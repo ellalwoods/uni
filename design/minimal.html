@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minimal study app directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: three tabs, each a minimal direction shown as three phone screens (home, a course, a study card). One accent colour per course, white ground, type does the work. */
+  --page:#f3f2ef; --ink:#1c1c1a; --soft:#6d6c67; --hair:#e6e4de; --white:#fdfcfa;
+  --sans:'Hanken Grotesk', system-ui, sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.top{max-width:1120px;margin:0 auto;padding:30px 24px 4px}
+.top h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:40px;line-height:1.05;margin:0 0 6px}
+.top p{margin:0;color:var(--soft);max-width:66ch}
+nav{max-width:1120px;margin:0 auto;padding:16px 24px 6px;display:flex;gap:8px;flex-wrap:wrap}
+nav button{border:1px solid #1c1c1a26;border-radius:999px;padding:8px 16px;font-size:14px;background:#fff}
+nav button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+section{display:none;max-width:1120px;margin:0 auto;padding:10px 24px 70px}
+section.on{display:block}
+.pitch{max-width:70ch;margin:8px 0 22px}
+.pitch h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:30px;margin:0 0 4px}
+.pitch p{margin:0;color:var(--soft)}
+.phones{display:flex;gap:26px;flex-wrap:wrap;justify-content:center}
+.ph{width:320px;flex:0 0 320px}
+.ph .cap{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:600;margin:0 0 8px 6px}
+.scr{width:320px;height:660px;border-radius:40px;overflow:hidden;position:relative;border:8px solid #fff;box-shadow:0 20px 44px #1c1c1a1f,0 0 0 1px #1c1c1a14;background:var(--white)}
+.in{position:absolute;inset:0;padding:48px 20px 20px;overflow:hidden}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:92px;height:24px;background:#111;border-radius:20px;z-index:9}
+.meta{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--soft)}
+.row{display:flex;justify-content:space-between;align-items:center}
+.backbtn{font-size:13px;font-weight:600;color:var(--soft)}
+.btn{display:block;text-align:center;padding:14px;border-radius:999px;font-weight:600;font-size:15px;color:#fff;background:var(--c)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--hair)}
+.pin{position:absolute;left:20px;right:20px;bottom:22px}
+.nextrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--hair);margin-top:4px}
+.nextrow .pk{width:26px;height:32px;border-radius:2px;border:1.5px solid var(--c);position:relative;flex:0 0 auto}
+.nextrow .pk:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--c)}
+.nextrow b{font-weight:600;font-size:14px;display:block;line-height:1.2}
+.nextrow span{font-size:12px;color:var(--soft)}
+.nextrow .chev{margin-left:auto;color:var(--soft);font-size:18px}
+.card{margin-top:22px}
+.card .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--c)}
+.card .a{font-size:15px;line-height:1.55;color:#33332f;margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
+.card .src{font-size:12px;color:var(--soft);margin-top:14px}
+.rate{position:absolute;left:20px;right:20px;bottom:22px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.prog{display:flex;gap:3px;margin-top:14px}
+.prog i{flex:1;height:3px;border-radius:2px;background:var(--hair)}
+.prog i.d{background:var(--c)}
+
+/* ===== A. Panes ===== */
+.A h3{font-family:'Instrument Serif',serif;font-weight:400}
+.A .title{font-family:'Instrument Serif',serif;font-size:34px;line-height:1;margin:8px 0 18px}
+.A .list{display:flex;flex-direction:column}
+.A .item{display:flex;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--hair)}
+.A .item:last-child{border-bottom:1px solid var(--hair)}
+.A .item .nm{font-family:'Instrument Serif',serif;font-size:21px;line-height:1.08}
+.A .item .st{font-size:12px;color:var(--soft);margin-top:4px}
+.A .item .st i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:1px}
+.A .add{display:flex;gap:14px;align-items:center;padding:14px 0;color:var(--soft);font-weight:600;font-size:14px}
+.A .add .ar{width:46px;height:62px;border:1.5px dashed #c9c6be;border-radius:23px 23px 2px 2px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.A .ctitle{font-family:'Instrument Serif',serif;font-size:30px;line-height:1.02;margin:14px 0 4px;color:var(--c)}
+.A .big{display:flex;justify-content:center;margin:16px 0 10px}
+.A .legend{display:flex;justify-content:center;gap:14px;font-size:11.5px;color:var(--soft);margin-bottom:6px}
+.A .legend span{display:flex;align-items:center;gap:5px}
+.A .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.A .card .q{font-family:'Instrument Serif',serif;font-size:27px;line-height:1.12;margin-top:8px}
+
+/* ===== B. Numerals ===== */
+.B{font-family:'Bricolage Grotesque',var(--sans)}
+.B .title{font-weight:800;font-size:30px;line-height:1;letter-spacing:-.02em;margin:8px 0 14px}
+.B .crow{padding:14px 0 12px;border-top:1.5px solid var(--ink)}
+.B .crow .nm{font-weight:800;font-size:22px;line-height:1.02;letter-spacing:-.015em;color:var(--c)}
+.B .segs{display:grid;grid-template-columns:repeat(13,1fr);gap:3px;margin-top:10px}
+.B .segs i{height:6px;border-radius:1px;background:var(--hair)}
+.B .segs i.p{background:var(--c)}
+.B .segs i.r{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c)}
+.B .crow .st{display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;color:var(--soft);margin-top:6px}
+.B .crow .st b{color:var(--c);font-weight:600}
+.B .add{border-top:1.5px solid var(--ink);padding-top:12px;font-weight:600;font-size:15px;color:var(--soft)}
+.B .ctitle{font-weight:800;font-size:27px;line-height:1;letter-spacing:-.02em;margin:12px 0 2px;color:var(--c)}
+.B .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:14px;border-top:1.5px solid var(--ink)}
+.B .cell{padding:6px 2px 8px;border-bottom:1px solid var(--hair);min-height:66px;position:relative}
+.B .cell .n{font-weight:800;font-size:36px;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.B .cell .t{font-family:var(--sans);font-size:10.5px;line-height:1.2;color:var(--soft);margin-top:2px;padding-right:6px}
+.B .cell.p .n{color:var(--c)}
+.B .cell.r .n{color:transparent;-webkit-text-stroke:1.4px var(--c)}
+.B .cell.r .t{color:var(--c);font-weight:700}
+.B .cell.s .n{color:#dcd9d1}
+.B .card .num{position:absolute;right:16px;bottom:96px;font-weight:800;font-size:120px;line-height:1;letter-spacing:-.05em;color:var(--c);opacity:.09}
+.B .card .q{font-weight:600;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin-top:8px;position:relative}
+
+/* ===== C. Stems ===== */
+.C .title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:36px;line-height:1;margin:8px 0 14px}
+.C .plates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.C .plate{border:1px solid var(--hair);border-radius:4px;padding:10px 10px 12px;background:#fff}
+.C .plate svg{display:block;margin:0 auto}
+.C .plate .nm{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;line-height:1.05;margin-top:6px;color:var(--c)}
+.C .plate .st{font-size:11px;color:var(--soft);margin-top:3px}
+.C .plate.add{border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--soft);font-weight:600;font-size:13.5px;min-height:70px;grid-column:1/-1}
+.C .ctitle{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;line-height:1;margin:12px 0 2px;color:var(--c)}
+.C .stemwrap{position:relative;margin-top:6px}
+.C .card .q{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;line-height:1.1;margin-top:8px}
+.C .card .leafic{margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Three minimal directions</h1>
+  <p>White space, one colour per course, and type doing most of the work. Each one shows the 13 weeks of a course at a glance, with three states: planted, ready to plant (notes are in) and sealed (no notes yet). The content is made up.</p>
+</div>
+<nav role="tablist" id="nav"></nav>
+<main id="main"></main>
+
+<script>
+const COURSES=[
+ {name:'International Commercial Arbitration', short:'Int’l Commercial Arbitration', c:'#c4572e', planted:8, ready:2},
+ {name:'Corporate Law', c:'#2f4c8f', planted:5, ready:1},
+ {name:'AI Law', c:'#3c7a5a', planted:6, ready:0},
+ {name:'Intensive course', c:'#8a3f6e', planted:1, ready:1},
+];
+const WEEKS=['What arbitration is','The agreement','Seats and laws','Institutions','The tribunal','Jurisdiction','Interim measures','Evidence','The award','Challenges','Enforcement','Investor–state','Revision'];
+const CARD={k:'Week 2 · Separability',q:'Why does an arbitration clause survive when the main contract is said to be void?',
+ a:'The clause is treated as its own small agreement inside the bigger one. An attack on the main contract doesn’t by itself knock out the promise to arbitrate, so the tribunal can still decide whether the contract is void.',src:'ICA Week 2 notes, p.3'};
+const st=(c,i)=>i<c.planted?'p':i<c.planted+c.ready?'r':'s';
+const status=c=>c.ready?`<i></i>${c.ready} ready to plant · ${c.planted} of 13 planted`:`${c.planted} of 13 planted`;
+const phone=(cap,cls,style,html)=>`<div class="ph"><p class="cap">${cap}</p><div class="scr"><div class="notch"></div><div class="in ${cls}" style="${style||''}">${html}</div></div></div>`;
+const I=COURSES[0];
+const nextRow=c=>c.ready?`<div class="nextrow"><div class="pk"></div><div><b>Week ${c.planted+1} is ready to plant</b><span>${c.ready} seed ${c.ready>1?'packets':'packet'} waiting · notes are in</span></div><span class="chev">›</span></div>`:'';
+const cardBody=(extra='')=>`${extra}<div class="k">${CARD.k}</div><div class="q">${CARD.q}</div><div class="a">${CARD.a}</div><div class="src">From ${CARD.src}</div>`;
+const prog=`<div class="prog">${[...Array(12)].map((_,i)=>`<i class="${i<4?'d':''}"></i>`).join('')}</div>`;
+const rate=`<div class="rate"><div class="btn ghost">See again</div><div class="btn">Got it</div></div>`;
+
+/* ===== A. Panes: a glasshouse window of 13 panes ===== */
+function arch(c,w,{labels=false}={}){
+  // 12 panes in a 3x4 grid, week 13 in the arch crown
+  const W=120,H=170,g=3,top=60,cols=3,rows=4,cw=(W-g*(cols+1))/cols,rh=(H-top-g*(rows+1))/rows;
+  const fill=s=>s==='p'?c.c:s==='r'?'#fff':'#efece6';
+  let o=`<svg width="${w}" viewBox="-2 -2 124 174"><defs><clipPath id="cl${w}${c.c.slice(1)}"><path d="M0 170 V60 A60 60 0 0 1 120 60 V170 Z"/></clipPath></defs><g clip-path="url(#cl${w}${c.c.slice(1)})"><rect x="0" y="0" width="120" height="170" fill="#fff"/>`;
+  for(let i=0;i<12;i++){const r=Math.floor(i/3),k=i%3,x=g+k*(cw+g),y=top+g+r*(rh+g),s=st(c,i);
+    o+=`<rect x="${x}" y="${y}" width="${cw}" height="${rh}" fill="${fill(s)}" ${s==='r'?`stroke="${c.c}" stroke-width="1.6"`:''}/>`;
+    if(labels) o+=`<text x="${x+cw/2}" y="${y+rh/2+4}" text-anchor="middle" font-family="Hanken Grotesk" font-size="11" font-weight="700" fill="${s==='p'?'#fff':s==='r'?c.c:'#b4b0a6'}">${i+1}</text>`;
+    if(s==='r'&&!labels) o+=`<circle cx="${x+cw/2}" cy="${y+rh/2}" r="2.6" fill="${c.c}"/>`;}
+  const s13=st(c,12);
+  o+=`<path d="M${g} ${top} A${60-g} ${60-g} 0 0 1 ${W-g} ${top} Z" fill="${fill(s13)}" ${s13==='r'?`stroke="${c.c}" stroke-width="1.6"`:''}/>`;
+  if(labels) o+=`<text x="60" y="44" text-anchor="middle" font-family="Hanken Grotesk" font-size="11" font-weight="700" fill="${s13==='p'?'#fff':'#b4b0a6'}">13</text>`;
+  o+=`</g><path d="M0 170 V60 A60 60 0 0 1 120 60 V170 Z" fill="none" stroke="#1c1c1a" stroke-width="1.6"/></svg>`;
+  return o;
+}
+function panes(){
+  const home=`<div class="row"><span class="meta">Semester 2</span><span class="meta">4 courses</span></div>
+   <div class="title">Glasshouses</div>
+   <div class="list">${COURSES.map(c=>`<div class="item" style="--c:${c.c}">${arch(c,46)}<div><div class="nm">${c.short||c.name}</div><div class="st">${status(c)}</div></div></div>`).join('')}</div>
+   <div class="add"><div class="ar">+</div>New glasshouse</div>`;
+  const inside=`<div class="row"><span class="backbtn">‹ Glasshouses</span><span class="meta">${I.planted} of 13</span></div>
+   <div class="ctitle">International Commercial Arbitration</div>
+   <div class="big">${arch(I,196,{labels:true})}</div>
+   <div class="legend"><span><i style="background:${I.c}"></i>Planted</span><span><i style="border:1.5px solid ${I.c}"></i>Ready</span><span><i style="background:#efece6"></i>Sealed</span></div>
+   <div class="pin">${nextRow(I)}<div class="btn">Study planted weeks</div></div>`;
+  const study=`<div class="row"><span class="backbtn">‹ Week 2</span><span class="meta">4 of 12</span></div>${prog}<div class="card">${cardBody()}</div>${rate}`;
+  return {id:'panes',name:'Panes',cls:'A',home,inside,study,
+    pitch:'Your glasshouse, reduced to one arched window. Each course is a window of 13 panes: twelve weeks in the grid and week 13 in the arch at the top. Panes fill with the course’s colour as you plant each week, so you see the whole semester in one shape.'};
+}
+
+/* ===== B. Numerals: the weeks as big numbers ===== */
+function numerals(){
+  const home=`<div class="row"><span class="meta">Semester 2</span><span class="meta">4 courses</span></div>
+   <div class="title">Courses</div>
+   ${COURSES.map(c=>`<div class="crow" style="--c:${c.c}"><div class="nm">${c.name}</div>
+     <div class="segs">${[...Array(13).keys()].map(i=>`<i class="${st(c,i)}"></i>`).join('')}</div>
+     <div class="st"><span>${c.planted} of 13 weeks</span>${c.ready?`<b>${c.ready} ready</b>`:'<span></span>'}</div></div>`).join('')}
+   <div class="add">+ Add a course</div>`;
+  const inside=`<div class="row"><span class="backbtn">‹ Courses</span><span class="meta">${I.planted} of 13</span></div>
+   <div class="ctitle">International Commercial Arbitration</div>
+   <div class="grid">${WEEKS.map((t,i)=>{const s=st(I,i);return `<div class="cell ${s}"><div class="n">${String(i+1).padStart(2,'0')}</div><div class="t">${s==='r'?'Ready to plant':s==='s'?'&nbsp;':t}</div></div>`}).join('')}</div>
+   <div class="pin"><div class="btn">Study planted weeks</div></div>`;
+  const study=`<div class="row"><span class="backbtn">‹ Week 02</span><span class="meta">4 of 12</span></div>${prog}<div class="card"><div class="num">02</div>${cardBody()}</div>${rate}`;
+  return {id:'numerals',name:'Numerals',cls:'B',home,inside,study,
+    pitch:'No metaphor at all: the weeks are the design. Each course is a run of 13 segments on the home screen, and inside it the weeks are big numbers, 01 to 13. Solid numbers are planted, outlined numbers are ready to plant, and pale numbers are sealed.'};
+}
+
+/* ===== C. Stems: one botanical line per course ===== */
+function stem(c,h,{labels=false,w=110}={}){
+  // weeks climb the stem from the bottom: 1 at the base, 13 at the tip
+  const cx=labels?44:w/2,top=10,bot=h-6,amp=labels?6:5,n=13;
+  const y=i=>bot-(i+1)*(bot-top)/(n+1), x=yy=>cx+Math.sin((bot-yy)/(bot-top)*Math.PI*2)*amp;
+  let path='';for(let yy=bot;yy>=top;yy-=4) path+=(path?' L':'M')+x(yy).toFixed(1)+' '+yy;
+  let o=`<svg width="${labels?272:w}" height="${h}" viewBox="0 0 ${labels?272:w} ${h}"><path d="${path}" fill="none" stroke="${c.c}" stroke-width="1.5" stroke-linecap="round"/>`;
+  for(let i=0;i<n;i++){const s=st(c,i),yy=y(i),xx=x(yy),side=labels?1:(i%2?1:-1),L=labels?16:13;
+    const lx=xx+side*L, ly=yy-6;
+    const leaf=`M${xx} ${yy} Q${xx+side*L*.5} ${yy-L*.75} ${lx} ${ly} Q${xx+side*L*.6} ${yy+1} ${xx} ${yy} Z`;
+    if(s==='p') o+=`<path d="${leaf}" fill="${c.c}"/>`;
+    else if(s==='r') o+=`<path d="${leaf}" fill="#fff" stroke="${c.c}" stroke-width="1.3"/><circle cx="${lx+side*5}" cy="${ly}" r="2.4" fill="${c.c}"/>`;
+    else o+=`<circle cx="${xx}" cy="${yy}" r="1.8" fill="#cfcbc2"/>`;
+    if(labels){const col=s==='s'?'#b4b0a6':s==='r'?c.c:'#1c1c1a';
+      o+=`<text x="${cx+34}" y="${yy+1}" font-family="Hanken Grotesk" font-size="10.5" font-weight="700" fill="${s==='s'?'#c8c4ba':c.c}">${i+1}</text>`;
+      o+=`<text x="${cx+52}" y="${yy+1}" font-family="Hanken Grotesk" font-size="12.5" font-weight="${s==='r'?700:500}" fill="${col}">${s==='r'?'Ready to plant':s==='s'?'Sealed':WEEKS[i]}</text>`;}}
+  return o+`</svg>`;
+}
+function stems(){
+  const home=`<div class="row"><span class="meta">Semester 2</span><span class="meta">4 courses</span></div>
+   <div class="title">Herbarium</div>
+   <div class="plates">${COURSES.map(c=>`<div class="plate" style="--c:${c.c}">${stem(c,118)}<div class="nm">${c.short||c.name}</div><div class="st">${c.ready?`${c.ready} ready · `:''}${c.planted} of 13</div></div>`).join('')}
+   <div class="plate add">+ New course</div></div>`;
+  const inside=`<div class="row"><span class="backbtn">‹ Herbarium</span><span class="meta">${I.planted} of 13</span></div>
+   <div class="ctitle">International Commercial Arbitration</div>
+   <div class="stemwrap">${stem(I,404,{labels:true})}</div>
+   <div class="pin"><div class="btn">Study planted weeks</div></div>`;
+  const leafic=`<svg class="leafic" width="26" height="20" viewBox="0 0 26 20"><path d="M2 18 Q10 2 24 2 Q18 16 2 18 Z" fill="${I.c}"/></svg>`;
+  const study=`<div class="row"><span class="backbtn">‹ Week 2</span><span class="meta">4 of 12</span></div>${prog}<div class="card">${cardBody(leafic)}</div>${rate}`;
+  return {id:'stems',name:'Stems',cls:'C',home,inside,study,
+    pitch:'Pressed botanical plates. Each course is a single stem drawn in one colour, and its weeks climb from the base: a leaf for each week you’ve planted, an open leaf for ready, a small dot for sealed. Inside, the stem doubles as a list, with each week’s title beside its leaf.'};
+}
+
+const D=[panes(),numerals(),stems()];
+const nav=document.getElementById('nav'),main=document.getElementById('main');
+nav.innerHTML=D.map((d,i)=>`<button role="tab" aria-selected="${i==0}" data-i="${i}">${d.name}</button>`).join('');
+main.innerHTML=D.map((d,i)=>`<section id="${d.id}" class="${i==0?'on':''}" role="tabpanel">
+  <div class="pitch"><h2>${d.name}</h2><p>${d.pitch}</p></div>
+  <div class="phones">${phone('Home',d.cls,'',d.home)}${phone('A course',d.cls,`--c:${I.c}`,d.inside)}${phone('Studying',d.cls,`--c:${I.c}`,d.study)}</div></section>`).join('');
+function show(i){nav.querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-selected',j==i));main.querySelectorAll('section').forEach((s,j)=>s.classList.toggle('on',j==i));if(location.hash!=='#'+D[i].id)history.replaceState(null,'','#'+D[i].id);}
+nav.onclick=e=>{const b=e.target.closest('button');if(b)show(+b.dataset.i)};
+const s0=D.findIndex(d=>'#'+d.id===location.hash);show(s0<0?0:s0);
+addEventListener('hashchange',()=>{const k=D.findIndex(d=>'#'+d.id===location.hash);if(k>=0)show(k)});
+</script>
+</body>
+</html>
