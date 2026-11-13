@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glasshouses mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: a row of phone screens walking through the flow: home → a glasshouse → a seed packet → a planted week → a card → a second habitat. */
+  --page:#f1f5ef; --ink:#22302a; --soft:#62756b; --line:#d6e2d9; --white:#ffffff;
+  --serif:'Young Serif', Georgia, serif; --sans:'Outfit', system-ui, sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+.top{padding:28px 24px 10px;max-width:1240px;margin:0 auto}
+.top h1{font-family:var(--serif);font-weight:400;font-size:34px;margin:0 0 6px;color:#2f6b47;text-wrap:balance}
+.top p{margin:0 0 6px;color:var(--soft);max-width:72ch}
+.flow{max-width:1240px;margin:0 auto;padding:16px 24px 60px;display:flex;flex-wrap:wrap;gap:30px 26px;justify-content:center}
+.ph{width:320px;flex:0 0 320px}
+.ph .cap{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--soft);font-weight:600;margin:0 0 4px 6px}
+.ph .cap b{color:#2f6b47}
+.ph .note{font-size:13px;color:var(--soft);margin:0 6px 10px;min-height:40px;line-height:1.4}
+.scr{width:320px;height:680px;border-radius:40px;overflow:hidden;position:relative;border:8px solid #fff;box-shadow:0 24px 50px #22302a24,0 0 0 1px #22302a1a;isolation:isolate;background:#fbfcfa}
+.scr .in{position:absolute;inset:0;overflow:hidden;padding:46px 16px 16px}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:92px;height:24px;background:#111;border-radius:20px;z-index:20}
+.crumbs{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--soft)}
+h2{font-family:var(--serif);font-weight:400;margin:0;line-height:1.05}
+
+/* ---------- Home: stacked glasshouses ---------- */
+.home h2{font-size:28px;color:#2f6b47;margin-top:8px}
+.home .sub{font-size:12.5px;color:var(--soft);margin:2px 0 12px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.house{position:relative;border-radius:14px 14px 8px 8px;overflow:hidden;box-shadow:0 6px 16px #22302a1f,0 0 0 3px #fff, 0 0 0 4px #d6e2d9}
+.house .sc{position:absolute;inset:0}
+.house .sc svg{display:block;width:100%;height:100%}
+.house .blur{filter:blur(3px) saturate(1.15);transform:scale(1.05)}
+.house .wipe{filter:blur(.8px);-webkit-mask:radial-gradient(ellipse 26% 38% at var(--wx) 46%,#000 35%,transparent 72%);mask:radial-gradient(ellipse 26% 38% at var(--wx) 46%,#000 35%,transparent 72%)}
+.house .fog{position:absolute;inset:0;background:linear-gradient(170deg,#ffffff80,#ffffff40 60%,#ffffff66);-webkit-mask:radial-gradient(ellipse 26% 38% at var(--wx) 46%,#0006 30%,#000 75%);mask:radial-gradient(ellipse 26% 38% at var(--wx) 46%,#0006 30%,#000 75%)}
+.house .drops{position:absolute;inset:0;background-image:radial-gradient(circle,#ffffffe6 0 1.1px,#ffffff00 1.6px),radial-gradient(circle,#ffffffcc 0 1.6px,#ffffff00 2.2px),radial-gradient(circle,#ffffffb3 0 .8px,#ffffff00 1.2px);background-size:13px 17px,29px 23px,7px 9px;background-position:0 0,6px 11px,3px 2px;opacity:.75;-webkit-mask:radial-gradient(ellipse 26% 38% at var(--wx) 46%,transparent 40%,#000 80%);mask:radial-gradient(ellipse 26% 38% at var(--wx) 46%,transparent 40%,#000 80%)}
+.house .streaks{position:absolute;inset:0}
+.house .frame{position:absolute;inset:0;pointer-events:none}
+.house .frame svg{width:100%;height:100%;display:block}
+.plate{position:absolute;left:0;right:0;bottom:0;background:#fffffff2;padding:6px 12px 7px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-top:3px solid #fff;box-shadow:0 -2px 8px #22302a14}
+.plate b{font-family:var(--serif);font-weight:400;font-size:14px;line-height:1.15;color:var(--c);}
+.plate span{font-size:10.5px;color:var(--soft);font-weight:500;white-space:nowrap}
+.addhouse{height:58px;border-radius:14px;border:2px dashed #b9cdbf;display:flex;align-items:center;justify-content:center;gap:8px;color:#5c7d68;font-weight:600;font-size:14px;background:repeating-linear-gradient(135deg,#ffffff 0 10px,#f5f9f5 10px 20px)}
+.addhouse i{font-style:normal;width:26px;height:26px;border-radius:50%;background:#2f6b47;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1}
+
+/* ---------- Inside a glasshouse ---------- */
+.inside{background:linear-gradient(var(--g1),var(--g2))}
+.inside h2{font-size:23px;color:var(--ink2);margin-top:6px}
+.inside .hab{font-size:12px;color:var(--soft);margin-top:2px}
+.shelf{margin-top:12px;position:relative}
+.shelf .lbl{display:flex;justify-content:space-between;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--soft);margin-bottom:5px}
+.row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 4px 0;position:relative}
+.row.r2{grid-template-columns:repeat(7,1fr)}
+.board{height:7px;background:linear-gradient(#ffffff,#e9e4da);border-radius:2px;box-shadow:0 3px 4px #22302a22;margin:0 0 10px}
+.pk{height:50px;border-radius:2px 2px 3px 3px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:3px;font-size:9px;font-weight:700;overflow:hidden}
+.pk .crimp{position:absolute;top:0;left:0;right:0;height:5px;background:repeating-linear-gradient(90deg,#00000014 0 2px,transparent 2px 4px)}
+.pk.ready{background:#fff;box-shadow:0 2px 4px #22302a2e;color:var(--ink2)}
+.pk.ready .art{position:absolute;top:6px;left:2px;right:2px;height:26px;border-radius:2px;background:var(--tint);display:flex;align-items:center;justify-content:center}
+.pk.ready:after{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 2px #fff}
+.pk.planted{background:#fff;box-shadow:0 2px 4px #22302a2e;color:var(--ink2);clip-path:polygon(0 12%,20% 6%,38% 13%,58% 5%,78% 12%,100% 6%,100% 100%,0 100%)}
+.pk.planted .art{position:absolute;top:9px;left:2px;right:2px;height:23px;border-radius:2px;background:var(--tint);display:flex;align-items:center;justify-content:center}
+.pk.locked{background:#ede6d8;color:#a89c86;border:1px dashed #cdbfa6;box-shadow:none}
+.pk.locked .num{font-family:var(--serif);font-size:14px;font-weight:400;position:absolute;top:13px;left:0;right:0;text-align:center;color:#b9ac94}
+.legend{display:flex;gap:10px;font-size:10.5px;color:var(--soft);margin:-4px 0 6px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.beds{position:relative;margin:2px -16px 0;height:250px}
+.beds svg{display:block;width:100%;height:100%}
+.ibtn{display:block;text-align:center;padding:12px;border-radius:999px;background:var(--ink2);color:#fff;font-weight:600;font-size:14px;margin-top:10px}
+
+/* ---------- Seed packet (week detail) ---------- */
+.packetwrap{margin-top:12px;position:relative}
+.bigpk{background:#fff;border-radius:6px 6px 10px 10px;box-shadow:0 16px 30px #22302a29,0 0 0 1px #22302a12;overflow:hidden;position:relative}
+.bigpk .crimp{height:16px;background:repeating-linear-gradient(90deg,var(--acc) 0 5px,color-mix(in srgb,var(--acc) 70%,#fff) 5px 10px)}
+.bigpk .art{height:150px;background:linear-gradient(var(--g1),var(--tint));position:relative;overflow:hidden}
+.bigpk .art svg{position:absolute;inset:0;width:100%;height:100%}
+.bigpk .wk{position:absolute;top:10px;left:12px;background:#fff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.04em}
+.bigpk .body{padding:12px 14px 14px}
+.bigpk h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0 0 2px;color:var(--ink2);line-height:1.1}
+.bigpk .var{font-size:11.5px;color:var(--soft);font-style:italic}
+.seeds{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.seeds span{font-size:11.5px;padding:3px 8px;border-radius:999px;background:var(--tint);color:var(--ink2);font-weight:500}
+.sown{display:flex;gap:8px;align-items:center;margin-top:12px;padding:8px 10px;border-radius:8px;background:#f6f8f5;font-size:11.5px;color:var(--soft);line-height:1.3}
+.sown b{color:var(--ink);font-weight:600}
+.doc{width:22px;height:28px;border-radius:2px;background:#fff;border:1.5px solid #c5d2c9;flex:0 0 auto;position:relative}
+.doc:after{content:"";position:absolute;left:4px;right:4px;top:7px;height:10px;background:repeating-linear-gradient(#c5d2c9 0 1.5px,transparent 1.5px 4px)}
+.plantbtn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:999px;background:var(--ink2);color:#fff;font-weight:600;font-size:14.5px;margin-top:12px}
+.ghostbtn{display:block;text-align:center;padding:10px;font-weight:600;font-size:13px;color:var(--ink2)}
+
+/* ---------- Planted week ---------- */
+.growhead{display:flex;gap:12px;align-items:flex-end;margin-top:10px;background:#ffffffb3;border-radius:14px;padding:6px 12px 0;box-shadow:0 0 0 1px #22302a12}
+.growhead .meta{padding-bottom:12px}
+.growhead .pc{font-family:var(--serif);font-size:30px;color:var(--ink2);line-height:1}
+.growhead .pcl{font-size:11.5px;color:var(--soft)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.modes div{text-align:center;padding:9px 4px 8px;border-radius:12px;background:#fff;box-shadow:0 0 0 1px #22302a14;font-size:13px;font-weight:600;color:var(--ink2);line-height:1.15}
+.modes div small{display:block;font-size:10.5px;font-weight:500;color:var(--soft);margin-top:2px}
+.modes div.on{background:var(--ink2);color:#fff;box-shadow:none}
+.modes div.on small{color:#ffffffcc}
+.conc{margin-top:10px;background:#fff;border-radius:14px;box-shadow:0 0 0 1px #22302a12;padding:4px 12px}
+.ci{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #eef2ee;font-size:13px}
+.ci:last-child{border-bottom:0}
+.ci .st{width:30px;height:24px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:center}
+.ci .nm{flex:1;line-height:1.2}
+.ci .lv{font-size:10.5px;color:var(--soft);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+/* ---------- Study card ---------- */
+.card{margin-top:14px;background:#fff;border-radius:18px;box-shadow:0 14px 30px #22302a22,0 0 0 1px #22302a10;overflow:hidden}
+.card .band{height:8px;background:repeating-linear-gradient(90deg,var(--acc) 0 5px,color-mix(in srgb,var(--acc) 70%,#fff) 5px 10px)}
+.card .cb{padding:16px 16px 14px}
+.card .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--acc2)}
+.card .q{font-family:var(--serif);font-size:19px;line-height:1.28;margin:8px 0 14px;color:var(--ink)}
+.card .a{font-size:13.5px;line-height:1.5;color:#33433b;border-top:1px dashed #d3ddd5;padding-top:12px}
+.card .src{font-size:11.5px;color:var(--soft);margin-top:12px;display:flex;gap:6px;align-items:center}
+.rate{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.rate div{padding:12px 6px;border-radius:14px;text-align:center;font-weight:600;font-size:14px;line-height:1.15}
+.rate div small{display:block;font-weight:500;font-size:11px;opacity:.8;margin-top:2px}
+.prog{display:flex;gap:3px;margin-top:10px}
+.prog i{flex:1;height:4px;border-radius:2px;background:#22302a1a}
+.prog i.d{background:var(--acc)}
+
+.legendrow{max-width:1240px;margin:0 auto;padding:0 24px 50px}
+.legendrow table{border-collapse:collapse;font-size:14px;width:100%;max-width:900px}
+.legendrow th,.legendrow td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.legendrow th{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--soft);font-weight:600}
+.legendrow h3{font-family:var(--serif);font-weight:400;font-size:22px;color:#2f6b47;margin:0 0 8px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Your glasshouses</h1>
+  <p>Each course is a glasshouse. On the home screen you see them from outside through fogged glass, with the habitat inside just about visible. Open one and it has its own light habitat, with a shelf of 13 seed packets for its 13 weeks. A packet stays sealed until you've added that week's notes, then it's ready to plant. International Commercial Arbitration below uses made-up example content.</p>
+</div>
+<div class="flow" id="flow"></div>
+<div class="legendrow">
+  <h3>How the pieces fit</h3>
+  <table>
+    <tr><th>In the app</th><th>What it is</th></tr>
+    <tr><td>A glasshouse</td><td>One course. You can have one or more, and you add another with the + button.</td></tr>
+    <tr><td>Its habitat</td><td>Each course's glasshouse has its own theme (an orangery, an alpine house, a succulent house, a lily house), so they always look different.</td></tr>
+    <tr><td>A seed packet</td><td>One week. There are 13 on the shelf. The intensive course can use a different layout once you know how it runs.</td></tr>
+    <tr><td>Sealed packet</td><td>No notes added for that week yet, so it can't be planted.</td></tr>
+    <tr><td>Ready packet</td><td>Notes are in. The packet shows the concepts (seeds) written from your notes, and you plant it when you're ready.</td></tr>
+    <tr><td>Planted week</td><td>It grows in the glasshouse as you learn its concepts. You can study it any time with flashcards, a quiz or a summary.</td></tr>
+  </table>
+</div>
+
+<script>
+/* ---------- habitats ---------- */
+const H = {
+  orangery:{name:'The Orangery', g1:'#fdf8ee', g2:'#fbf2e2', tint:'#fbe9c8', acc:'#e9a23b', acc2:'#c0712b', ink2:'#8a4b22', leaf:'#7fa86a', leaf2:'#9cbf7c', floor:'#efc9a8', floor2:'#e6b892'},
+  alpine:  {name:'The Alpine House', g1:'#f2f7fc', g2:'#e8f0f8', tint:'#dfeaf6', acc:'#7aa6d6', acc2:'#4b7cb3', ink2:'#2f5f86', leaf:'#8db39a', leaf2:'#a9c8b3', floor:'#e3e9e6', floor2:'#d3dcd8'},
+  desert:  {name:'The Succulent House', g1:'#fdf3ee', g2:'#f9e8e0', tint:'#f8dfe3', acc:'#e98ba0', acc2:'#c75f78', ink2:'#9a4458', leaf:'#9cbf9a', leaf2:'#b7d3b1', floor:'#f3dccb', floor2:'#ebcdb7'},
+  lily:    {name:'The Lily House', g1:'#eef9f7', g2:'#e2f3f0', tint:'#d8f0ec', acc:'#f29bb6', acc2:'#d5658a', ink2:'#2c7a73', leaf:'#7cc0a0', leaf2:'#a3d6bd', floor:'#c6e9e4', floor2:'#b0dfd9'},
+};
+const rng = s => () => (s = (s*9301+49297)%233280)/233280;
+
+/* one growing plant per habitat; g = 0..1 */
+function plant(t, x, y, g, k=1){
+  const h=H[t]; let o='';
+  if(t==='orangery'){
+    const th=10+g*44, r=7+g*17;
+    o+=`<path d="M${x-14*k} ${y-22*k} h${28*k} l-${4*k} ${22*k} h-${20*k} z" fill="#d9805a"/><rect x="${x-16*k}" y="${y-25*k}" width="${32*k}" height="${5*k}" rx="1.5" fill="#e59572"/>`;
+    o+=`<path d="M${x} ${y-25*k} V${y-25*k-th*k}" stroke="#8d6a4c" stroke-width="${2.6*k}"/>`;
+    const cy=y-25*k-th*k;
+    o+=`<circle cx="${x}" cy="${cy}" r="${r*k}" fill="${h.leaf}"/><circle cx="${x-r*.35*k}" cy="${cy-r*.3*k}" r="${r*.55*k}" fill="${h.leaf2}"/>`;
+    const n=Math.round(g*7); const R=rng(Math.round(x*7+g*100));
+    for(let i=0;i<n;i++){const a=R()*6.28, d=R()*r*.75; o+=`<ellipse cx="${x+Math.cos(a)*d*k}" cy="${cy+Math.sin(a)*d*k}" rx="${3.4*k}" ry="${2.8*k}" fill="#f3c33f"/>`;}
+  } else if(t==='alpine'){
+    o+=`<rect x="${x-20*k}" y="${y-14*k}" width="${40*k}" height="${14*k}" rx="${4*k}" fill="#cfd6d3"/><rect x="${x-20*k}" y="${y-14*k}" width="${40*k}" height="${3*k}" rx="1.5" fill="#dde3e0"/>`;
+    const w=8+g*24, hh=5+g*16;
+    o+=`<ellipse cx="${x}" cy="${y-14*k}" rx="${w*k}" ry="${hh*k}" fill="${h.leaf}"/><ellipse cx="${x-w*.2*k}" cy="${y-16*k-hh*.25*k}" rx="${w*.6*k}" ry="${hh*.55*k}" fill="${h.leaf2}"/>`;
+    const n=Math.round(g*11); const R=rng(Math.round(x*5+g*50));
+    for(let i=0;i<n;i++){const px=x+(R()-.5)*w*1.5*k, py=y-14*k-R()*hh*1.4*k; o+=`<circle cx="${px}" cy="${py}" r="${2.3*k}" fill="${i%3?'#ffffff':'#9cc1ea'}" stroke="#ffffff" stroke-width=".5"/><circle cx="${px}" cy="${py}" r="${.8*k}" fill="#f2d36b"/>`;}
+    if(g>.5){o+=`<path d="M${x+w*.6*k} ${y-14*k} q2 -${18*k} 0 -${26*k}" stroke="#7aa08a" stroke-width="1.4" fill="none"/><circle cx="${x+w*.6*k}" cy="${y-40*k}" r="${4*k}" fill="#b9d1ef"/>`;}
+  } else if(t==='desert'){
+    o+=`<path d="M${x-13*k} ${y-20*k} h${26*k} l-${3*k} ${20*k} h-${20*k} z" fill="#f2b8a6"/><rect x="${x-15*k}" y="${y-23*k}" width="${30*k}" height="${4.5*k}" rx="1.5" fill="#f6c9ba"/>`;
+    const ch=12+g*46, cw=11+g*6, top=y-23*k-ch*k;
+    o+=`<rect x="${x-cw/2*k}" y="${top}" width="${cw*k}" height="${ch*k+2}" rx="${cw/2*k}" fill="${h.leaf}"/><rect x="${x-cw/2*k+2}" y="${top+3}" width="${2*k}" height="${ch*k-6}" rx="1" fill="${h.leaf2}"/>`;
+    if(g>.35) o+=`<path d="M${x-cw/2*k} ${top+ch*.55*k} h-${7*k} a${4*k} ${4*k} 0 0 1 -${4*k} -${4*k} v-${10*k}" stroke="${h.leaf}" stroke-width="${7*k}" fill="none" stroke-linecap="round"/>`;
+    if(g>.55) o+=`<path d="M${x+cw/2*k} ${top+ch*.4*k} h${6*k} a${4*k} ${4*k} 0 0 0 ${4*k} -${4*k} v-${8*k}" stroke="${h.leaf}" stroke-width="${7*k}" fill="none" stroke-linecap="round"/>`;
+    if(g>.65) o+=`<g transform="translate(${x} ${top-1})">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-${4*k}" rx="${2.6*k}" ry="${4.5*k}" fill="${h.acc}" transform="rotate(${a})"/>`).join('')}<circle r="${2*k}" fill="#f7d77a"/></g>`;
+  } else {
+    o+=`<ellipse cx="${x}" cy="${y-4*k}" rx="${28*k}" ry="${6*k}" fill="#a9ddd6"/>`;
+    const n=1+Math.round(g*3);
+    for(let i=0;i<n;i++){const px=x+(i-(n-1)/2)*16*k, py=y-5*k-(i%2)*3*k; o+=`<path d="M${px} ${py} m-${9*k} 0 a${9*k} ${4*k} 0 1 0 ${18*k} 0 a${9*k} ${4*k} 0 0 0 -${8*k} -${4*k} l-${1*k} ${4*k} z" fill="${i%2?h.leaf2:h.leaf}"/>`;}
+    const sh=6+g*30;
+    if(g>.15) o+=`<path d="M${x+4*k} ${y-6*k} V${y-6*k-sh*k}" stroke="#6aa88a" stroke-width="${1.8*k}"/>`;
+    if(g>.55){const cy=y-6*k-sh*k; o+=`<g transform="translate(${x+4*k} ${cy})">${[-50,-25,0,25,50].map(a=>`<ellipse cx="0" cy="-${6*k}" rx="${3.4*k}" ry="${7*k}" fill="${a?h.acc:'#f7b9cb'}" transform="rotate(${a})"/>`).join('')}<circle r="${2.2*k}" fill="#f7d77a"/></g>`;}
+    else if(g>.15){const cy=y-6*k-sh*k; o+=`<ellipse cx="${x+4*k}" cy="${cy-4*k}" rx="${3.2*k}" ry="${5.5*k}" fill="${h.acc}" opacity=".8"/>`;}
+  }
+  return o;
+}
+/* the habitat behind the plants */
+function backdrop(t, W, Ht, floorY){
+  const h=H[t]; let o=`<defs><linearGradient id="bg${t}${W}${Ht}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${h.g1}"/><stop offset="1" stop-color="${h.g2}"/></linearGradient></defs>
+   <rect width="${W}" height="${Ht}" fill="url(#bg${t}${W}${Ht})"/>`;
+  if(t==='orangery'){
+    o+=`<rect x="0" y="${floorY-40}" width="${W}" height="40" fill="#fbf4e8"/>`;
+    for(let x=20;x<W;x+=70) o+=`<path d="M${x} ${floorY-40} v-${Ht*.32} a22 22 0 0 1 44 0 v${Ht*.32}" fill="#fff6e3" stroke="#f3e2c4" stroke-width="2"/>`;
+    o+=`<rect x="0" y="${floorY}" width="${W}" height="${Ht-floorY}" fill="${h.floor}"/>`;
+    for(let x=0;x<W;x+=22) o+=`<path d="M${x} ${floorY} l${-8} ${Ht-floorY}" stroke="${h.floor2}" stroke-width="1.2"/>`;
+    o+=`<path d="M0 ${floorY+ (Ht-floorY)/2} H${W}" stroke="${h.floor2}" stroke-width="1.2"/>`;
+  } else if(t==='alpine'){
+    o+=`<path d="M0 ${floorY-30} L${W*.2} ${floorY-90} L${W*.38} ${floorY-45} L${W*.58} ${floorY-110} L${W*.8} ${floorY-50} L${W} ${floorY-80} V${floorY} H0 Z" fill="#e7eef6"/>`;
+    o+=`<path d="M${W*.52} ${floorY-98} L${W*.58} ${floorY-110} L${W*.64} ${floorY-96} Z" fill="#fff"/>`;
+    o+=`<rect x="0" y="${floorY}" width="${W}" height="${Ht-floorY}" fill="${h.floor}"/>`;
+    const R=rng(W+3); for(let i=0;i<14;i++) o+=`<ellipse cx="${R()*W}" cy="${floorY+6+R()*(Ht-floorY-8)}" rx="${6+R()*12}" ry="${3+R()*4}" fill="${h.floor2}"/>`;
+  } else if(t==='desert'){
+    o+=`<path d="M0 ${floorY-20} Q${W*.25} ${floorY-60} ${W*.5} ${floorY-25} T${W} ${floorY-35} V${floorY} H0Z" fill="#f8e2d6"/>`;
+    o+=`<circle cx="${W*.8}" cy="${floorY-90}" r="22" fill="#fde9d6"/>`;
+    o+=`<rect x="0" y="${floorY}" width="${W}" height="${Ht-floorY}" fill="${h.floor}"/>`;
+    const R=rng(W+9); for(let i=0;i<30;i++) o+=`<circle cx="${R()*W}" cy="${floorY+4+R()*(Ht-floorY-6)}" r="${.8+R()*1.4}" fill="${h.floor2}"/>`;
+  } else {
+    o+=`<rect x="0" y="${floorY}" width="${W}" height="${Ht-floorY}" fill="${h.floor}"/>`;
+    for(let i=0;i<6;i++) o+=`<path d="M${i*W/5-10} ${floorY+12+i%3*10} q14 -4 28 0" stroke="#e6f7f4" stroke-width="2" fill="none"/>`;
+    for(let x=10;x<W;x+=46) o+=`<path d="M${x} ${floorY} q-3 -40 2 -70" stroke="#a3d6bd" stroke-width="2" fill="none"/><ellipse cx="${x+2}" cy="${floorY-72}" rx="2.5" ry="8" fill="#c9a77a"/>`;
+  }
+  return o;
+}
+/* glass panes and roof over a scene */
+function glassFrame(W,Ht,cols){
+  let o=`<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="none">`;
+  for(let i=1;i<cols;i++){const x=i*W/cols; o+=`<line x1="${x}" y1="0" x2="${x}" y2="${Ht}" stroke="#fff" stroke-width="3"/>`;}
+  o+=`<line x1="0" y1="${Ht*.38}" x2="${W}" y2="${Ht*.38}" stroke="#fff" stroke-width="2.5"/>`;
+  o+=`<line x1="0" y1="${Ht*.72}" x2="${W}" y2="${Ht*.72}" stroke="#fff" stroke-width="2" opacity=".8"/>`;
+  return o+`<rect x="1.5" y="1.5" width="${W-3}" height="${Ht-3}" fill="none" stroke="#fff" stroke-width="4"/></svg>`;
+}
+/* small icon on packets */
+function icon(t,s=16){
+  const h=H[t];
+  if(t==='orangery') return `<svg width="${s}" height="${s}" viewBox="0 0 20 20"><path d="M10 4 q4 -3 7 -1 q-3 3 -7 1" fill="${h.leaf}"/><ellipse cx="10" cy="12" rx="6.5" ry="5.5" fill="#f3c33f"/><ellipse cx="8" cy="10" rx="2" ry="1.2" fill="#fbe08a"/></svg>`;
+  if(t==='alpine') return `<svg width="${s}" height="${s}" viewBox="0 0 20 20">${[0,60,120,180,240,300].map(a=>`<ellipse cx="10" cy="5" rx="2.2" ry="4.5" fill="#fff" stroke="#9cc1ea" stroke-width=".8" transform="rotate(${a} 10 10)"/>`).join('')}<circle cx="10" cy="10" r="2.4" fill="#f2d36b"/></svg>`;
+  if(t==='desert') return `<svg width="${s}" height="${s}" viewBox="0 0 20 20"><rect x="7" y="5" width="6" height="13" rx="3" fill="${h.leaf}"/>${[0,90,180,270].map(a=>`<ellipse cx="10" cy="2.5" rx="1.6" ry="2.4" fill="${h.acc}" transform="rotate(${a} 10 5)"/>`).join('')}</svg>`;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 20 20">${[-50,-25,0,25,50].map(a=>`<ellipse cx="10" cy="7" rx="2.4" ry="5" fill="${h.acc}" transform="rotate(${a} 10 13)"/>`).join('')}<path d="M3 15 q7 4 14 0" stroke="${h.leaf}" stroke-width="2" fill="none"/></svg>`;
+}
+
+/* ---------- content (made-up) ---------- */
+const COURSES = [
+  {name:'International Commercial Arbitration', short:'Int\'l Commercial Arbitration', t:'orangery', h:132, planted:3, ready:2, wx:'68%'},
+  {name:'Corporate Law', short:'Corporate Law', t:'alpine', h:104, planted:5, ready:1, wx:'30%'},
+  {name:'AI Law', short:'AI Law', t:'desert', h:124, planted:2, ready:1, wx:'60%'},
+  {name:'Intensive course', short:'Intensive course', t:'lily', h:98, planted:0, ready:1, wx:'40%', intensive:true},
+];
+const ICA_WEEKS = ['What arbitration is','The arbitration agreement','Seats and laws','Arbitral institutions','Forming the tribunal','Jurisdiction','Interim measures','Evidence and hearings','The award','Challenging awards','Enforcement abroad','Investor–state cases','Revision week'];
+const ICA_GROW = [.85,.6,.3];
+const CORP_GROW = [.9,.75,.55,.35,.15];
+
+/* ---------- screens ---------- */
+const phone=(cap,note,cls,style,html)=>`<div class="ph"><p class="cap">${cap}</p><p class="note">${note}</p><div class="scr"><div class="notch"></div><div class="in ${cls}" style="${style||''}">${html}</div></div></div>`;
+const vars=t=>{const h=H[t];return `--g1:${h.g1};--g2:${h.g2};--tint:${h.tint};--acc:${h.acc};--acc2:${h.acc2};--ink2:${h.ink2};`};
+
+function homeScreen(){
+  const houses = COURSES.map((c,i)=>{
+    const W=288, Ht=c.h, fy=Ht*.62;
+    const R=rng(i*31+7); let plants='';
+    const n=4+Math.floor(R()*2);
+    for(let j=0;j<n;j++){plants+=plant(c.t, 26+j*(W-50)/(n-1), Ht-30-R()*6, .5+R()*.5, .9);}
+    const scene=`<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="xMidYMid slice">${backdrop(c.t,W,Ht,fy)}${plants}</svg>`;
+    const streaks=`<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="none" style="width:100%;height:100%">${[40,95,170,232,262].map((x,k)=>`<path d="M${x} ${10+k*7} q1 ${Ht*.3} -1 ${Ht*.55}" stroke="#ffffff" stroke-opacity=".6" stroke-width="1.2" fill="none"/>`).join('')}</svg>`;
+    return `<div class="house" style="height:${Ht}px;--wx:${c.wx};--c:${H[c.t].ink2}">
+      <div class="sc blur">${scene}</div><div class="sc wipe">${scene}</div><div class="fog"></div><div class="drops"></div><div class="streaks">${streaks}</div>
+      <div class="frame">${glassFrame(W,Ht,5)}</div>
+      <div class="plate"><b>${c.short}</b><span>${c.intensive?'Intensive':`${c.planted}/13 planted`}</span></div></div>`}).join('');
+  return `<div class="crumbs"><span>Semester 2</span><span>4 glasshouses</span></div>
+    <h2>Your glasshouses</h2><div class="sub">Tap one to step inside.</div>
+    <div class="stack">${houses}<div class="addhouse"><i>+</i>Add a course</div></div>`;
+}
+
+function shelf(t, planted, ready, weeks){
+  const pk=i=>{const n=i+1;
+    if(i<planted) return `<div class="pk planted" title="Week ${n}"><div class="art">${icon(t,14)}</div>${n}</div>`;
+    if(i<planted+ready) return `<div class="pk ready" title="Week ${n}"><div class="crimp"></div><div class="art">${icon(t,15)}</div>${n}</div>`;
+    return `<div class="pk locked" title="Week ${n}"><div class="num">${n}</div><span style="font-size:8px;font-weight:600">sealed</span></div>`};
+  const all=[...Array(13).keys()];
+  return `<div class="shelf"><div class="lbl"><span>Seed shelf · 13 weeks</span><span>${planted} planted · ${ready} ready</span></div>
+    <div class="row">${all.slice(0,7).map(pk).join('')}</div><div class="board"></div>
+    <div class="row">${all.slice(7).map(pk).join('')}<div></div></div><div class="board"></div>
+    <div class="legend"><span><i style="background:${H[t].acc}"></i>Ready to plant</span><span><i style="background:#fff;box-shadow:0 0 0 1px #ccc"></i>Planted</span><span><i style="background:#ede6d8;border:1px dashed #cdbfa6"></i>Sealed, no notes yet</span></div></div>`;
+}
+
+function insideScreen(t, name, grow, ready, cta){
+  const W=320, Ht=250, fy=150;
+  let beds='';
+  const total=grow.length+ready;
+  grow.forEach((g,i)=>{const x=40+i*(W-80)/Math.max(total-1,1);
+    beds+=plant(t,x,fy+50,g,1)+`<g><rect x="${x-17}" y="${fy+56}" width="34" height="15" rx="3" fill="#fff"/><text x="${x}" y="${fy+67}" text-anchor="middle" font-family="Outfit" font-size="9.5" font-weight="700" fill="${H[t].ink2}">Wk ${i+1}</text></g>`;});
+  for(let r=0;r<ready;r++){const i=grow.length+r, x=40+i*(W-80)/Math.max(total-1,1);
+    beds+=`<g><ellipse cx="${x}" cy="${fy+46}" rx="20" ry="6" fill="#00000012"/><circle cx="${x}" cy="${fy+28}" r="15" fill="#ffffffcc" stroke="${H[t].acc}" stroke-width="1.6" stroke-dasharray="3 3"/><text x="${x}" y="${fy+33}" text-anchor="middle" font-family="Outfit" font-size="16" font-weight="600" fill="${H[t].acc2}">+</text>
+      <rect x="${x-17}" y="${fy+56}" width="34" height="15" rx="3" fill="${H[t].acc}"/><text x="${x}" y="${fy+67}" text-anchor="middle" font-family="Outfit" font-size="9.5" font-weight="700" fill="#fff">Wk ${i+1}</text></g>`;}
+  const scene=`<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="xMidYMax slice">${backdrop(t,W,Ht,fy)}${beds}</svg>`;
+  const h=H[t], c=COURSES.find(c=>c.t===t);
+  return `<div class="crumbs"><span>‹ Glasshouses</span><span style="color:${h.acc2}">${h.name}</span></div>
+    <h2>${name}</h2><div class="hab">${grow.length} weeks growing · ${Math.round(100*grow.reduce((a,b)=>a+b,0)/13)}% of the course grown</div>
+    ${shelf(t,c.planted,c.ready)}
+    <div class="beds">${scene}</div>
+    <div class="ibtn">${cta}</div>`;
+}
+
+function packetScreen(){
+  const t='orangery', W=288, Ht=150;
+  const art=`<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="xMidYMax slice">${backdrop(t,W,Ht,112)}${plant(t,144,150,.95,1.35)}${plant(t,58,146,.5,.8)}${plant(t,230,146,.65,.8)}</svg>`;
+  return `<div class="crumbs"><span>‹ The Orangery</span><span>Week 4 of 13</span></div>
+   <div class="packetwrap"><div class="bigpk"><div class="crimp"></div><div class="art">${art}<span class="wk">WEEK 4 · READY TO PLANT</span></div>
+    <div class="body"><h3>Arbitral institutions</h3><div class="var">International Commercial Arbitration · Orangery strain</div>
+     <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-top:10px">8 seeds in this packet</div>
+     <div class="seeds"><span>Administered vs ad hoc</span><span>Institutional rules</span><span>The secretariat</span><span>Scrutiny of awards</span><span>Fees and deposits</span><span>Emergency arbitrator</span><span>Expedited procedure</span><span>Choosing an institution</span></div>
+     <div class="sown"><div class="doc"></div><div>Sown from <b>ICA Week 4 notes.pdf</b><br>14 pages · added Tuesday</div></div>
+    </div></div></div>
+   <div class="plantbtn">${icon(t,18)} Plant week 4</div>
+   <div class="ghostbtn">Read the summary first</div>`;
+}
+
+function plantedScreen(){
+  const t='orangery', h=H[t];
+  const conc=[['Separability',.9],['Kompetenz-Kompetenz',.7],['Written form',.55],['Pathological clauses',.4],['Scope of the clause',.3],['Non-signatories',.1],['Multi-tier clauses',0]];
+  const stage=m=>m>=.7?['In bloom',plant(t,15,24,.85,.42)]:m>=.4?['Leafing',plant(t,15,24,.45,.42)]:m>0?['Sprouting',`<path d="M15 24 V14" stroke="#6b9a5c" stroke-width="1.6"/><ellipse cx="11" cy="14" rx="4" ry="2.2" fill="${h.leaf}"/><ellipse cx="19" cy="14" rx="4" ry="2.2" fill="${h.leaf}"/>`]:['Seed',`<ellipse cx="15" cy="21" rx="3.5" ry="2.4" fill="#8d6a4c"/>`];
+  return `<div class="crumbs"><span>‹ The Orangery</span><span>Week 2 · planted</span></div>
+   <div class="growhead"><svg width="70" height="92" viewBox="0 0 70 92">${plant(t,35,92,.6,1)}</svg>
+    <div class="meta"><div class="pcl" style="font-weight:600;color:var(--ink2)">Week 2</div><h2 style="font-size:20px;color:var(--ink2)">The arbitration agreement</h2><div class="pc" style="margin-top:6px">60%<span class="pcl"> grown</span></div></div></div>
+   <div class="modes"><div class="on">Flashcards<small>12 cards</small></div><div>Quiz<small>10 questions</small></div><div>Summary<small>1 page</small></div></div>
+   <div class="conc">${conc.map(c=>{const [l,svg]=stage(c[1]);return `<div class="ci"><div class="st"><svg width="30" height="26" viewBox="0 0 30 26">${svg}</svg></div><div class="nm">${c[0]}</div><div class="lv">${l}</div></div>`}).join('')}</div>`;
+}
+
+function cardScreen(){
+  return `<div class="crumbs"><span>‹ Week 2 · Flashcards</span><span>4 / 12</span></div>
+   <div class="prog">${[...Array(12)].map((_,i)=>`<i class="${i<4?'d':''}"></i>`).join('')}</div>
+   <div class="card"><div class="band"></div><div class="cb">
+    <div class="k">Week 2 · Separability</div>
+    <div class="q">Why does an arbitration clause survive when the main contract is said to be void?</div>
+    <div class="a">The clause is treated as its own small agreement tucked inside the bigger one. So an attack on the main contract does not by itself knock out the promise to arbitrate, and the tribunal can still hear the dispute about whether the contract is void.</div>
+    <div class="src"><div class="doc" style="width:14px;height:18px"></div>From ICA Week 2 notes, p.3 · "Separability"</div></div></div>
+   <div class="rate"><div style="background:#fff;box-shadow:0 0 0 1px #22302a1a;color:var(--ink2)">Needs water<small>see it again</small></div><div style="background:var(--ink2);color:#fff">In bloom<small>I knew it</small></div></div>
+   <div style="text-align:center;font-size:11.5px;color:var(--soft);margin-top:12px">Your answers only change how this week grows. Nothing is scheduled.</div>`;
+}
+
+const flow=document.getElementById('flow');
+flow.innerHTML=[
+  phone('<b>1</b> · Home','Each course is a fogged glasshouse, with its habitat just showing through. Add another course with the + button.','home','',homeScreen()),
+  phone('<b>2</b> · Inside a glasshouse','The Orangery. The 13 seed packets sit on the shelf above, and planted weeks grow in the beds below.','inside',vars('orangery'),insideScreen('orangery','International Commercial Arbitration',ICA_GROW,2,'Study everything planted')),
+  phone('<b>3</b> · A ready packet','Week 4 notes are in, so the packet is ready. It shows the seeds written from your notes.','inside',vars('orangery'),packetScreen()),
+  phone('<b>4</b> · A planted week','Each concept grows from seed to bloom as you learn it. Study it any way you like.','inside',vars('orangery'),plantedScreen()),
+  phone('<b>5</b> · Studying','A flashcard written from your notes, naming the page it came from.','inside',vars('orangery'),cardScreen()),
+  phone('<b>6</b> · A different glasshouse','Corporate Law lives in the Alpine House: the same shelf and beds in a different habitat.','inside',vars('alpine'),insideScreen('alpine','Corporate Law',CORP_GROW,1,'Study everything planted')),
+].join('');
+</script>
+</body>
+</html>
