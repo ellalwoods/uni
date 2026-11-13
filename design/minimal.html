@@ -10,7 +10,7 @@
 <style>
 :root{
   /* Layout: three tabs, each a minimal direction shown as three phone screens (home, a course, a study card). One accent colour per course, white ground, type does the work. */
-  --page:#f3f2ef; --ink:#1c1c1a; --soft:#6d6c67; --hair:#e6e4de; --white:#fdfcfa;
+  --page:#f8f1f0; --ink:#43333d; --soft:#8f7f88; --hair:#f1e5e7; --white:#fffbfa;
   --sans:'Hanken Grotesk', system-ui, sans-serif;
   color-scheme:light;
 }
@@ -39,7 +39,7 @@ section.on{display:block}
 .meta{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--soft)}
 .row{display:flex;justify-content:space-between;align-items:center}
 .backbtn{font-size:13px;font-weight:600;color:var(--soft)}
-.btn{display:block;text-align:center;padding:14px;border-radius:999px;font-weight:600;font-size:15px;color:#fff;background:var(--c)}
+.btn{display:block;text-align:center;padding:14px;border-radius:999px;font-weight:600;font-size:15px;color:#fff;background:var(--cd)}
 .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--hair)}
 .pin{position:absolute;left:20px;right:20px;bottom:22px}
 .nextrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--hair);margin-top:4px}
@@ -49,8 +49,8 @@ section.on{display:block}
 .nextrow span{font-size:12px;color:var(--soft)}
 .nextrow .chev{margin-left:auto;color:var(--soft);font-size:18px}
 .card{margin-top:22px}
-.card .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--c)}
-.card .a{font-size:15px;line-height:1.55;color:#33332f;margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
+.card .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--cd)}
+.card .a{font-size:15px;line-height:1.55;color:#5a4852;margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
 .card .src{font-size:12px;color:var(--soft);margin-top:14px}
 .rate{position:absolute;left:20px;right:20px;bottom:22px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .prog{display:flex;gap:3px;margin-top:14px}
@@ -78,36 +78,36 @@ section.on{display:block}
 /* ===== B. Numerals ===== */
 .B{font-family:'Bricolage Grotesque',var(--sans)}
 .B .title{font-weight:800;font-size:30px;line-height:1;letter-spacing:-.02em;margin:8px 0 14px}
-.B .crow{padding:14px 0 12px;border-top:1.5px solid var(--ink)}
-.B .crow .nm{font-weight:800;font-size:22px;line-height:1.02;letter-spacing:-.015em;color:var(--c)}
+.B .crow{padding:14px 0 12px;border-top:1px solid var(--hair)}
+.B .crow .nm{font-weight:800;font-size:22px;line-height:1.02;letter-spacing:-.015em;color:var(--cd)}
 .B .segs{display:grid;grid-template-columns:repeat(13,1fr);gap:3px;margin-top:10px}
 .B .segs i{height:6px;border-radius:1px;background:var(--hair)}
 .B .segs i.p{background:var(--c)}
-.B .segs i.r{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c)}
+.B .segs i.r{background:transparent;box-shadow:inset 0 0 0 1.5px var(--cd)}
 .B .crow .st{display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;color:var(--soft);margin-top:6px}
-.B .crow .st b{color:var(--c);font-weight:600}
-.B .add{border-top:1.5px solid var(--ink);padding-top:12px;font-weight:600;font-size:15px;color:var(--soft)}
-.B .ctitle{font-weight:800;font-size:27px;line-height:1;letter-spacing:-.02em;margin:12px 0 2px;color:var(--c)}
-.B .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:14px;border-top:1.5px solid var(--ink)}
+.B .crow .st b{color:var(--cd);font-weight:600}
+.B .add{border-top:1px solid var(--hair);padding-top:12px;font-weight:600;font-size:15px;color:var(--soft)}
+.B .ctitle{font-weight:800;font-size:27px;line-height:1;letter-spacing:-.02em;margin:12px 0 2px;color:var(--cd)}
+.B .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:14px;border-top:1px solid var(--hair)}
 .B .cell{padding:6px 2px 8px;border-bottom:1px solid var(--hair);min-height:66px;position:relative}
 .B .cell .n{font-weight:800;font-size:36px;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
 .B .cell .t{font-family:var(--sans);font-size:10.5px;line-height:1.2;color:var(--soft);margin-top:2px;padding-right:6px}
-.B .cell.p .n{color:var(--c)}
-.B .cell.r .n{color:transparent;-webkit-text-stroke:1.4px var(--c)}
-.B .cell.r .t{color:var(--c);font-weight:700}
-.B .cell.s .n{color:#dcd9d1}
-.B .card .num{position:absolute;right:16px;bottom:96px;font-weight:800;font-size:120px;line-height:1;letter-spacing:-.05em;color:var(--c);opacity:.09}
+.B .cell.p .n{color:var(--cd)}
+.B .cell.r .n{color:transparent;-webkit-text-stroke:1.4px var(--cd)}
+.B .cell.r .t{color:var(--cd);font-weight:700}
+.B .cell.s .n{color:#eadde0}
+.B .card .num{position:absolute;right:16px;bottom:96px;font-weight:800;font-size:120px;line-height:1;letter-spacing:-.05em;color:var(--c);opacity:.35}
 .B .card .q{font-weight:600;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin-top:8px;position:relative}
 
 /* ===== C. Stems ===== */
 .C .title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:36px;line-height:1;margin:8px 0 14px}
 .C .plates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.C .plate{border:1px solid var(--hair);border-radius:4px;padding:10px 10px 12px;background:#fff}
+.C .plate{border:1px solid var(--hair);border-radius:12px;padding:10px 10px 12px;background:#fff}
 .C .plate svg{display:block;margin:0 auto}
-.C .plate .nm{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;line-height:1.05;margin-top:6px;color:var(--c)}
+.C .plate .nm{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;line-height:1.05;margin-top:6px;color:var(--cd)}
 .C .plate .st{font-size:11px;color:var(--soft);margin-top:3px}
-.C .plate.add{border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--soft);font-weight:600;font-size:13.5px;min-height:70px;grid-column:1/-1}
-.C .ctitle{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;line-height:1;margin:12px 0 2px;color:var(--c)}
+.C .plate.add{border-style:dashed;border-color:#e6d3d8;display:flex;align-items:center;justify-content:center;color:var(--soft);font-weight:600;font-size:13.5px;min-height:70px;grid-column:1/-1}
+.C .ctitle{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;line-height:1;margin:12px 0 2px;color:var(--cd)}
 .C .stemwrap{position:relative;margin-top:6px}
 .C .card .q{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;line-height:1.1;margin-top:8px}
 .C .card .leafic{margin-bottom:8px}
@@ -115,7 +115,7 @@ section.on{display:block}
 </head>
 <body>
 <div class="top">
-  <h1>Three minimal directions</h1>
+  <h1>Two minimal directions</h1>
   <p>White space, one colour per course, and type doing most of the work. Each one shows the 13 weeks of a course at a glance, with three states: planted, ready to plant (notes are in) and sealed (no notes yet). The content is made up.</p>
 </div>
 <nav role="tablist" id="nav"></nav>
@@ -123,10 +123,10 @@ section.on{display:block}
 
 <script>
 const COURSES=[
- {name:'International Commercial Arbitration', short:'Int’l Commercial Arbitration', c:'#c4572e', planted:8, ready:2},
- {name:'Corporate Law', c:'#2f4c8f', planted:5, ready:1},
- {name:'AI Law', c:'#3c7a5a', planted:6, ready:0},
- {name:'Intensive course', c:'#8a3f6e', planted:1, ready:1},
+ {name:'International Commercial Arbitration', short:'Int’l Commercial Arbitration', c:'#f4b3c2', d:'#c45d80', planted:8, ready:2},
+ {name:'Corporate Law', c:'#cdbcef', d:'#8466c2', planted:5, ready:1},
+ {name:'AI Law', c:'#b3dcc8', d:'#4f9a7c', planted:6, ready:0},
+ {name:'Intensive course', c:'#f9cba6', d:'#d0804a', planted:1, ready:1},
 ];
 const WEEKS=['What arbitration is','The agreement','Seats and laws','Institutions','The tribunal','Jurisdiction','Interim measures','Evidence','The award','Challenges','Enforcement','Investor–state','Revision'];
 const CARD={k:'Week 2 · Separability',q:'Why does an arbitration clause survive when the main contract is said to be void?',
@@ -175,7 +175,7 @@ function panes(){
 function numerals(){
   const home=`<div class="row"><span class="meta">Semester 2</span><span class="meta">4 courses</span></div>
    <div class="title">Courses</div>
-   ${COURSES.map(c=>`<div class="crow" style="--c:${c.c}"><div class="nm">${c.name}</div>
+   ${COURSES.map(c=>`<div class="crow" style="--c:${c.c};--cd:${c.d}"><div class="nm">${c.name}</div>
      <div class="segs">${[...Array(13).keys()].map(i=>`<i class="${st(c,i)}"></i>`).join('')}</div>
      <div class="st"><span>${c.planted} of 13 weeks</span>${c.ready?`<b>${c.ready} ready</b>`:'<span></span>'}</div></div>`).join('')}
    <div class="add">+ Add a course</div>`;
@@ -194,22 +194,22 @@ function stem(c,h,{labels=false,w=110}={}){
   const cx=labels?44:w/2,top=10,bot=h-6,amp=labels?6:5,n=13;
   const y=i=>bot-(i+1)*(bot-top)/(n+1), x=yy=>cx+Math.sin((bot-yy)/(bot-top)*Math.PI*2)*amp;
   let path='';for(let yy=bot;yy>=top;yy-=4) path+=(path?' L':'M')+x(yy).toFixed(1)+' '+yy;
-  let o=`<svg width="${labels?272:w}" height="${h}" viewBox="0 0 ${labels?272:w} ${h}"><path d="${path}" fill="none" stroke="${c.c}" stroke-width="1.5" stroke-linecap="round"/>`;
+  let o=`<svg width="${labels?272:w}" height="${h}" viewBox="0 0 ${labels?272:w} ${h}"><path d="${path}" fill="none" stroke="${c.d}" stroke-width="1.4" stroke-linecap="round" opacity=".75"/>`;
   for(let i=0;i<n;i++){const s=st(c,i),yy=y(i),xx=x(yy),side=labels?1:(i%2?1:-1),L=labels?16:13;
     const lx=xx+side*L, ly=yy-6;
     const leaf=`M${xx} ${yy} Q${xx+side*L*.5} ${yy-L*.75} ${lx} ${ly} Q${xx+side*L*.6} ${yy+1} ${xx} ${yy} Z`;
     if(s==='p') o+=`<path d="${leaf}" fill="${c.c}"/>`;
-    else if(s==='r') o+=`<path d="${leaf}" fill="#fff" stroke="${c.c}" stroke-width="1.3"/><circle cx="${lx+side*5}" cy="${ly}" r="2.4" fill="${c.c}"/>`;
-    else o+=`<circle cx="${xx}" cy="${yy}" r="1.8" fill="#cfcbc2"/>`;
-    if(labels){const col=s==='s'?'#b4b0a6':s==='r'?c.c:'#1c1c1a';
-      o+=`<text x="${cx+34}" y="${yy+1}" font-family="Hanken Grotesk" font-size="10.5" font-weight="700" fill="${s==='s'?'#c8c4ba':c.c}">${i+1}</text>`;
+    else if(s==='r') o+=`<path d="${leaf}" fill="#fff" stroke="${c.d}" stroke-width="1.3"/><circle cx="${lx+side*5}" cy="${ly}" r="2.4" fill="${c.d}"/>`;
+    else o+=`<circle cx="${xx}" cy="${yy}" r="1.8" fill="#e5d3d8"/>`;
+    if(labels){const col=s==='s'?'#c9b8bf':s==='r'?c.d:'#43333d';
+      o+=`<text x="${cx+34}" y="${yy+1}" font-family="Hanken Grotesk" font-size="10.5" font-weight="700" fill="${s==='s'?'#d8c8ce':c.d}">${i+1}</text>`;
       o+=`<text x="${cx+52}" y="${yy+1}" font-family="Hanken Grotesk" font-size="12.5" font-weight="${s==='r'?700:500}" fill="${col}">${s==='r'?'Ready to plant':s==='s'?'Sealed':WEEKS[i]}</text>`;}}
   return o+`</svg>`;
 }
 function stems(){
   const home=`<div class="row"><span class="meta">Semester 2</span><span class="meta">4 courses</span></div>
    <div class="title">Herbarium</div>
-   <div class="plates">${COURSES.map(c=>`<div class="plate" style="--c:${c.c}">${stem(c,118)}<div class="nm">${c.short||c.name}</div><div class="st">${c.ready?`${c.ready} ready · `:''}${c.planted} of 13</div></div>`).join('')}
+   <div class="plates">${COURSES.map(c=>`<div class="plate" style="--c:${c.c};--cd:${c.d}">${stem(c,118)}<div class="nm">${c.short||c.name}</div><div class="st">${c.ready?`${c.ready} ready · `:''}${c.planted} of 13</div></div>`).join('')}
    <div class="plate add">+ New course</div></div>`;
   const inside=`<div class="row"><span class="backbtn">‹ Herbarium</span><span class="meta">${I.planted} of 13</span></div>
    <div class="ctitle">International Commercial Arbitration</div>
@@ -221,12 +221,12 @@ function stems(){
     pitch:'Pressed botanical plates. Each course is a single stem drawn in one colour, and its weeks climb from the base: a leaf for each week you’ve planted, an open leaf for ready, a small dot for sealed. Inside, the stem doubles as a list, with each week’s title beside its leaf.'};
 }
 
-const D=[panes(),numerals(),stems()];
+const D=[numerals(),stems()];
 const nav=document.getElementById('nav'),main=document.getElementById('main');
 nav.innerHTML=D.map((d,i)=>`<button role="tab" aria-selected="${i==0}" data-i="${i}">${d.name}</button>`).join('');
 main.innerHTML=D.map((d,i)=>`<section id="${d.id}" class="${i==0?'on':''}" role="tabpanel">
   <div class="pitch"><h2>${d.name}</h2><p>${d.pitch}</p></div>
-  <div class="phones">${phone('Home',d.cls,'',d.home)}${phone('A course',d.cls,`--c:${I.c}`,d.inside)}${phone('Studying',d.cls,`--c:${I.c}`,d.study)}</div></section>`).join('');
+  <div class="phones">${phone('Home',d.cls,'',d.home)}${phone('A course',d.cls,`--c:${I.c};--cd:${I.d}`,d.inside)}${phone('Studying',d.cls,`--c:${I.c};--cd:${I.d}`,d.study)}</div></section>`).join('');
 function show(i){nav.querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-selected',j==i));main.querySelectorAll('section').forEach((s,j)=>s.classList.toggle('on',j==i));if(location.hash!=='#'+D[i].id)history.replaceState(null,'','#'+D[i].id);}
 nav.onclick=e=>{const b=e.target.closest('button');if(b)show(+b.dataset.i)};
 const s0=D.findIndex(d=>'#'+d.id===location.hash);show(s0<0?0:s0);
