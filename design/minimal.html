@@ -22,7 +22,19 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .top{max-width:1120px;margin:0 auto;padding:30px 24px 4px}
 .top h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:40px;line-height:1.05;margin:0 0 6px}
 .top p{margin:0;color:var(--soft);max-width:66ch}
-nav{max-width:1120px;margin:0 auto;padding:16px 24px 6px;display:flex;gap:8px;flex-wrap:wrap}
+.bar{position:sticky;top:0;z-index:20;background:var(--page);border-bottom:1px solid var(--hair);transition:background .3s}
+nav{max-width:1120px;margin:0 auto;padding:14px 24px 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sw{max-width:1120px;margin:0 auto;padding:6px 24px 14px}
+.sw .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--soft);margin:4px 0 6px}
+.pals{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
+.pal{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:8px 10px 7px;border-radius:12px;background:var(--pb);box-shadow:0 0 0 1px #00000014;min-width:104px}
+.pal .chips{display:flex;gap:3px}
+.pal .chips i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px #0000000d}
+.pal span{font-size:12px;font-weight:600;color:var(--pi);white-space:nowrap}
+.pal[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.tones{display:flex;gap:6px;margin-left:auto;align-items:center;font-size:12px;color:var(--soft)}
+.tones button{border:1px solid var(--hair);border-radius:999px;padding:5px 11px;font-size:12.5px;background:var(--white)}
+.tones button[aria-pressed="true"]{background:var(--ink);color:var(--white);border-color:var(--ink)}
 nav button{border:1px solid #1c1c1a26;border-radius:999px;padding:8px 16px;font-size:14px;background:#fff}
 nav button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 section{display:none;max-width:1120px;margin:0 auto;padding:10px 24px 70px}
@@ -50,7 +62,7 @@ section.on{display:block}
 .nextrow .chev{margin-left:auto;color:var(--soft);font-size:18px}
 .card{margin-top:22px}
 .card .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--cd)}
-.card .a{font-size:15px;line-height:1.55;color:#5a4852;margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
+.card .a{font-size:15px;line-height:1.55;color:var(--ink);opacity:.86;margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
 .card .src{font-size:12px;color:var(--soft);margin-top:14px}
 .rate{position:absolute;left:20px;right:20px;bottom:22px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .prog{display:flex;gap:3px;margin-top:14px}
@@ -95,7 +107,7 @@ section.on{display:block}
 .B .cell.p .n{color:var(--cd)}
 .B .cell.r .n{color:transparent;-webkit-text-stroke:1.4px var(--cd)}
 .B .cell.r .t{color:var(--cd);font-weight:700}
-.B .cell.s .n{color:#eadde0}
+.B .cell.s .n{color:var(--faint)}
 .B .card .num{position:absolute;right:16px;bottom:96px;font-weight:800;font-size:120px;line-height:1;letter-spacing:-.05em;color:var(--c);opacity:.35}
 .B .card .q{font-weight:600;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin-top:8px;position:relative}
 
@@ -106,7 +118,7 @@ section.on{display:block}
 .C .plate svg{display:block;margin:0 auto}
 .C .plate .nm{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;line-height:1.05;margin-top:6px;color:var(--cd)}
 .C .plate .st{font-size:11px;color:var(--soft);margin-top:3px}
-.C .plate.add{border-style:dashed;border-color:#e6d3d8;display:flex;align-items:center;justify-content:center;color:var(--soft);font-weight:600;font-size:13.5px;min-height:70px;grid-column:1/-1}
+.C .plate.add{border-style:dashed;border-color:var(--faint);display:flex;align-items:center;justify-content:center;color:var(--soft);font-weight:600;font-size:13.5px;min-height:70px;grid-column:1/-1}
 .C .ctitle{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;line-height:1;margin:12px 0 2px;color:var(--cd)}
 .C .stemwrap{position:relative;margin-top:6px}
 .C .card .q{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;line-height:1.1;margin-top:8px}
@@ -118,7 +130,7 @@ section.on{display:block}
   <h1>Two minimal directions</h1>
   <p>White space, one colour per course, and type doing most of the work. Each one shows the 13 weeks of a course at a glance, with three states: planted, ready to plant (notes are in) and sealed (no notes yet). The content is made up.</p>
 </div>
-<nav role="tablist" id="nav"></nav>
+<div class="bar"><nav role="tablist" id="nav"></nav><div class="sw"><div class="lbl">Colours: tap to try</div><div class="pals" id="pals"></div></div></div>
 <main id="main"></main>
 
 <script>
@@ -200,9 +212,9 @@ function stem(c,h,{labels=false,w=110}={}){
     const leaf=`M${xx} ${yy} Q${xx+side*L*.5} ${yy-L*.75} ${lx} ${ly} Q${xx+side*L*.6} ${yy+1} ${xx} ${yy} Z`;
     if(s==='p') o+=`<path d="${leaf}" fill="${c.c}"/>`;
     else if(s==='r') o+=`<path d="${leaf}" fill="#fff" stroke="${c.d}" stroke-width="1.3"/><circle cx="${lx+side*5}" cy="${ly}" r="2.4" fill="${c.d}"/>`;
-    else o+=`<circle cx="${xx}" cy="${yy}" r="1.8" fill="#e5d3d8"/>`;
-    if(labels){const col=s==='s'?'#c9b8bf':s==='r'?c.d:'#43333d';
-      o+=`<text x="${cx+34}" y="${yy+1}" font-family="Hanken Grotesk" font-size="10.5" font-weight="700" fill="${s==='s'?'#d8c8ce':c.d}">${i+1}</text>`;
+    else o+=`<circle cx="${xx}" cy="${yy}" r="1.8" fill="${P.faint}"/>`;
+    if(labels){const col=s==='s'?P.soft:s==='r'?c.d:P.ink;
+      o+=`<text x="${cx+34}" y="${yy+1}" font-family="Hanken Grotesk" font-size="10.5" font-weight="700" fill="${s==='s'?P.faint:c.d}">${i+1}</text>`;
       o+=`<text x="${cx+52}" y="${yy+1}" font-family="Hanken Grotesk" font-size="12.5" font-weight="${s==='r'?700:500}" fill="${col}">${s==='r'?'Ready to plant':s==='s'?'Sealed':WEEKS[i]}</text>`;}}
   return o+`</svg>`;
 }
@@ -221,16 +233,55 @@ function stems(){
     pitch:'Pressed botanical plates. Each course is a single stem drawn in one colour, and its weeks climb from the base: a leaf for each week you’ve planted, an open leaf for ready, a small dot for sealed. Inside, the stem doubles as a list, with each week’s title beside its leaf.'};
 }
 
-const D=[numerals(),stems()];
-const nav=document.getElementById('nav'),main=document.getElementById('main');
-nav.innerHTML=D.map((d,i)=>`<button role="tab" aria-selected="${i==0}" data-i="${i}">${d.name}</button>`).join('');
-main.innerHTML=D.map((d,i)=>`<section id="${d.id}" class="${i==0?'on':''}" role="tabpanel">
-  <div class="pitch"><h2>${d.name}</h2><p>${d.pitch}</p></div>
-  <div class="phones">${phone('Home',d.cls,'',d.home)}${phone('A course',d.cls,`--c:${I.c};--cd:${I.d}`,d.inside)}${phone('Studying',d.cls,`--c:${I.c};--cd:${I.d}`,d.study)}</div></section>`).join('');
-function show(i){nav.querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-selected',j==i));main.querySelectorAll('section').forEach((s,j)=>s.classList.toggle('on',j==i));if(location.hash!=='#'+D[i].id)history.replaceState(null,'','#'+D[i].id);}
-nav.onclick=e=>{const b=e.target.closest('button');if(b)show(+b.dataset.i)};
-const s0=D.findIndex(d=>'#'+d.id===location.hash);show(s0<0?0:s0);
-addEventListener('hashchange',()=>{const k=D.findIndex(d=>'#'+d.id===location.hash);if(k>=0)show(k)});
+const PALETTES=[
+ {n:'Blush garden', page:'#f8f1f0',white:'#fffbfa',ink:'#43333d',soft:'#8f7f88',hair:'#f1e5e7', c:[['#f4b3c2','#c45d80'],['#cdbcef','#8466c2'],['#b3dcc8','#4f9a7c'],['#f9cba6','#d0804a']]},
+ {n:'Strawberry milk', page:'#fff4f5',white:'#fffafa',ink:'#52323b',soft:'#a07c85',hair:'#f8e1e5', c:[['#ffb7c5','#d24a6c'],['#e8c8f0','#9a58ae'],['#f7c6a3','#c6713d'],['#ffd9e0','#c7607a']]},
+ {n:'Lavender fields', page:'#f6f3fb',white:'#fdfcff',ink:'#3d3550',soft:'#847c99',hair:'#e9e3f4', c:[['#d4c4f2','#7e62c4'],['#f3c4dc','#b9558a'],['#c2d4f5','#5476b8'],['#c9e7e0','#4b8f82']]},
+ {n:'Cotton candy', page:'#fbf5fb',white:'#fffbff',ink:'#47354a',soft:'#937f97',hair:'#f1e4f2', c:[['#ffc2e2','#cc4f93'],['#bde0fe','#3d84c6'],['#cdb4db','#8a5ba8'],['#ffd6a5','#c8812a']]},
+ {n:'Sorbet', page:'#fdf5ef',white:'#fffaf6',ink:'#4a3434',soft:'#9a807c',hair:'#f5e4dc', c:[['#ffb4a2','#d9614a'],['#fbe39b','#a8840f'],['#bfe8c9','#4c9a63'],['#f6c1d9','#c0548a']]},
+ {n:'Peach & butter', page:'#fff8ef',white:'#fffcf7',ink:'#4b3a2c',soft:'#9b8571',hair:'#f4e6d3', c:[['#ffc8a8','#d0703f'],['#fde59a','#a8840f'],['#f7b8b0','#c2584e'],['#c9dfb1','#5f8a3d']]},
+ {n:'Rosé', page:'#fbf3f1',white:'#fffaf9',ink:'#4a3233',soft:'#977c7c',hair:'#f2e1de', c:[['#f2b8b0','#c2584b'],['#e9c6d8','#a95584'],['#f5d6b3','#b97a35'],['#cfd9c2','#62804a']]},
+ {n:'Lilac dusk', page:'#f7f2f6',white:'#fdfafc',ink:'#45374a',soft:'#8f7f95',hair:'#ece2ec', c:[['#d9b8e8','#9156ad'],['#f1bfd0','#bf5a82'],['#bfc9f0','#5b6cbf'],['#f6d2b8','#c37a48']]},
+ {n:'Sage & rose', page:'#f5f6f1',white:'#fcfdf9',ink:'#3a4038',soft:'#7e857a',hair:'#e5e8de', c:[['#e8b4b8','#b05a64'],['#b5c9a5','#5d7d4c'],['#d9c7e3','#8a64a3'],['#f0d3a9','#b07c2f']]},
+ {n:'Mint chip', page:'#f1f8f5',white:'#fafdfb',ink:'#2e3f39',soft:'#75897f',hair:'#dcece5', c:[['#b2e5d2','#3a9677'],['#f7c3cf','#c4567a'],['#cfe0a8','#6f8d2b'],['#c9d3f2','#5a6fbd']]},
+ {n:'Seaside', page:'#f2f7f8',white:'#fbfdfd',ink:'#2f3f48',soft:'#788a93',hair:'#dfeaec', c:[['#a9d6e5','#3b85a3'],['#f6c6c0','#c06a5f'],['#c3e3cf','#4d9467'],['#f3e1a8','#a7861d']]},
+ {n:'Bluebell', page:'#f3f5fb',white:'#fbfcff',ink:'#2f3650',soft:'#7a809a',hair:'#e2e6f3', c:[['#b9c8f2','#4d68c0'],['#f5c5d5','#c2577f'],['#a9dbe8','#2f8aa5'],['#d8c1f0','#8457c0']]},
+ {n:'Matcha latte', page:'#f4f3ec',white:'#fbfaf5',ink:'#3b3d33',soft:'#84836f',hair:'#e5e3d6', c:[['#c5d6a4','#64803a'],['#e7cfb4','#9f6d3c'],['#d8c3d6','#8a5d86'],['#b9d4cf','#4b8178']]},
+ {n:'Champagne', page:'#faf6ef',white:'#fffdf8',ink:'#3f3830',soft:'#8e8577',hair:'#eee6d8', c:[['#ead7c3','#9c7350'],['#f1d0d0','#b45f63'],['#d6d9c4','#6d7550'],['#d5cde4','#7a6698']]},
+ {n:'Wildflower', page:'#f8f5ee',white:'#fffdf7',ink:'#3e3a33',soft:'#8a8478',hair:'#ebe5d8', c:[['#f4a9a0','#c4544a'],['#f7d77a','#a5820c'],['#a7c7e7','#3f75ad'],['#c4a7e7','#7d55b8']]},
+ {n:'All pink', page:'#fdf3f5',white:'#fffafb',ink:'#4d3039',soft:'#9c7a85',hair:'#f6dfe5', c:[['#f8c3cf','#c9547a'],['#efa3b7','#b4416a'],['#fbd8c9','#c66a4a'],['#e6b3d6','#a24d87']]},
+ {n:'All lilac', page:'#f7f4fc',white:'#fdfbff',ink:'#3f3552',soft:'#8a7f9e',hair:'#ebe4f6', c:[['#d6c6f4','#7c5fc6'],['#e6c3ec','#9a55a8'],['#c5ccf3','#5a68bf'],['#f0c9e0','#b3568b']]},
+ {n:'Neapolitan', page:'#fbf6f1',white:'#fffcf9',ink:'#46352f',soft:'#937f75',hair:'#f1e5dc', c:[['#f7bfc4','#c4566a'],['#e9d5bd','#8f6a45'],['#fff0c2','#a28414'],['#c9b5a3','#7c5c45']]},
+];
+const TONES=[['Tinted','page'],['White','#ffffff'],['Cream','#fffaf0']];
+let P, pi=0, ti=0;
+try{pi=+localStorage.getItem('pal')||0;ti=+localStorage.getItem('tone')||0;}catch(e){}
+const mixHex=(a,b,t)=>{const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const A=p(a),B=p(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')};
+const nav=document.getElementById('nav'),main=document.getElementById('main'),pals=document.getElementById('pals');
+let cur=0, D;
+function render(){
+  P=PALETTES[pi];
+  const scr=TONES[ti][1]==='page'?mixHex(P.page,'#ffffff',.35):TONES[ti][1];
+  P.faint=mixHex(P.soft,scr,.62);
+  const r=document.documentElement.style;
+  r.setProperty('--page',P.page);r.setProperty('--white',scr);r.setProperty('--ink',P.ink);r.setProperty('--soft',P.soft);r.setProperty('--hair',P.hair);r.setProperty('--faint',P.faint);
+  COURSES.forEach((c,i)=>{c.c=P.c[i][0];c.d=P.c[i][1];});
+  D=[numerals(),stems()];
+  nav.innerHTML=D.map((d,i)=>`<button role="tab" aria-selected="${i==cur}" data-i="${i}">${d.name}</button>`).join('')+
+    `<div class="tones" role="group" aria-label="Screen background">Background ${TONES.map((t,i)=>`<button data-t="${i}" aria-pressed="${i==ti}">${t[0]}</button>`).join('')}</div>`;
+  pals.innerHTML=PALETTES.map((p,i)=>`<button class="pal" data-p="${i}" aria-pressed="${i==pi}" style="--pb:${mixHex(p.page,'#ffffff',.3)};--pi:${p.ink}"><div class="chips">${p.c.map(c=>`<i style="background:${c[0]};box-shadow:inset 0 0 0 3px ${c[0]},inset 0 0 0 9px ${c[1]}"></i>`).join('')}</div><span>${p.n}</span></button>`).join('');
+  main.innerHTML=D.map((d,i)=>`<section id="${d.id}" class="${i==cur?'on':''}" role="tabpanel">
+    <div class="pitch"><h2>${d.name}</h2><p>${d.pitch}</p></div>
+    <div class="phones">${phone('Home',d.cls,'',d.home)}${phone('A course',d.cls,`--c:${I.c};--cd:${I.d}`,d.inside)}${phone('Studying',d.cls,`--c:${I.c};--cd:${I.d}`,d.study)}</div></section>`).join('');
+  if(location.hash!=='#'+D[cur].id) history.replaceState(null,'','#'+D[cur].id);
+}
+nav.onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.i!==undefined){cur=+b.dataset.i;render();}
+  if(b.dataset.t!==undefined){ti=+b.dataset.t;try{localStorage.setItem('tone',ti)}catch(e){};render();}};
+pals.onclick=e=>{const b=e.target.closest('button');if(!b)return;pi=+b.dataset.p;try{localStorage.setItem('pal',pi)}catch(e){};render();};
+cur=Math.max(0,['numerals','stems'].indexOf(location.hash.slice(1)));
+render();
+addEventListener('hashchange',()=>{const k=['numerals','stems'].indexOf(location.hash.slice(1));if(k>=0&&k!==cur){cur=k;render();}});
 </script>
 </body>
 </html>
