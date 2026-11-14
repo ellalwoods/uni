@@ -55,6 +55,15 @@ One-time setup in the repository settings:
 
 Then, on iPhone, open the link in **Safari → Share → Add to Home Screen**. It opens full-screen and works offline. On a laptop, just bookmark it.
 
+## Sync between devices
+
+DuoDisco syncs your courses, course changes and progress through Supabase, in the same project as DuoVino (its own `duodisco_` table, separate from DuoVino's).
+
+- **One-time setup:** in Supabase, open **SQL Editor**, paste `supabase/duodisco.sql` and run it.
+- **On each device:** **Settings → Sync between devices**, enter the same sync phrase. The first device starts the sync; others join it and merge in what they already had.
+- The phrase is never stored or sent: only a SHA-256 hash of it is. If it's forgotten, start again with a new phrase (each device keeps its own copy meanwhile).
+- Offline changes are kept on the device and sync when it's back online.
+
 ## Your progress
 
-Progress is stored only in the browser on that device. Use **Settings → Back up your progress** now and then, and **Restore a backup** on a new phone.
+Progress is stored in the browser on each device, and synced if sync is on. You can also use **Settings → Back up your progress** now and then, and **Restore a backup** on a new phone.

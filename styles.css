@@ -333,3 +333,10 @@ blockquote cite { display: block; font-style: normal; font-size: 12.5px; color: 
 }
 
 .sc.sadd .dot { display: flex; align-items: center; justify-content: center; width: 15px; height: 15px; margin: 0 -3px; font-size: 12px; }
+
+/* sync */
+.syncstat { display: flex; gap: 8px; align-items: baseline; color: var(--ink) !important; }
+.sdot { width: 9px; height: 9px; border-radius: 50%; background: var(--faint); flex: 0 0 auto; transform: translateY(-1px); }
+.sdot.ok { background: #00a95c; }
+.sdot.err { background: #e5484d; }
+.form .show { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 13.5px; color: var(--soft); margin-top: 4px; }

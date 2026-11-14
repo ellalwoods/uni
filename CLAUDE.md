@@ -74,13 +74,17 @@ Inside text: `**bold**`, `*italic*`, and `***Case name***` for case names (as th
 
 Don't commit the user's original notes files: they asked for them not to be kept. Read them from the upload, convert them, and don't save them in the repo.
 
+## Sync (Supabase)
+
+`cloud-config.js` points at the user's Supabase project (shared with DuoVino); `supabase/duodisco.sql` creates the `duodisco_sync` table and the `duodisco_load` / `duodisco_save` functions, the only things the public key can use. Each device signs in with a sync phrase; only its SHA-256 hash (`'duodisco:' + phrase`, lowercased, spaces collapsed) is sent. The synced state is `{ app: 'uni', v: 2, progress, courses }`, where `progress` and `courses` each carry `_at`, the time they last changed; when syncing, the newer copy of each wins, and a device joining an existing phrase merges both. If you change the shape of the synced state, keep it backwards compatible. If you change the SQL, the user has to re-run it in Supabase → SQL Editor.
+
 ## Adding a course
 
 Add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` tag for it in `index.html` (before `app.js`), and add it to `ASSETS` in `sw.js`. Course ids are lowercase letters and digits only. Colours are the riso inks: pink `#ff48b0`, blue `#0078bf`, green `#00a95c`, orange `#ff6c2f`, violet `#765ba7`, red `#f15060`, teal `#00838a`, navy `#3255a4`.
 
 ### Courses the user manages in the app
 
-The user can add, rename, recolour, change the weeks of, and remove courses in the app (the + button, and Settings → Courses). Those changes live only on that device (localStorage key `uni.courses`, also included in backups), so they don't reach other devices or content files by themselves:
+The user can add, rename, recolour, change the weeks of, and remove courses in the app (the + button, and Settings → Courses). Those changes are saved on the device (localStorage key `uni.courses`, included in backups) and reach the user's other devices only if sync is on. They never reach the content files by themselves:
 
 - **A course added in the app** gets an id made from its name: lowercase letters and digits only, for example "Constitutional Law" → `constitutionallaw`. When the user asks you to add notes for it, first add that course to `content/courses.js` with **the same id**, name, colour and weeks (ask the user for them if you don't know), so it exists on every device. Then add the week as usual.
 - **Renaming, recolouring or removing** a course in the app overrides `content/courses.js` on that device only. If the user wants a change everywhere, make it in `content/courses.js` too.
@@ -99,4 +103,5 @@ The user can add, rename, recolour, change the weeks of, and remove courses in t
 | `sw.js`, `manifest.webmanifest` | Offline support and home-screen install |
 | `icon.svg`, `icon-180/192/512.png` | The pink disco ball logo. The PNGs are rendered from the SVG (iPhones need PNG home-screen icons): re-render them if the SVG changes |
 | `.github/workflows/publish.yml` | Automatic publishing to GitHub Pages |
+| `cloud-config.js`, `supabase/duodisco.sql` | Sync between devices (Supabase) |
 | `design/` | Earlier design mockups, not part of the app |

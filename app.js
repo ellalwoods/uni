@@ -18,7 +18,7 @@
   const PKEY = 'uni.progress';
   const blank = () => ({ weeks: {}, cards: {}, quiz: {} });
   let P = Object.assign(blank(), store.get(PKEY, {}));
-  const save = () => store.set(PKEY, P);
+  const save = () => { P._at = Date.now(); store.set(PKEY, P); cloudPush(); };
   try { localStorage.removeItem('uni.example'); localStorage.removeItem('uni.progress.example'); } catch (e) {}
 
   /* Courses you add, edit or remove in the app. Saved on this device and in backups.
@@ -26,9 +26,95 @@
   const CKEY = 'uni.courses';
   const blankCfg = () => ({ added: [], edits: {}, removed: [] });
   let CFG = Object.assign(blankCfg(), store.get(CKEY, {}));
-  const saveCfg = () => { store.set(CKEY, CFG); applyCfg(); };
+  const saveCfg = () => { CFG._at = Date.now(); store.set(CKEY, CFG); applyCfg(); cloudPush(); };
+  /* ---------- sync between devices (Supabase) ----------
+   * The phrase is never stored: only its SHA-256 hash, which is the row id. Progress and course
+   * changes each carry the time they last changed (_at); when syncing, the newer copy of each wins.
+   * Turning sync on for a phrase that already has data merges the two, so nothing is lost. */
+  const CLOUD = window.DUODISCO_CLOUD || {};
+  const cloudOn = !!(CLOUD.url && CLOUD.key);
+  const SKEY = 'uni.sync';
+  let SYNC = store.get(SKEY, null);   // { id, at } once sync is on
+  let syncState = '';                 // '', 'syncing', 'error'
+  const normPhrase = p => String(p || '').toLowerCase().trim().replace(/\s+/g, ' ');
+  async function phraseId(p) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('duodisco:' + normPhrase(p)));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function rpc(fn, args) {
+    const r = await fetch(`${CLOUD.url.replace(/\/$/, '')}/rest/v1/rpc/${fn}`, { method: 'POST',
+      headers: { apikey: CLOUD.key, ...(CLOUD.key.startsWith('eyJ') ? { Authorization: `Bearer ${CLOUD.key}` } : {}), 'Content-Type': 'application/json' },
+      body: JSON.stringify(args) });
+    if (!r.ok) throw new Error(`sync ${fn} ${r.status}`);
+    return r.json();
+  }
+  const snapshot = () => ({ app: 'uni', v: 2, progress: P, courses: CFG });
+  let pushTimer = null, pushing = Promise.resolve();
+  function cloudPush(now) {
+    if (!cloudOn || !SYNC) return;
+    clearTimeout(pushTimer);
+    const run = () => (pushing = pushing.then(async () => {
+      try { const ok = await rpc('duodisco_save', { p_id: SYNC.id, p_state: snapshot(), p_create: false }); syncDone(ok ? '' : 'error'); }
+      catch (e) { syncDone('error'); }
+    }));
+    if (now) return run();
+    pushTimer = setTimeout(run, 1500);
+  }
+  function syncDone(st) {
+    syncState = st;
+    if (!st && SYNC) { SYNC.at = Date.now(); store.set(SKEY, SYNC); }
+    if (current && current.name === 'settings') { const el = document.getElementById('syncstat'); if (el) el.innerHTML = syncLine(); }
+  }
+  // Newer copy of each part wins.
+  function takeNewer(remote) {
+    let changed = false;
+    if (remote && remote.progress && (remote.progress._at || 0) > (P._at || 0)) { P = Object.assign(blank(), remote.progress); store.set(PKEY, P); changed = true; }
+    if (remote && remote.courses && (remote.courses._at || 0) > (CFG._at || 0)) { CFG = Object.assign(blankCfg(), remote.courses); store.set(CKEY, CFG); applyCfg(); changed = true; }
+    return changed;
+  }
+  // Used once, when a device joins a phrase that already has data: keep everything from both.
+  function mergeAll(remote) {
+    const rp = Object.assign(blank(), remote.progress || {}), rc = Object.assign(blankCfg(), remote.courses || {});
+    for (const [k, v] of Object.entries(rp.weeks)) P.weeks[k] = Math.min(P.weeks[k] || v, v);
+    for (const [k, v] of Object.entries(rp.cards)) if (!P.cards[k] || (v.at || 0) > (P.cards[k].at || 0)) P.cards[k] = v;
+    for (const [k, v] of Object.entries(rp.quiz)) if (!P.quiz[k] || v.best > P.quiz[k].best) P.quiz[k] = v;
+    rc.added.forEach(a => { if (!CFG.added.some(x => x.id === a.id)) CFG.added.push(a); });
+    CFG.edits = Object.assign({}, rc.edits, CFG.edits);
+    CFG.removed = [...new Set([...CFG.removed, ...rc.removed])];
+    P._at = CFG._at = Date.now();
+    store.set(PKEY, P); store.set(CKEY, CFG); applyCfg();
+  }
+  async function cloudPull() {
+    if (!cloudOn || !SYNC) return;
+    try {
+      const res = await rpc('duodisco_load', { p_id: SYNC.id });
+      const changed = res && res.state ? takeNewer(res.state) : false;
+      syncDone('');
+      if (changed && current && !session && !['form', 'search'].includes(current.name)) render();
+      if (!res || (res.state && ((P._at || 0) > (res.state.progress?._at || 0) || (CFG._at || 0) > (res.state.courses?._at || 0)))) cloudPush(true);
+    } catch (e) { syncDone('error'); }
+  }
+  async function syncStart(phrase) {
+    const id = await phraseId(phrase);
+    const res = await rpc('duodisco_load', { p_id: id });
+    if (res && res.state) { mergeAll(res.state); SYNC = { id }; store.set(SKEY, SYNC); await cloudPush(true); return 'joined'; }
+    P._at = P._at || Date.now(); CFG._at = CFG._at || Date.now();
+    const ok = await rpc('duodisco_save', { p_id: id, p_state: snapshot(), p_create: true });
+    if (!ok) throw new Error('create failed');
+    SYNC = { id }; store.set(SKEY, SYNC); syncDone(''); return 'created';
+  }
+  function syncLine() {
+    if (syncState === 'error') return `<span class="sdot err"></span>Couldn’t reach the sync server. Changes are kept on this device and sync when you’re back online.`;
+    if (!SYNC || !SYNC.at) return `<span class="sdot"></span>Sync is on.`;
+    const mins = Math.round((Date.now() - SYNC.at) / 60000);
+    return `<span class="sdot ok"></span>Synced ${mins < 1 ? 'just now' : mins < 60 ? mins + ' min ago' : new Date(SYNC.at).toLocaleString()}.`;
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudPush(true); else cloudPull(); });
+
   const INKS = [['#ff48b0', 'Pink'], ['#0078bf', 'Blue'], ['#00a95c', 'Green'], ['#ff6c2f', 'Orange'], ['#765ba7', 'Violet'], ['#f15060', 'Red'], ['#00838a', 'Teal'], ['#3255a4', 'Navy']];
   function applyCfg() {
+    // drop app-made courses that were deleted (for example on another device)
+    UNI.courses.filter(c => c.mine && !CFG.added.some(a => a.id === c.id)).forEach(c => { UNI.courses.splice(UNI.courses.indexOf(c), 1); delete UNI.byId[c.id]; });
     CFG.added.forEach(a => {
       if (!UNI.byId[a.id]) UNI.addCourse({ id: a.id, mine: true });
       const c = UNI.byId[a.id];
@@ -419,12 +505,13 @@
     return `<div class="screen">
       <div class="bar">${back('home', 'Courses')}<span class="meta">Settings</span></div>
       <h1 class="title">Settings</h1>
+      ${cloudOn ? syncSection() : ''}
       <div class="set"><h2>Courses</h2><p>Add, rename, recolour or remove a course.</p>
         ${courses().map(c => `<button class="crs" style="${cv(c)}" data-go="edit-${c.id}"><span class="dot"></span><span class="nm">${esc(c.name)}</span><span class="ed">Edit</span></button>`).join('')}
         <button class="crs add" data-go="new-course"><span class="dot">+</span><span class="nm">Add a course</span></button>
         ${gone.length ? `<p style="margin-top:14px">Removed courses. Bringing one back restores its weeks and progress.</p>${gone.map(c => `<div class="crs gone" style="${cv(c)}"><span class="dot"></span><span class="nm">${esc(c.name)}</span><button class="ed" data-act="restore-course" data-id="${c.id}">Bring back</button></div>`).join('')}` : ''}
       </div>
-      <div class="set"><h2>Back up your progress</h2><p>Your progress and course changes are saved on this device only. Copy this somewhere safe, or download it, to move it to a new phone.</p>
+      <div class="set"><h2>Back up your progress</h2><p>Your progress and course changes are saved on this device${SYNC ? ' and synced' : ' only'}. Copy this somewhere safe, or download it, to move it to a new phone.</p>
         <textarea id="bk" readonly aria-label="Backup">${esc(data)}</textarea>
         <div class="row-btns" style="margin-top:8px"><button class="btn small" data-act="copy">Copy</button>${url ? `<a class="btn small ghost" href="${url}" download="duodisco-backup.json">Download</a>` : ''}</div></div>
       <div class="set"><h2>Restore a backup</h2><p>Paste a backup here, or choose the file.</p>
@@ -433,6 +520,32 @@
       <div class="set"><h2>Reset progress</h2><p>Clears what you've studied and your quiz scores. Your courses and their content aren't affected.</p>
         <button class="btn small ghost" data-act="reset">Reset progress</button></div>
     </div>`;
+  }
+  function syncSection() {
+    if (SYNC) return `<div class="set"><h2>Sync between devices</h2>
+        <p id="syncstat" class="syncstat">${syncLine()}</p>
+        <p>Your courses, course changes and progress stay the same on every device where you’ve entered your sync phrase.</p>
+        <div class="row-btns"><button class="btn small" data-act="sync-now">Sync now</button><button class="btn small ghost" data-act="sync-off">Stop syncing on this device</button></div></div>`;
+    return `<div class="set"><h2>Sync between devices</h2>
+        <p>Keep your courses and progress the same on your phone and laptop. Choose a sync phrase and enter the same phrase on each device. It isn’t stored anywhere: only a scrambled code made from it is used, so if you forget it, start again with a new one.</p>
+        <form id="syncform" class="form" novalidate>
+          <label for="f-phrase">Sync phrase <small>at least 8 characters; capitals and spacing don’t matter</small></label>
+          <input id="f-phrase" name="phrase" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. pink disco ball forever">
+          <label class="show"><input type="checkbox" id="f-show"> Show phrase</label>
+          <p class="formerr" id="serr" role="alert"></p>
+          <button class="btn" type="submit">Turn on sync</button>
+        </form></div>`;
+  }
+  async function syncSubmit() {
+    const f = document.getElementById('syncform'), err = document.getElementById('serr'), btn = f.querySelector('button[type=submit]');
+    const phrase = f.elements['phrase'].value;
+    if (normPhrase(phrase).length < 8) { err.textContent = 'Use at least 8 characters.'; return; }
+    btn.disabled = true; btn.textContent = 'Connecting…'; err.textContent = '';
+    try {
+      const how = await syncStart(phrase);
+      toast(how === 'joined' ? 'Synced: this device now matches your others' : 'Sync is on. Enter the same phrase on your other devices.');
+      render();
+    } catch (e) { btn.disabled = false; btn.textContent = 'Turn on sync'; err.textContent = 'Couldn’t reach the sync server. Check you’re online and try again.'; }
   }
   function restore(text) {
     try {
@@ -551,6 +664,10 @@
     app.innerHTML = `<div class="layout">${side(r)}<div class="main">${html}</div></div>`;
     document.title = c ? `${c.short || c.name} · DuoDisco` : 'DuoDisco';
     if (r.name === 'form') document.getElementById('cform').addEventListener('submit', e => { e.preventDefault(); saveCourse(r.c); });
+    if (r.name === 'settings' && document.getElementById('syncform')) {
+      document.getElementById('syncform').addEventListener('submit', e => { e.preventDefault(); syncSubmit(); });
+      document.getElementById('f-show').addEventListener('change', e => { document.getElementById('f-phrase').type = e.target.checked ? 'text' : 'password'; });
+    }
     if (r.name === 'settings') document.getElementById('rsfile')?.addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(restore); });
     if (r.name === 'search') { const q = document.getElementById('q'), out = document.getElementById('results'); q.addEventListener('input', () => { out.innerHTML = searchResults(c, q.value); }); q.focus(); }
     current = r;
@@ -594,6 +711,10 @@
         saveCfg(); toast('Course removed'); go('home'); break;
       }
       case 'restore-course': CFG.removed = CFG.removed.filter(x => x !== t.dataset.id); saveCfg(); toast('Course brought back'); render(); break;
+      case 'sync-now': t.disabled = true; cloudPush(true).then(cloudPull).then(() => { t.disabled = false; }); break;
+      case 'sync-off':
+        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to stop syncing'; break; }
+        SYNC = null; syncState = ''; try { localStorage.removeItem(SKEY); } catch (e) {} toast('Sync is off on this device. Your data here is kept.'); render(); break;
       case 'copy': { const ta = document.getElementById('bk'); (navigator.clipboard ? navigator.clipboard.writeText(ta.value) : Promise.reject()).then(() => toast('Copied'), () => { ta.select(); toast('Select all and copy'); }); break; }
       case 'restore': restore(document.getElementById('rs').value); break;
       case 'reset':
@@ -604,4 +725,5 @@
   });
 
   render();
+  cloudPull();
 })();
