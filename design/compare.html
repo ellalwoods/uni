@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerals vs The Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&family=Hanken+Grotesk:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: two rows of three phones, Numerals in riso inks on white above, the original Stack below, for side-by-side comparison. */
+  --page:#f4f3ef; --ink:#1a1a1a; --soft:#5c5a55; --hair:#ebebeb; --faint:#e2e2e2; --white:#ffffff;
+  --pink:#ff48b0; --blue:#0078bf; --green:#00a95c; --orange:#ff6c2f; --yellow:#ffe800;
+  --sans:'Hanken Grotesk', system-ui, sans-serif; --mono:'IBM Plex Mono', ui-monospace, monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+.top{max-width:1120px;margin:0 auto;padding:30px 24px 0}
+.top h1{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:34px;line-height:1.05;margin:0 0 6px;letter-spacing:-.01em}
+.top p{margin:0;color:var(--soft);max-width:70ch}
+.block{max-width:1120px;margin:0 auto;padding:26px 24px 10px}
+.block h2{font-family:'Archivo Black',sans-serif;font-weight:400;font-size:22px;margin:0 0 2px;display:flex;align-items:center;gap:10px}
+.block h2 i{width:14px;height:14px;border-radius:50%;display:inline-block}
+.block > p{margin:0 0 16px;color:var(--soft);max-width:70ch;font-size:14px}
+.phones{display:flex;gap:26px;flex-wrap:wrap;justify-content:center}
+.ph{width:320px;flex:0 0 320px}
+.ph .cap{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:600;margin:0 0 8px 6px}
+.scr{width:320px;height:660px;border-radius:40px;overflow:hidden;position:relative;border:8px solid #fff;box-shadow:0 20px 44px #1a1a1a1f,0 0 0 1px #1a1a1a14}
+.in{position:absolute;inset:0;padding:48px 20px 20px;overflow:hidden}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:92px;height:24px;background:#111;border-radius:20px;z-index:9}
+.diff{max-width:1120px;margin:10px auto 0;padding:0 24px 60px}
+.diff table{width:100%;max-width:900px;border-collapse:collapse;font-size:14px;background:#fff;border-radius:10px;overflow:hidden}
+.diff th,.diff td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--hair);vertical-align:top}
+.diff th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:600}
+.tw{overflow-x:auto}
+
+/* ===== Numerals in riso inks ===== */
+.N{background:#fff;font-family:'Bricolage Grotesque',var(--sans)}
+.N .meta{font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--soft)}
+.N .row{display:flex;justify-content:space-between;align-items:center}
+.N .backbtn{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--soft)}
+.N .title{font-weight:800;font-size:30px;line-height:1;letter-spacing:-.02em;margin:8px 0 14px}
+.N .crow{padding:14px 0 12px;border-top:1px solid var(--hair)}
+.N .crow .nm{font-weight:800;font-size:22px;line-height:1.02;letter-spacing:-.015em;color:var(--c)}
+.N .segs{display:grid;grid-template-columns:repeat(13,1fr);gap:3px;margin-top:10px}
+.N .segs i{height:6px;border-radius:1px;background:var(--hair)}
+.N .segs i.p{background:var(--c)}
+.N .segs i.r{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c)}
+.N .crow .st{display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;color:var(--soft);margin-top:6px}
+.N .crow .st b{color:var(--c);font-weight:700}
+.N .add{border-top:1px solid var(--hair);padding-top:12px;font-weight:600;font-size:15px;color:var(--soft)}
+.N .ctitle{font-weight:800;font-size:27px;line-height:1;letter-spacing:-.02em;margin:12px 0 2px;color:var(--c)}
+.N .grid{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;border-top:1px solid var(--hair)}
+.N .cell{padding:6px 2px 8px;border-bottom:1px solid var(--hair);min-height:66px}
+.N .cell .n{font-weight:800;font-size:36px;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.N .cell .t{font-family:var(--sans);font-size:10.5px;line-height:1.2;color:var(--soft);margin-top:2px;padding-right:6px}
+.N .cell.p .n{color:var(--c)}
+.N .cell.r .n{color:transparent;-webkit-text-stroke:1.4px var(--c)}
+.N .cell.r .t{color:var(--c);font-weight:700}
+.N .cell.s .n{color:var(--faint)}
+.N .btn{display:block;text-align:center;padding:14px;border-radius:999px;font-family:var(--sans);font-weight:700;font-size:15px;color:#fff;background:var(--c)}
+.N .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--hair)}
+.N .pin{position:absolute;left:20px;right:20px;bottom:22px}
+.N .prog{display:flex;gap:3px;margin-top:14px}
+.N .prog i{flex:1;height:3px;border-radius:2px;background:var(--hair)}
+.N .prog i.d{background:var(--c)}
+.N .card{margin-top:22px}
+.N .card .k{font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--c)}
+.N .card .q{font-weight:600;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin-top:8px;position:relative}
+.N .card .a{font-family:var(--sans);font-size:15px;line-height:1.55;color:#33332f;margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
+.N .card .src{font-family:var(--sans);font-size:12px;color:var(--soft);margin-top:14px}
+.N .card .num{position:absolute;right:16px;bottom:96px;font-weight:800;font-size:120px;line-height:1;letter-spacing:-.05em;color:var(--c);opacity:.16}
+.N .rate{position:absolute;left:20px;right:20px;bottom:22px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ===== The Stack (original riso concept) ===== */
+.rs{background:#fbfaf5;color:#1a1a1a;font-family:'Archivo',sans-serif}
+.crumbs{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.rs .mast{font-family:'Archivo Black',sans-serif;font-size:42px;line-height:.85;letter-spacing:-.02em;position:relative}
+.rs .mast .a{color:#ff48b0;mix-blend-mode:multiply}
+.rs .mast .b{position:absolute;left:3px;top:2px;color:#0078bf;mix-blend-mode:multiply}
+.rs .sm{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.zines{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.zine{height:162px;position:relative;padding:9px;color:#1a1a1a;overflow:hidden;background:#fff;box-shadow:2px 3px 0 #1a1a1a}
+.zine .ht{position:absolute;inset:0;background-image:radial-gradient(var(--c) 32%,transparent 34%);background-size:7px 7px;mix-blend-mode:multiply;-webkit-mask:linear-gradient(160deg,transparent 30%,#000 75%);mask:linear-gradient(160deg,transparent 30%,#000 75%)}
+.zine .ht2{position:absolute;right:-18px;top:30px;width:90px;height:90px;border-radius:50%;background:var(--c2);mix-blend-mode:multiply;opacity:.9}
+.zine .no{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;position:relative}
+.zine .nm{position:relative;font-family:'Archivo Black',sans-serif;font-size:17px;line-height:.98;margin-top:6px;letter-spacing:-.01em;color:var(--c);mix-blend-mode:multiply}
+.zine .pct{position:absolute;left:9px;bottom:8px;font-family:'Archivo Black',sans-serif;font-size:30px;line-height:1;color:var(--c2);mix-blend-mode:multiply}
+.zine .pct small{display:block;margin-top:4px;font-family:var(--mono);font-size:9px;color:#1a1a1a;letter-spacing:.06em;mix-blend-mode:normal}
+.zine.empty{background:transparent;box-shadow:none;border:2px dashed #1a1a1a55;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-size:14px;color:#1a1a1a77;text-align:center}
+.toc{margin-top:10px;border-top:3px solid #1a1a1a}
+.tocrow{border-bottom:1px solid #1a1a1a;padding:9px 0}
+.tocrow .h{display:flex;gap:8px;align-items:baseline}
+.tocrow .h b{font-family:'Archivo Black',sans-serif;font-size:24px;line-height:.9;color:#0078bf;mix-blend-mode:multiply;min-width:30px}
+.tocrow .h span{font-weight:800;font-size:14px;line-height:1.15}
+.tocrow .cs2{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0 38px}
+.tag{font-size:11px;padding:2px 6px;font-weight:600}
+.tag.k3{background:#ff48b0;color:#fff}
+.tag.k2{background:#ff48b066;color:#1a1a1a}
+.tag.k1,.tag.k0{border:1px solid #ff48b0;color:#c2257f}
+.tag.k0{border-style:dashed;opacity:.7}
+.rsmodes{display:grid;grid-template-columns:repeat(3,1fr);margin-top:12px;border:2px solid #1a1a1a}
+.rsmodes div{padding:8px 4px;text-align:center;font-family:'Archivo Black',sans-serif;font-size:12px;border-right:2px solid #1a1a1a}
+.rsmodes div:last-child{border-right:0}
+.rsmodes div.on{background:#1a1a1a;color:#fff}
+.poster{margin-top:12px;background:#fff;padding:14px 14px 12px;position:relative;box-shadow:3px 4px 0 #1a1a1a;overflow:hidden}
+.poster .bg{position:absolute;right:-40px;top:-40px;width:170px;height:170px;border-radius:50%;background-image:radial-gradient(#ffe800 36%,transparent 38%);background-size:8px 8px;mix-blend-mode:multiply}
+.poster .k{position:relative;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.poster .q{position:relative;font-family:'Archivo Black',sans-serif;font-size:21px;line-height:1.05;margin:8px 0 12px;color:#0078bf;letter-spacing:-.01em}
+.poster .a{position:relative;font-size:13.5px;line-height:1.45;border-left:4px solid #ff48b0;padding-left:10px}
+.poster .src{position:relative;font-family:var(--mono);font-size:10px;margin-top:12px;padding-top:8px;border-top:1px solid #1a1a1a;letter-spacing:.04em}
+.regmark{position:absolute;width:16px;height:16px;border:1.5px solid #1a1a1a;border-radius:50%}
+.regmark:before,.regmark:after{content:"";position:absolute;background:#1a1a1a}
+.regmark:before{left:50%;top:-5px;bottom:-5px;width:1.5px;margin-left:-.75px}
+.regmark:after{top:50%;left:-5px;right:-5px;height:1.5px;margin-top:-.75px}
+.rsrate{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.rsrate div{padding:11px;text-align:center;font-family:'Archivo Black',sans-serif;font-size:13px;border:2px solid #1a1a1a}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Numerals vs The Stack</h1>
+  <p>The same three screens in each: home, a course, and studying a card. Numerals now uses the riso inks (fluoro pink, blue, green and orange) on a plain white background. The Stack is shown as it was originally. The content is made up.</p>
+</div>
+
+<section class="block">
+  <h2><i style="background:var(--pink)"></i>Numerals, riso inks on white</h2>
+  <p>Flat colour, clean type, and the 13 weeks as big numbers. It uses the riso palette without any of the print effects.</p>
+  <div class="phones" id="numerals"></div>
+</section>
+
+<section class="block">
+  <h2><i style="background:var(--blue)"></i>The Stack, as it was</h2>
+  <p>Each course is a zine. Halftone dots, overprinted inks, registration marks and hard black shadows.</p>
+  <div class="phones" id="stack"></div>
+</section>
+
+<section class="diff">
+  <div class="tw"><table>
+    <tr><th></th><th>Numerals (riso inks)</th><th>The Stack</th></tr>
+    <tr><td>Feel</td><td>Clean, calm, modern</td><td>Loud, playful, printed</td></tr>
+    <tr><td>Weeks</td><td>Always 13 numbered slots, so you see what's planted, ready and sealed</td><td>Only the weeks you've uploaded, as issues in a contents list</td></tr>
+    <tr><td>Reading a course</td><td>Course name in its colour, 13 segments underneath</td><td>A zine cover with halftone and a big percentage</td></tr>
+    <tr><td>Study card</td><td>Plain card, a large faint week number behind it</td><td>Poster proof with a yellow halftone and a black drop shadow</td></tr>
+    <tr><td>Overlap with Good Word Charlie</td><td>Shares the colours only</td><td>Shares the whole riso look</td></tr>
+  </table></div>
+</section>
+
+<script>
+const phone=(cap,cls,style,html)=>`<div class="ph"><p class="cap">${cap}</p><div class="scr"><div class="notch"></div><div class="in ${cls}" style="${style||''}">${html}</div></div></div>`;
+
+/* ---------- Numerals ---------- */
+const COURSES=[
+ {name:'International Commercial Arbitration', c:'#ff48b0', planted:8, ready:2},
+ {name:'Corporate Law', c:'#0078bf', planted:5, ready:1},
+ {name:'AI Law', c:'#00a95c', planted:6, ready:0},
+ {name:'Intensive course', c:'#ff6c2f', planted:1, ready:1},
+];
+const WEEKS=['What arbitration is','The agreement','Seats and laws','Institutions','The tribunal','Jurisdiction','Interim measures','Evidence','The award','Challenges','Enforcement','Investor–state','Revision'];
+const CARD={k:'Week 2 · Separability',q:'Why does an arbitration clause survive when the main contract is said to be void?',
+ a:'The clause is treated as its own small agreement inside the bigger one. An attack on the main contract doesn’t by itself knock out the promise to arbitrate, so the tribunal can still decide whether the contract is void.',src:'ICA Week 2 notes, p.3'};
+const st=(c,i)=>i<c.planted?'p':i<c.planted+c.ready?'r':'s';
+const I=COURSES[0];
+const nHome=`<div class="row"><span class="meta">Semester 2</span><span class="meta">4 courses</span></div>
+ <div class="title">Courses</div>
+ ${COURSES.map(c=>`<div class="crow" style="--c:${c.c}"><div class="nm">${c.name}</div>
+   <div class="segs">${[...Array(13).keys()].map(i=>`<i class="${st(c,i)}"></i>`).join('')}</div>
+   <div class="st"><span>${c.planted} of 13 weeks</span>${c.ready?`<b>${c.ready} ready</b>`:'<span></span>'}</div></div>`).join('')}
+ <div class="add">+ Add a course</div>`;
+const nInside=`<div class="row"><span class="backbtn">‹ Courses</span><span class="meta">${I.planted} of 13</span></div>
+ <div class="ctitle">International Commercial Arbitration</div>
+ <div class="grid">${WEEKS.map((t,i)=>{const s=st(I,i);return `<div class="cell ${s}"><div class="n">${String(i+1).padStart(2,'0')}</div><div class="t">${s==='r'?'Ready to plant':s==='s'?'&nbsp;':t}</div></div>`}).join('')}</div>
+ <div class="pin"><div class="btn">Study planted weeks</div></div>`;
+const nStudy=`<div class="row"><span class="backbtn">‹ Week 02</span><span class="meta">4 of 12</span></div>
+ <div class="prog">${[...Array(12)].map((_,i)=>`<i class="${i<4?'d':''}"></i>`).join('')}</div>
+ <div class="card"><div class="num">02</div><div class="k">${CARD.k}</div><div class="q">${CARD.q}</div><div class="a">${CARD.a}</div><div class="src">From ${CARD.src}</div></div>
+ <div class="rate"><div class="btn ghost">See again</div><div class="btn">Got it</div></div>`;
+document.getElementById('numerals').innerHTML=phone('Home','N','',nHome)+phone('A course','N',`--c:${I.c}`,nInside)+phone('Studying','N',`--c:${I.c}`,nStudy);
+
+/* ---------- The Stack (original) ---------- */
+const S=[
+ {name:'International Commercial Arbitration', weeks:[
+   {t:'Foundations of arbitration', c:[['Party autonomy',.95],['Arbitration agreement',.85],['Seat of arbitration',.7]]},
+   {t:'The arbitration agreement', c:[['Separability',.75],['Kompetenz-Kompetenz',.5],['Arbitrability',.35]]},
+   {t:'Constituting the tribunal', c:[['Appointment',.45],['Independence',.25],['Challenges',.1]]},
+   {t:'Recognition & enforcement', c:[['New York Convention',.2],['Article V grounds',0],['Public policy',0]]}]},
+ {name:'Corporate Law', weeks:[
+   {t:'Corporate personality', c:[['Separate personality',.95],['Salomon',.85],['Limited liability',.7]]},
+   {t:'Lifting the veil', c:[['Evasion principle',.55],['Concealment',.35],['Agency',.3]]},
+   {t:"Directors' duties", c:[['Duty of care',.2],['Fiduciary duties',.1],['Conflicts',0]]}]},
+ {name:'AI Law', weeks:[
+   {t:'Regulating AI', c:[['AI system definition',.8],['Risk-based approach',.6]]},
+   {t:'The EU AI Act', c:[['Prohibited practices',.4],['High-risk systems',.25],['Transparency',.1]]}]},
+];
+const avg=w=>w.c.reduce((s,x)=>s+x[1],0)/w.c.length;
+const pct=s=>Math.round(100*s.weeks.reduce((a,w)=>a+avg(w),0)/s.weeks.length);
+const lvl=m=>m>=.7?3:m>=.4?2:m>0?1:0;
+const F=S[0], ink=[['#ff48b0','#ffe800'],['#0078bf','#ff48b0'],['#00a95c','#0078bf']];
+const sHome=`<div class="crumbs"><span>Semester 2</span><span>Print run</span></div>
+ <div class="mast" style="margin-top:10px"><span class="a">THE<br>STACK</span><span class="b" aria-hidden="true">THE<br>STACK</span></div>
+ <div class="sm" style="margin-top:8px">Each subject is a zine. Each week is a new issue.</div>
+ <div class="zines">${S.map((s,i)=>`<div class="zine" style="--c:${ink[i][0]};--c2:${ink[i][1]};transform:rotate(${[-1.5,1,-.5][i]}deg)">
+   <div class="ht"></div><div class="ht2"></div><div class="no">VOL.0${i+1} · ${s.weeks.length} ISSUES</div><div class="nm">${s.name}</div>
+   <div class="pct">${pct(s)}%<small>INKED</small></div></div>`).join('')}
+   <div class="zine empty">+ Start<br>a zine</div><div class="zine empty" style="grid-column:1/-1;height:52px">+ Start a zine</div></div>`;
+const sInside=`<div class="crumbs"><span>‹ The stack</span><span>Vol.01</span></div>
+ <div style="position:relative;margin-top:10px"><div class="regmark" style="right:0;top:2px"></div>
+ <div style="font-family:'Archivo Black',sans-serif;font-size:26px;line-height:.95;color:#ff48b0;mix-blend-mode:multiply;padding-right:26px">International Commercial Arbitration</div></div>
+ <div class="sm" style="margin-top:6px">${pct(F)}% inked · Contents</div>
+ <div class="rsmodes"><div class="on">Proof</div><div>Pop quiz</div><div>Digest</div></div>
+ <div class="toc">${F.weeks.map((w,i)=>`<div class="tocrow"><div class="h"><b>0${i+1}</b><span>${w.t}</span></div>
+   <div class="cs2">${w.c.map(c=>`<span class="tag k${lvl(c[1])}">${c[0]}</span>`).join('')}</div></div>`).join('')}</div>
+ <div class="sm" style="margin-top:8px;opacity:.7">Solid ink = known. Outline = not yet printed.</div>`;
+const sStudy=`<div class="crumbs"><span>‹ Vol.01 · Proof</span><span>4 / 12</span></div>
+ <div class="poster"><div class="bg"></div><div class="regmark" style="left:8px;bottom:8px;opacity:.5"></div>
+   <div class="k">ICA · Week 2 · Separability</div><div class="q">What does the doctrine of separability mean for an arbitration clause?</div>
+   <div class="a">The arbitration agreement is treated as separate from the main contract, so the invalidity of the main contract does not automatically invalidate the agreement to arbitrate.</div>
+   <div class="src">From: ICA Week 2 notes, p.3</div></div>
+ <div class="sm" style="text-align:center;margin-top:14px">Did it print clean?</div>
+ <div class="rsrate"><div>Misprint</div><div style="background:#ff48b0;color:#fff;border-color:#ff48b0">Clean print</div></div>`;
+document.getElementById('stack').innerHTML=phone('Home','rs','',sHome)+phone('A course','rs','',sInside)+phone('Studying','rs','',sStudy);
+</script>
+</body>
+</html>
