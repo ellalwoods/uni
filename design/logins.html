@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DuoDisco login ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: five phone screens side by side, each a first-launch login in DuoDisco's own style (white, riso inks, big type). */
+  --ink:#1a1a1a; --soft:#5c5a55; --hair:#ebebeb; --faint:#dedede; --page:#f4f3ef;
+  --pink:#ff48b0; --blue:#0078bf; --green:#00a95c; --orange:#ff6c2f; --violet:#765ba7; --red:#f15060; --teal:#00838a; --navy:#3255a4;
+  --display:'Bricolage Grotesque', 'Hanken Grotesk', system-ui, sans-serif; --sans:'Hanken Grotesk', system-ui, sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.top{max-width:1240px;margin:0 auto;padding:30px 24px 8px}
+.top h1{font-family:var(--display);font-weight:800;font-size:34px;letter-spacing:-.02em;margin:0 0 6px;line-height:1.05}
+.top p{margin:0;color:var(--soft);max-width:72ch}
+.flow{max-width:1240px;margin:0 auto;padding:22px 24px 60px;display:flex;flex-wrap:wrap;gap:34px 26px;justify-content:center}
+.ph{width:320px;flex:0 0 320px}
+.ph h2{font-family:var(--display);font-weight:800;font-size:19px;margin:0 0 2px 6px;letter-spacing:-.01em}
+.ph .why{font-size:13px;color:var(--soft);margin:0 6px 10px;min-height:56px;line-height:1.4}
+.scr{width:320px;height:680px;border-radius:40px;overflow:hidden;position:relative;border:8px solid #fff;box-shadow:0 22px 46px #1a1a1a1f,0 0 0 1px #1a1a1a14;background:#fff}
+.in{position:absolute;inset:0;padding:48px 20px 20px;display:flex;flex-direction:column;overflow:hidden}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:92px;height:24px;background:#111;border-radius:20px;z-index:9}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:800;font-size:16px}
+.hello{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;letter-spacing:-.02em;margin:18px 0 4px}
+.sub{font-size:13px;color:var(--soft);margin:0 0 12px;line-height:1.4}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--soft);margin:12px 0 6px}
+.name{font:inherit;font-size:16px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--hair);background:#fafaf8;width:100%}
+.go{margin-top:auto;display:block;width:100%;text-align:center;padding:14px;border-radius:999px;font-weight:700;font-size:15px;color:#fff;background:var(--pink)}
+.go:disabled{background:var(--faint);color:#fff}
+.small{text-align:center;font-size:12px;color:var(--soft);margin-top:8px}
+
+/* 1. dance floor */
+.floor{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;background:#141414;border-radius:16px;margin-top:2px}
+.tile{aspect-ratio:1;border-radius:6px;background:color-mix(in srgb,var(--k) 22%,#141414);position:relative;transition:background .15s, box-shadow .15s;display:flex;align-items:center;justify-content:center}
+.tile.on{background:var(--k);box-shadow:0 0 18px var(--k),0 0 0 2px #ffffff55 inset}
+.tile b{font-family:var(--display);font-weight:800;font-size:22px;color:#fff;opacity:0}
+.tile.on b{opacity:1}
+.order{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:12px;color:var(--soft);align-items:center}
+.order i{width:18px;height:18px;border-radius:4px;background:var(--hair);display:inline-block}
+
+/* 2. maxim + ink */
+.maxims{display:flex;flex-wrap:wrap;gap:6px}
+.mean{font-size:12.5px;color:var(--soft);margin:8px 0 0;min-height:18px}
+.mean b{color:var(--ink);font-weight:600}
+.mx{display:block;text-align:left;padding:7px 10px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--hair);font-style:italic;font-weight:500;font-size:13.5px;line-height:1.2}
+.mx small{display:block;font-style:normal;font-weight:500;font-size:11px;color:var(--soft)}
+.mx.on{background:var(--ink);color:#fff;box-shadow:none}
+.mx.on small{color:#ffffffaa}
+.inks{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.dot{aspect-ratio:1;border-radius:50%;background:var(--k);box-shadow:0 0 0 2.5px #fff,0 0 0 4px transparent}
+.dot.on{box-shadow:0 0 0 2.5px #fff,0 0 0 4.5px var(--k)}
+
+/* 3. record + speed */
+.records{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:2px}
+.rec{aspect-ratio:1;border-radius:50%;position:relative;background:repeating-radial-gradient(circle,#1b1b1b 0 2px,#262626 2px 4px);box-shadow:0 2px 6px #0003}
+.rec::after{content:"";position:absolute;inset:32%;border-radius:50%;background:var(--k);box-shadow:0 0 0 1px #0002}
+.rec::before{content:"";position:absolute;left:50%;top:50%;width:6%;height:6%;margin:-3% 0 0 -3%;border-radius:50%;background:#fff;z-index:1}
+.rec.on{box-shadow:0 0 0 3px #fff,0 0 0 5.5px var(--k),0 6px 14px #0004;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.speeds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sp{padding:12px 4px;border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--hair);text-align:center;font-family:var(--display);font-weight:800;font-size:22px;line-height:1}
+.sp small{display:block;font-family:var(--sans);font-weight:600;font-size:10.5px;color:var(--soft);margin-top:3px}
+.sp.on{background:var(--ink);color:#fff;box-shadow:none}
+.sp.on small{color:#ffffffaa}
+
+/* 4. ball + move */
+.balls{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ball{aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px var(--hair)}
+.ball.on,.move.on{box-shadow:inset 0 0 0 2.5px var(--ink);background:#f6f6f4}
+.moves{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.move{display:flex;flex-direction:column;align-items:center;padding:6px 2px 5px;border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--hair);font-size:10.5px;font-weight:600;color:var(--soft);line-height:1.1}
+.move svg{display:block;margin-bottom:2px}
+
+/* 5. cocktail + decade */
+.glasses{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.gl{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px 6px;border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--hair);font-size:9.5px;font-weight:600;color:var(--soft);line-height:1.15;text-align:center}
+.gl.on{box-shadow:inset 0 0 0 2.5px var(--ink);background:#f6f6f4;color:var(--ink)}
+.decades{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.dc{padding:11px 0;border-radius:10px;box-shadow:inset 0 0 0 1.5px var(--hair);text-align:center;font-family:var(--display);font-weight:800;font-size:16px}
+.dc.on{background:var(--ink);color:#fff;box-shadow:none}
+
+.compare{max-width:960px;margin:0 auto;padding:0 24px 60px}
+.compare h3{font-family:var(--display);font-weight:800;font-size:20px;margin:0 0 8px}
+.compare table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:12px;overflow:hidden}
+.compare th,.compare td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--hair);vertical-align:top}
+.compare th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:700}
+.compare td:first-child{font-weight:700;white-space:nowrap}
+.tw{overflow-x:auto}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Login ideas for DuoDisco</h1>
+  <p>Each screen shows on first launch, on every device. Your name plus the picks open the same courses and progress everywhere. Like DuoVino, it keeps your data separate rather than locking it away, and only a scrambled code made from your picks is ever sent. Every screen is interactive: tap to try it.</p>
+</div>
+<div class="flow" id="flow"></div>
+<section class="compare">
+  <h3>Side by side</h3>
+  <div class="tw"><table>
+    <tr><th>Idea</th><th>What you pick</th><th>Combinations per name</th><th>Feel</th></tr>
+    <tr><td>1. Dance floor</td><td>3 tiles in order, out of 9</td><td>504</td><td>Visual and quick, most like the logo</td></tr>
+    <tr><td>2. Latin maxim</td><td>A maxim and an ink</td><td>64</td><td>Most "uni" and law school</td></tr>
+    <tr><td>3. Record</td><td>A record and a speed</td><td>24</td><td>Playful and simple</td></tr>
+    <tr><td>4. Ball and move</td><td>A disco ball and a dance move</td><td>64</td><td>The most fun</td></tr>
+    <tr><td>5. Cocktail</td><td>A cocktail and a decade</td><td>40</td><td>A nod to DuoVino</td></tr>
+  </table></div>
+</section>
+
+<script>
+const INK={pink:'#ff48b0',blue:'#0078bf',green:'#00a95c',orange:'#ff6c2f',violet:'#765ba7',red:'#f15060',teal:'#00838a',navy:'#3255a4'};
+const K=Object.values(INK);
+const logo=`<svg width="26" height="26" viewBox="0 0 512 512"><g>${(()=>{let o='';const n=9,r=176,cx=256,cy=270,s=2*r/n;for(let j=0;j<n;j++)for(let i=0;i<n;i++){const x=cx-r+i*s,y=cy-r+j*s,dx=x+s/2-cx,dy=y+s/2-cy;if(dx*dx+dy*dy>(r*1.03)**2)continue;const d=i+j;o+=`<rect x="${x+4}" y="${y+4}" width="${s-8}" height="${s-8}" rx="5" fill="${d<6?'#ffb3dc':d<12?'#ff48b0':'#d92f8f'}"/>`;}return o;})()}</g></svg>`;
+const head=(t,sub)=>`<div class="logo">${logo}DuoDisco</div><div class="hello">${t}</div><p class="sub">${sub}</p><input class="name" placeholder="Your name" value="Ella" aria-label="Your name">`;
+const sparkle=(c,s=14)=>`<svg width="${s}" height="${s}" viewBox="0 0 20 20"><path d="M10 0 Q11.6 8.4 20 10 Q11.6 11.6 10 20 Q8.4 11.6 0 10 Q8.4 8.4 10 0Z" fill="${c}"/></svg>`;
+function ballSVG(c,size){const n=7,r=20,s=2*r/n;let o='';for(let j=0;j<n;j++)for(let i=0;i<n;i++){const x=-r+i*s,y=-r+j*s,dx=x+s/2,dy=y+s/2;if(dx*dx+dy*dy>(r*1.05)**2)continue;const d=i+j;o+=`<rect x="${x+.7}" y="${y+.7}" width="${s-1.4}" height="${s-1.4}" rx="1" fill="${c}" opacity="${d<4?.45:d<9?1:.8}"/>`;}return `<svg width="${size}" height="${size}" viewBox="-22 -22 44 44">${o}</svg>`;}
+// stick figures: head, body and limbs as lines
+const MOVES=[
+ ['The point','M20 12 L20 28 M20 16 L30 4 M20 16 L12 22 M20 28 L13 40 M20 28 L27 40'],
+ ['The hustle','M20 12 L20 28 M20 17 L10 20 M20 17 L30 20 M20 28 L12 38 M20 28 L28 40'],
+ ['The bump','M18 12 L22 28 M19 17 L10 22 M19 17 L28 12 M22 28 L14 40 M22 28 L30 38'],
+ ['The spin','M20 12 L20 28 M20 16 L8 12 M20 16 L32 12 M20 28 L20 40 M20 32 L28 36'],
+ ['The robot','M20 12 L20 28 M20 17 L12 17 L12 10 M20 17 L28 17 L28 24 M20 28 L15 40 M20 28 L25 40'],
+ ['The YMCA','M20 12 L20 28 M20 16 L12 4 M20 16 L28 4 M20 28 L15 40 M20 28 L25 40'],
+ ['The twist','M20 12 L18 28 M19 18 L9 16 M19 18 L28 22 M18 28 L10 36 L12 40 M18 28 L26 36 L24 40'],
+ ['The bow','M14 16 L22 28 M17 20 L10 28 M17 20 L28 22 M22 28 L18 40 M22 28 L28 40'],
+];
+const fig=(d,c)=>`<svg width="40" height="42" viewBox="0 0 40 42" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/><circle cx="${d.match(/M(\d+) (\d+)/)[1]}" cy="7" r="4.2" fill="${c}" stroke="none"/></svg>`;
+// cocktail glasses, simple and flat
+const GLASS={
+ coupe:c=>`<svg width="34" height="38" viewBox="0 0 34 38"><path d="M4 8 H30 Q28 20 17 20 Q6 20 4 8Z" fill="${c}"/><path d="M17 20 V33 M10 34 H24" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/></svg>`,
+ martini:c=>`<svg width="34" height="38" viewBox="0 0 34 38"><path d="M3 6 H31 L17 21Z" fill="${c}"/><path d="M17 21 V33 M10 34 H24" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="9" r="2.4" fill="#00a95c"/></svg>`,
+ tall:c=>`<svg width="34" height="38" viewBox="0 0 34 38"><path d="M9 4 H25 L23 35 H11Z" fill="${c}"/><path d="M21 1 L18 14" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/></svg>`,
+ rocks:c=>`<svg width="34" height="38" viewBox="0 0 34 38"><path d="M6 14 H28 L26 34 H8Z" fill="${c}"/><rect x="11" y="18" width="6" height="6" rx="1" fill="#ffffff88"/></svg>`,
+ hurricane:c=>`<svg width="34" height="38" viewBox="0 0 34 38"><path d="M11 2 H23 Q20 9 24 16 Q28 26 19 30 V33 H15 V30 Q6 26 10 16 Q14 9 11 2Z" fill="${c}"/><path d="M11 35 H23" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/></svg>`,
+ flute:c=>`<svg width="34" height="38" viewBox="0 0 34 38"><path d="M13 2 H21 L20 20 Q17 23 14 20Z" fill="${c}"/><path d="M17 22 V33 M12 34 H22" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/></svg>`,
+};
+const COCKTAILS=[['Cosmopolitan','coupe',INK.pink],['Blue Lagoon','tall',INK.blue],['Mojito','tall',INK.green],['Tequila Sunrise','hurricane',INK.orange],['Aviation','martini',INK.violet],['Negroni','rocks',INK.red],['Grasshopper','coupe',INK.teal],['Bellini','flute','#ffb37a']];
+const MAXIMS=[['Res ipsa loquitur','The thing speaks for itself'],['Audi alteram partem','Hear the other side'],['Ignorantia juris non excusat','Ignorance of the law is no excuse'],['Nemo judex in causa sua','No one judges their own case'],['Stare decisis','Stand by what was decided'],['Pacta sunt servanda','Agreements must be kept'],['Ubi jus ibi remedium','Where there is a right, a remedy'],['Volenti non fit injuria','No injury to one who consents']];
+
+const S={floor:[0,4,8],maxim:0,ink:0,rec:0,speed:1,ball:0,move:3,glass:0,dec:1};
+const screens=[
+ {id:'floor',title:'1. Dance floor',why:'Light up three tiles, in order. It’s quick, visual, and the hardest of the five to guess.',
+  body:()=>`${head('Hello','Type your name, then light up three tiles in order. Use the same ones on every device.')}
+   <div class="lbl">Your three tiles</div>
+   <div class="floor">${K.concat(['#ffe800']).map((k,i)=>{const o=S.floor.indexOf(i);return `<button class="tile ${o>=0?'on':''}" style="--k:${k}" data-floor="${i}" aria-label="Tile ${i+1}"><b>${o>=0?o+1:''}</b></button>`}).join('')}</div>
+   <div class="order">Order ${[0,1,2].map(i=>`<i style="${S.floor[i]!=null?`background:${K.concat(['#ffe800'])[S.floor[i]]}`:''}"></i>`).join('')} · tap a lit tile to undo</div>
+   <button class="go" ${S.floor.length===3?'':'disabled'}>Open DuoDisco</button><div class="small">New here? This starts your DuoDisco.</div>`},
+ {id:'maxim',title:'2. Latin maxim and ink',why:'Pick a Latin maxim and an ink colour. It fits the Latin name and law school best.',
+  body:()=>`${head('Salve','Your name, a maxim and a colour. Pick the same ones on every device.')}
+   <div class="lbl">A maxim</div>
+   <div class="maxims">${MAXIMS.map(([m],i)=>`<button class="mx ${S.maxim===i?'on':''}" data-maxim="${i}">${m}</button>`).join('')}</div>
+   <p class="mean"><b>${MAXIMS[S.maxim][0]}:</b> ${MAXIMS[S.maxim][1].toLowerCase()}.</p>
+   <div class="lbl">An ink</div>
+   <div class="inks">${K.map((k,i)=>`<button class="dot ${S.ink===i?'on':''}" style="--k:${k}" data-ink="${i}" aria-label="Ink ${i+1}"></button>`).join('')}</div>
+   <button class="go">Open DuoDisco</button>`},
+ {id:'record',title:'3. Record and speed',why:'Pick a coloured record and how fast it plays. Simple and playful, but fewer combinations.',
+  body:()=>`${head('Hello','Your name, then put on a record. Pick the same one on every device.')}
+   <div class="lbl">A record</div>
+   <div class="records">${K.map((k,i)=>`<button class="rec ${S.rec===i?'on':''}" style="--k:${k}" data-rec="${i}" aria-label="Record ${i+1}"></button>`).join('')}</div>
+   <div class="lbl">At what speed</div>
+   <div class="speeds">${[['33','rpm'],['45','rpm'],['78','rpm']].map(([n,u],i)=>`<button class="sp ${S.speed===i?'on':''}" data-speed="${i}">${n}<small>${u}</small></button>`).join('')}</div>
+   <button class="go">Open DuoDisco</button>`},
+ {id:'ball',title:'4. Disco ball and dance move',why:'Pick a disco ball and a dance move. The most fun, and the most like DuoVino’s picture picks.',
+  body:()=>`${head('Hello','Your name, a disco ball and a move. Pick the same ones on every device.')}
+   <div class="lbl">A disco ball</div>
+   <div class="balls">${K.map((k,i)=>`<button class="ball ${S.ball===i?'on':''}" data-ball="${i}" aria-label="Disco ball ${i+1}">${ballSVG(k,[30,38,34,42,32,40,36,30][i])}</button>`).join('')}</div>
+   <div class="lbl">A move</div>
+   <div class="moves">${MOVES.map(([n,d],i)=>`<button class="move ${S.move===i?'on':''}" data-move="${i}">${fig(d,S.move===i?K[S.ball]:'#1a1a1a')}${n}</button>`).join('')}</div>
+   <button class="go">Open DuoDisco</button>`},
+ {id:'cocktail',title:'5. Cocktail and decade',why:'Pick a cocktail and a decade. A light nod to DuoVino, though less about studying.',
+  body:()=>`${head('Cheers','Your name, a cocktail and a decade. Pick the same ones on every device.')}
+   <div class="lbl">A cocktail</div>
+   <div class="glasses">${COCKTAILS.map(([n,g,c],i)=>`<button class="gl ${S.glass===i?'on':''}" data-glass="${i}">${GLASS[g](c)}${n}</button>`).join('')}</div>
+   <div class="lbl">A decade</div>
+   <div class="decades">${['60s','70s','80s','90s','00s'].map((d,i)=>`<button class="dc ${S.dec===i?'on':''}" data-dec="${i}">${d}</button>`).join('')}</div>
+   <button class="go">Open DuoDisco</button>`},
+];
+const flow=document.getElementById('flow');
+function draw(){flow.innerHTML=screens.map(s=>`<div class="ph"><h2>${s.title}</h2><p class="why">${s.why}</p><div class="scr"><div class="notch"></div><div class="in">${s.body()}</div></div></div>`).join('');}
+flow.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+  if(d.floor!=null){const i=+d.floor,k=S.floor.indexOf(i);if(k>=0)S.floor.splice(k,1);else if(S.floor.length<3)S.floor.push(i);}
+  for(const key of ['maxim','ink','rec','speed','ball','move','glass','dec']) if(d[key]!=null) S[key]=+d[key];
+  draw();});
+draw();
+</script>
+</body>
+</html>
