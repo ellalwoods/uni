@@ -84,7 +84,7 @@ Don't commit the user's original notes files: they asked for them not to be kept
 
 ## Adding a course
 
-The app starts with no courses: the user adds them in the app. To add one in the code, add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` tag for it in `index.html` (before `app.js`), and add it to `ASSETS` in `sw.js`. Course ids are lowercase letters and digits only. Colours are the riso inks: pink `#ff48b0`, blue `#0078bf`, green `#00a95c`, orange `#ff6c2f`, violet `#765ba7`, red `#f15060`, teal `#00838a`, navy `#3255a4`.
+The app starts with no courses: the user adds them in the app. To add one in the code, add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` tag for it in `index.html` (before `app.js`), and add it to `ASSETS` in `sw.js`. Course ids are lowercase letters and digits only. Colours come from `INKS` in `app.js`: pink `#ff48b0`, rose `#e8608c`, raspberry `#c83f78`, coral `#f2716a`, peach `#e97f5e`, apricot `#e48a3a`, orchid `#b04fb8`, lilac `#8f6fd1`, mauve `#a35d8f`, berry `#9e3a72`, sky `#2f9fd6`, aqua `#159fae`, sage `#5f9474`, red `#f15060`, orange `#ff6c2f`, violet `#765ba7`, blue `#0078bf`, green `#00a95c`, teal `#00838a`, navy `#3255a4`.
 
 ### Courses the user manages in the app
 

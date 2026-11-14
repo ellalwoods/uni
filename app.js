@@ -118,7 +118,10 @@
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') cloudPush(true); else cloudPull(); });
 
-  const INKS = [['#ff48b0', 'Pink'], ['#0078bf', 'Blue'], ['#00a95c', 'Green'], ['#ff6c2f', 'Orange'], ['#765ba7', 'Violet'], ['#f15060', 'Red'], ['#00838a', 'Teal'], ['#3255a4', 'Navy']];
+  // Course colours: softer shades first, then the original riso inks. All deep enough to read as text and behind white.
+  const INKS = [['#ff48b0', 'Pink'], ['#e8608c', 'Rose'], ['#c83f78', 'Raspberry'], ['#f2716a', 'Coral'], ['#e97f5e', 'Peach'], ['#e48a3a', 'Apricot'],
+    ['#b04fb8', 'Orchid'], ['#8f6fd1', 'Lilac'], ['#a35d8f', 'Mauve'], ['#9e3a72', 'Berry'], ['#2f9fd6', 'Sky'], ['#159fae', 'Aqua'],
+    ['#5f9474', 'Sage'], ['#f15060', 'Red'], ['#ff6c2f', 'Orange'], ['#765ba7', 'Violet'], ['#0078bf', 'Blue'], ['#00a95c', 'Green'], ['#00838a', 'Teal'], ['#3255a4', 'Navy']];
   function applyCfg() {
     // drop app-made courses that were deleted (for example on another device)
     UNI.courses.filter(c => c.mine && !CFG.added.some(a => a.id === c.id)).forEach(c => { UNI.courses.splice(UNI.courses.indexOf(c), 1); delete UNI.byId[c.id]; });
