@@ -15,15 +15,35 @@
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   };
-  const EXAMPLE = !!UNI.example;
-  const PKEY = EXAMPLE ? 'uni.progress.example' : 'uni.progress';
+  const PKEY = 'uni.progress';
   const blank = () => ({ weeks: {}, cards: {}, quiz: {} });
   let P = Object.assign(blank(), store.get(PKEY, {}));
   const save = () => store.set(PKEY, P);
+  try { localStorage.removeItem('uni.example'); localStorage.removeItem('uni.progress.example'); } catch (e) {}
+
+  /* Courses you add, edit or remove in the app. Saved on this device and in backups.
+   * added: courses created in the app; edits: changes to any course; removed: hidden course ids. */
+  const CKEY = 'uni.courses';
+  const blankCfg = () => ({ added: [], edits: {}, removed: [] });
+  let CFG = Object.assign(blankCfg(), store.get(CKEY, {}));
+  const saveCfg = () => { store.set(CKEY, CFG); applyCfg(); };
+  const INKS = [['#ff48b0', 'Pink'], ['#0078bf', 'Blue'], ['#00a95c', 'Green'], ['#ff6c2f', 'Orange'], ['#765ba7', 'Violet'], ['#f15060', 'Red'], ['#00838a', 'Teal'], ['#3255a4', 'Navy']];
+  function applyCfg() {
+    CFG.added.forEach(a => {
+      if (!UNI.byId[a.id]) UNI.addCourse({ id: a.id, mine: true });
+      const c = UNI.byId[a.id];
+      if (c.mine) c.orig = { name: a.name, short: a.short, colour: a.colour, weeks: a.weeks };
+    });
+    UNI.courses.forEach(c => {
+      if (!c.orig) c.orig = { name: c.name, short: c.short, colour: c.colour, weeks: c.weeks };
+      Object.assign(c, c.orig, CFG.edits[c.id] || {});
+      delete IDX[c.id];
+    });
+  }
 
   /* ---------- content ---------- */
-  const courses = () => UNI.courses;
-  const course = id => UNI.byId[id];
+  const courses = () => UNI.courses.filter(c => !CFG.removed.includes(c.id));
+  const course = id => CFG.removed.includes(id) ? null : UNI.byId[id];
   const week = (c, n) => c.content[n];
   const wkey = (c, n) => c.id + ':' + n;
   const state = (c, n) => !week(c, n) ? 'none' : P.weeks[wkey(c, n)] ? 'studied' : 'new';
@@ -39,6 +59,7 @@
 
   /* Indexes of cases, legislation, definitions and methods, built from the notes blocks. */
   const IDX = {};
+  applyCfg();
   function index(c) {
     if (IDX[c.id]) return IDX[c.id];
     const cases = {}, laws = [], terms = [], methods = [], sections = [];
@@ -121,16 +142,17 @@
     const rows = cs.map(c => {
       const a = addedWeeks(c).length, nw = newCount(c);
       return `<button class="crow" style="${cv(c)}" data-go="c-${c.id}">
-        <div class="nm">${esc(c.name)}${c.example ? ' <small>Example</small>' : ''}</div>
+        <div class="nm">${esc(c.name)}</div>
         <div class="segs" style="--n:${c.weeks}">${weeksOf(c).map(n => `<i class="${state(c, n)}"></i>`).join('')}</div>
         <div class="st"><span>${a} of ${c.weeks} weeks added</span>${nw ? `<b>${nw} new</b>` : '<span></span>'}</div></button>`;
     }).join('');
     return `<div class="screen">
-      <div class="bar"><span class="meta">${plural(cs.length, 'course')}</span>
-        <button class="iconbtn" data-go="settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></div>
+      <div class="bar"><span class="logo"><img src="icon.svg" alt="" width="30" height="30">DuoDisco</span>
+        <span class="barbtns"><button class="iconbtn" data-go="new-course" aria-label="Add a course"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="iconbtn" data-go="settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></span></div>
       <h1 class="title">Courses</h1>
-      ${EXAMPLE ? `<div class="banner">Example content is on: Evidence week 6, from your Evidence notes. Turn it off in Settings.</div>` : ''}
-      ${rows || `<div class="empty">No courses yet.</div>`}
+      ${rows || `<div class="empty">No courses yet. Add one with the + button.</div>`}
+      <button class="addrow" data-go="new-course"><span>+</span>Add a course</button>
       <p class="note">New weeks appear here once their notes have been added.</p>
     </div>`;
   }
@@ -138,7 +160,7 @@
   /* ---------- course: weeks, cases, legislation, methods, search ---------- */
   function courseHead(c, tab) {
     const a = addedWeeks(c).length;
-    return `<div class="bar">${back('home', 'Courses')}${searchBtn(c)}</div>
+    return `<div class="bar">${back('home', 'Courses')}<span class="barbtns"><button class="textbtn" data-go="edit-${c.id}">Edit</button>${searchBtn(c)}</span></div>
       <h1 class="ctitle">${esc(c.name)}</h1>
       <div class="meta" style="margin-top:6px">${a} of ${c.weeks} weeks added</div>
       ${tabs(c, tab)}`;
@@ -390,20 +412,25 @@
 
   /* ---------- settings ---------- */
   function settingsPage() {
-    const data = JSON.stringify({ app: 'uni', v: 1, progress: P });
+    const data = JSON.stringify({ app: 'uni', v: 2, progress: P, courses: CFG });
+    const gone = UNI.courses.filter(c => CFG.removed.includes(c.id));
     let url = '';
     try { url = URL.createObjectURL(new Blob([data], { type: 'application/json' })); } catch (e) {}
     return `<div class="screen">
       <div class="bar">${back('home', 'Courses')}<span class="meta">Settings</span></div>
       <h1 class="title">Settings</h1>
-      <div class="set"><button class="switch" role="switch" aria-checked="${EXAMPLE}" data-act="example"><span><h2>Example content</h2><p style="margin:2px 0 0">Adds an Evidence course with week 6 (Hearsay) from your Evidence notes, to try the app. Its progress is kept separately.</p></span><span class="tg"></span></button></div>
-      <div class="set"><h2>Back up your progress</h2><p>Your progress is saved on this device only. Copy this somewhere safe, or download it, to move it to a new phone.</p>
+      <div class="set"><h2>Courses</h2><p>Add, rename, recolour or remove a course.</p>
+        ${courses().map(c => `<button class="crs" style="${cv(c)}" data-go="edit-${c.id}"><span class="dot"></span><span class="nm">${esc(c.name)}</span><span class="ed">Edit</span></button>`).join('')}
+        <button class="crs add" data-go="new-course"><span class="dot">+</span><span class="nm">Add a course</span></button>
+        ${gone.length ? `<p style="margin-top:14px">Removed courses. Bringing one back restores its weeks and progress.</p>${gone.map(c => `<div class="crs gone" style="${cv(c)}"><span class="dot"></span><span class="nm">${esc(c.name)}</span><button class="ed" data-act="restore-course" data-id="${c.id}">Bring back</button></div>`).join('')}` : ''}
+      </div>
+      <div class="set"><h2>Back up your progress</h2><p>Your progress and course changes are saved on this device only. Copy this somewhere safe, or download it, to move it to a new phone.</p>
         <textarea id="bk" readonly aria-label="Backup">${esc(data)}</textarea>
         <div class="row-btns" style="margin-top:8px"><button class="btn small" data-act="copy">Copy</button>${url ? `<a class="btn small ghost" href="${url}" download="duodisco-backup.json">Download</a>` : ''}</div></div>
       <div class="set"><h2>Restore a backup</h2><p>Paste a backup here, or choose the file.</p>
         <textarea id="rs" aria-label="Paste a backup"></textarea>
         <div class="row-btns" style="margin-top:8px"><button class="btn small" data-act="restore">Restore</button><label class="btn small ghost" style="cursor:pointer">Choose file<input type="file" id="rsfile" accept="application/json,.json" hidden></label></div></div>
-      <div class="set"><h2>Reset progress</h2><p>Clears what you've studied and your quiz scores${EXAMPLE ? ' for the example content' : ''}. Course content isn't affected.</p>
+      <div class="set"><h2>Reset progress</h2><p>Clears what you've studied and your quiz scores. Your courses and their content aren't affected.</p>
         <button class="btn small ghost" data-act="reset">Reset progress</button></div>
     </div>`;
   }
@@ -411,14 +438,60 @@
     try {
       const d = JSON.parse(text);
       if (!d || d.app !== 'uni' || !d.progress) throw new Error();
-      P = Object.assign(blank(), d.progress); save(); toast('Backup restored'); go('home');
+      P = Object.assign(blank(), d.progress); save();
+      if (d.courses) { CFG = Object.assign(blankCfg(), d.courses); saveCfg(); }
+      toast('Backup restored'); go('home');
     } catch (e) { toast('That doesn’t look like a DuoDisco backup.'); }
+  }
+
+  /* ---------- adding and editing courses ---------- */
+  function courseForm(c) {
+    const isNew = !c, colour = c ? c.colour : (INKS.find(([h]) => !courses().some(x => x.colour === h)) || INKS[0])[0];
+    const minWeeks = c ? Math.max(1, ...Object.keys(c.content).map(Number)) : 1;
+    const hasContent = c && Object.keys(c.content).length;
+    return `<div class="screen" style="--c:${colour}">
+      <div class="bar">${back(isNew ? 'home' : 'c-' + c.id, isNew ? 'Courses' : (c.short || c.name))}<span class="meta">${isNew ? 'New course' : 'Edit course'}</span></div>
+      <h1 class="title">${isNew ? 'Add a course' : 'Edit course'}</h1>
+      <form class="form" id="cform" novalidate>
+        <label for="f-name">Course name</label>
+        <input id="f-name" name="name" required maxlength="80" value="${esc(c ? c.name : '')}" placeholder="e.g. Constitutional Law" autocomplete="off">
+        <label for="f-short">Short name <small>for the sidebar and buttons (optional)</small></label>
+        <input id="f-short" name="short" maxlength="24" value="${esc(c && c.short !== c.name ? c.short || '' : '')}" placeholder="e.g. Con Law" autocomplete="off">
+        <fieldset><legend>Colour</legend><div class="inks">${INKS.map(([h, n]) => `<label class="ink" style="--k:${h}"><input type="radio" name="colour" value="${h}" ${h === colour ? 'checked' : ''}><span></span><em>${n}</em></label>`).join('')}</div></fieldset>
+        <label for="f-weeks">Number of weeks</label>
+        <input id="f-weeks" name="weeks" type="number" inputmode="numeric" min="${minWeeks}" max="26" value="${c ? c.weeks : 13}">
+        ${hasContent ? `<small class="hint">At least ${minWeeks}, because week ${minWeeks} has been added.</small>` : ''}
+        <p class="formerr" id="ferr" role="alert"></p>
+        <button class="btn" type="submit">${isNew ? 'Add course' : 'Save changes'}</button>
+      </form>
+      ${isNew ? `<p class="note">Once it’s added, upload a week’s notes to Claude and ask to add them to this course.</p>` : `
+      <div class="set danger"><h2>Remove this course</h2><p>${hasContent ? 'It disappears from your courses. Its weeks and your progress are kept, and you can bring it back from Settings.' : 'It disappears from your courses. You can bring it back from Settings.'}</p>
+        <button class="btn small ghost" data-act="remove-course" data-id="${c.id}">Remove course</button></div>`}
+    </div>`;
+  }
+  function saveCourse(c) {
+    const f = document.getElementById('cform'), err = document.getElementById('ferr');
+    const name = f.elements['name'].value.trim(), short = f.elements['short'].value.trim(), colour = f.elements['colour'].value, weeks = Math.round(+f.elements['weeks'].value);
+    const min = c ? Math.max(1, ...Object.keys(c.content).map(Number)) : 1;
+    if (!name) { err.textContent = 'Give the course a name.'; f.elements['name'].focus(); return; }
+    if (!(weeks >= min && weeks <= 26)) { err.textContent = `Weeks must be between ${min} and 26.`; f.elements['weeks'].focus(); return; }
+    const vals = { name, short: short || name, colour, weeks };
+    if (!c) {
+      let id = name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 24) || 'course', base = id, k = 2;
+      while (UNI.byId[id]) id = base + k++;
+      CFG.added.push({ id, ...vals }); saveCfg(); toast('Course added'); go('c-' + id);
+    } else {
+      if (c.mine) Object.assign(CFG.added.find(a => a.id === c.id), vals); else CFG.edits[c.id] = vals;
+      saveCfg(); toast('Saved'); go('c-' + c.id);
+    }
   }
 
   /* ---------- routing ---------- */
   function parse() {
     const h = location.hash.slice(1) || 'home';
     if (h === 'home' || h === 'settings') return { name: h, raw: h };
+    if (h === 'new-course') return { name: 'form', raw: h };
+    if (h.startsWith('edit-')) { const c = course(h.slice(5)); return c ? { name: 'form', c, raw: h } : { name: 'home', raw: 'home' }; }
     const m = h.match(/^c-([a-z0-9]+)(?:-(.*))?$/);
     if (!m || !course(m[1])) return { name: 'home', raw: 'home' };
     const c = course(m[1]), rest = m[2] || '';
@@ -440,9 +513,10 @@
     const cur = r.c;
     const link = (k, l) => `<button class="sl ${r.name === k ? 'on' : ''}" data-go="c-${cur.id}-${k}">${l}</button>`;
     return `<aside class="side" aria-label="Navigation">
-      <button class="brand" data-go="home">DuoDisco</button>
+      <button class="brand" data-go="home"><img src="icon.svg" alt="" width="34" height="34">DuoDisco</button>
       <div class="slbl">Courses</div>
       ${courses().map(c => `<button class="sc ${cur && cur.id === c.id ? 'on' : ''}" style="${cv(c)}" data-go="c-${c.id}"><span class="dot"></span><span class="nm">${esc(c.short || c.name)}</span><span class="ct">${addedWeeks(c).length}/${c.weeks}</span></button>`).join('')}
+      <button class="sc sadd" data-go="new-course"><span class="dot">+</span><span class="nm">Add a course</span></button>
       ${cur ? `<div class="slbl">${esc(cur.short || cur.name)}</div>
         <div style="${cv(cur)}">${weeksOf(cur).map(n => { const w = week(cur, n), s = state(cur, n);
           return `<button class="sw ${s} ${r.n === n ? 'on' : ''}" ${w ? `data-go="c-${cur.id}-w${n}"` : `data-none="${n}"`}><b>${pad(n)}</b><span>${w ? esc(w.title) : 'Not added yet'}</span></button>`; }).join('')}
@@ -456,6 +530,7 @@
     switch (r.name) {
       case 'home': html = home(); break;
       case 'settings': html = settingsPage(); break;
+      case 'form': html = courseForm(c); break;
       case 'course': html = coursePage(c); break;
       case 'cases': html = casesPage(c); break;
       case 'law': html = lawPage(c); break;
@@ -475,6 +550,7 @@
     }
     app.innerHTML = `<div class="layout">${side(r)}<div class="main">${html}</div></div>`;
     document.title = c ? `${c.short || c.name} · DuoDisco` : 'DuoDisco';
+    if (r.name === 'form') document.getElementById('cform').addEventListener('submit', e => { e.preventDefault(); saveCourse(r.c); });
     if (r.name === 'settings') document.getElementById('rsfile')?.addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(restore); });
     if (r.name === 'search') { const q = document.getElementById('q'), out = document.getElementById('results'); q.addEventListener('input', () => { out.innerHTML = searchResults(c, q.value); }); q.focus(); }
     current = r;
@@ -510,7 +586,14 @@
       case 'practise': practise = { key: wkey(c, current.n), shown: 0 }; render(); break;
       case 'practise-next': practise.shown++; render(); break;
       case 'practise-stop': practise = null; render(); break;
-      case 'example': store.set('uni.example', !EXAMPLE); location.hash = 'home'; location.reload(); break;
+      case 'remove-course': {
+        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to remove'; break; }
+        const id = t.dataset.id, mine = CFG.added.find(a => a.id === id), empty = !Object.keys(UNI.byId[id].content).length;
+        if (mine && empty) { CFG.added = CFG.added.filter(a => a.id !== id); const i = UNI.courses.indexOf(UNI.byId[id]); UNI.courses.splice(i, 1); delete UNI.byId[id]; }
+        else CFG.removed.push(id);
+        saveCfg(); toast('Course removed'); go('home'); break;
+      }
+      case 'restore-course': CFG.removed = CFG.removed.filter(x => x !== t.dataset.id); saveCfg(); toast('Course brought back'); render(); break;
       case 'copy': { const ta = document.getElementById('bk'); (navigator.clipboard ? navigator.clipboard.writeText(ta.value) : Promise.reject()).then(() => toast('Copied'), () => { ta.select(); toast('Select all and copy'); }); break; }
       case 'restore': restore(document.getElementById('rs').value); break;
       case 'reset':

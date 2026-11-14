@@ -17,7 +17,7 @@ The notes are long and dense (a law week is typically 2,000 to 8,000 words, with
 5. Serve the folder (`python3 -m http.server`) and check on a phone-sized screen: the week opens, every topic reads cleanly, case names link to the case page, the method works, flashcard filters and the quiz work, and nothing runs off the side.
 6. Commit with a message like `Add Evidence week 6: Hearsay`, and push. Don't open a pull request: pushing to a `claude/` branch (or `main`) publishes automatically (see Publishing).
 
-`content/example.js` is a complete worked example (Evidence week 6, Hearsay) built from the user's own notes. Match its depth and style.
+A complete worked example (Evidence week 6, Hearsay) was removed from the app at the user's request but is in git history: `git show 2ff6b55:content/example.js`. Match its depth and style.
 
 ## The shape of a week
 
@@ -76,7 +76,15 @@ Don't commit the user's original notes files: they asked for them not to be kept
 
 ## Adding a course
 
-Add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` tag for it in `index.html` (before `content/example.js`), and add it to `ASSETS` in `sw.js`. Course ids are lowercase letters and digits only. Colours are the riso inks: pink `#ff48b0`, blue `#0078bf`, green `#00a95c`, orange `#ff6c2f`, violet `#765ba7`. Use `weeks:` for a course that doesn't run for 13 weeks (the intensive course may differ: ask the user how it's taught).
+Add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` tag for it in `index.html` (before `app.js`), and add it to `ASSETS` in `sw.js`. Course ids are lowercase letters and digits only. Colours are the riso inks: pink `#ff48b0`, blue `#0078bf`, green `#00a95c`, orange `#ff6c2f`, violet `#765ba7`, red `#f15060`, teal `#00838a`, navy `#3255a4`.
+
+### Courses the user manages in the app
+
+The user can add, rename, recolour, change the weeks of, and remove courses in the app (the + button, and Settings → Courses). Those changes live only on that device (localStorage key `uni.courses`, also included in backups), so they don't reach other devices or content files by themselves:
+
+- **A course added in the app** gets an id made from its name: lowercase letters and digits only, for example "Constitutional Law" → `constitutionallaw`. When the user asks you to add notes for it, first add that course to `content/courses.js` with **the same id**, name, colour and weeks (ask the user for them if you don't know), so it exists on every device. Then add the week as usual.
+- **Renaming, recolouring or removing** a course in the app overrides `content/courses.js` on that device only. If the user wants a change everywhere, make it in `content/courses.js` too.
+- Removing a course hides it; its content and progress are kept and it can be brought back from Settings. Use `weeks:` for a course that doesn't run for 13 weeks (the intensive course may differ: ask the user how it's taught).
 
 ## Files
 
@@ -87,8 +95,8 @@ Add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` t
 | `uni.js` | Content registry (`UNI.addCourse`, `UNI.addWeek`) |
 | `content/courses.js` | The list of courses |
 | `content/<id>.js` | One course's weeks |
-| `content/example.js` | Worked example (Evidence week 6), only shown when Settings → Example content is on |
 | `app.js` | Screens, notes reader, indexes, search, flashcards, quiz, progress, backup |
-| `sw.js`, `manifest.webmanifest`, `icon.svg` | Offline support and home-screen install |
+| `sw.js`, `manifest.webmanifest` | Offline support and home-screen install |
+| `icon.svg`, `icon-180/192/512.png` | The pink disco ball logo. The PNGs are rendered from the SVG (iPhones need PNG home-screen icons): re-render them if the SVG changes |
 | `.github/workflows/publish.yml` | Automatic publishing to GitHub Pages |
 | `design/` | Earlier design mockups, not part of the app |

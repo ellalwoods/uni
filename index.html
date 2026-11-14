@@ -10,7 +10,7 @@
   <title>DuoDisco</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,13 +18,12 @@
 </head>
 <body>
   <main id="app" aria-live="polite"></main>
-  <!-- Order matters: the registry, then one file per course, then the example content, then the app. -->
+  <!-- Order matters: the registry, then one file per course, then the app. -->
   <script src="uni.js"></script>
   <script src="content/courses.js"></script>
   <script src="content/ica.js"></script>
   <script src="content/corporate.js"></script>
   <script src="content/ailaw.js"></script>
-  <script src="content/example.js"></script>
   <script src="app.js"></script>
   <script>if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});</script>
 </body>

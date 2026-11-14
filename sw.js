@@ -1,7 +1,7 @@
 // Network-first service worker: works offline, and always picks up new content when online.
 // Bump CACHE and keep ASSETS in step with index.html whenever a file is added.
-const CACHE = 'uni-v4';
-const ASSETS = ['./', 'index.html', 'styles.css', 'uni.js', 'content/courses.js', 'content/ica.js', 'content/corporate.js', 'content/ailaw.js', 'content/example.js', 'app.js', 'icon.svg', 'manifest.webmanifest'];
+const CACHE = 'uni-v5';
+const ASSETS = ['./', 'index.html', 'styles.css', 'uni.js', 'content/courses.js', 'content/ica.js', 'content/corporate.js', 'content/ailaw.js', 'app.js', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS.map(a => new Request(a, { cache: 'reload' }))))); self.skipWaiting(); });
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {

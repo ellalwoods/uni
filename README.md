@@ -22,6 +22,12 @@ A study app for my university courses. The name follows Duolingo, Duovino and Du
   - **Problem method:** read it, or practise it from memory one step at a time.
 - **Reviewing a whole course:** the Flashcards and Quiz buttons on a course mix every week together.
 
+## Managing courses
+
+- **Add a course** with the **+** button on the Courses screen (or in the sidebar on a computer): give it a name, an optional short name, a colour and the number of weeks.
+- **Edit or remove a course** from **Edit** on the course, or **Settings → Courses**. Removing a course hides it but keeps its weeks and progress; bring it back from Settings.
+- These changes are saved on the device you make them on (and in backups). When I ask Claude to add notes to a new course, Claude adds the course to the app for every device.
+
 ## Adding a week's notes
 
 1. Upload the notes to Claude in chat.
@@ -37,7 +43,6 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-To try it before adding any notes, turn on **Settings → Example content**. It adds an Evidence course with week 6 (Hearsay), built from my Evidence notes.
 
 ## Publishing (automatic)
 
