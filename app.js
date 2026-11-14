@@ -1,4 +1,4 @@
-/* Uni: the app. Vanilla JS, no build step. Routes live in the URL hash, e.g. #c-ica-w2-t1. */
+/* DuoDisco: the app. Vanilla JS, no build step. Routes live in the URL hash, e.g. #c-ica-w2-t1. */
 (() => {
   'use strict';
   const app = document.getElementById('app');
@@ -399,7 +399,7 @@
       <div class="set"><button class="switch" role="switch" aria-checked="${EXAMPLE}" data-act="example"><span><h2>Example content</h2><p style="margin:2px 0 0">Adds an Evidence course with week 6 (Hearsay) from your Evidence notes, to try the app. Its progress is kept separately.</p></span><span class="tg"></span></button></div>
       <div class="set"><h2>Back up your progress</h2><p>Your progress is saved on this device only. Copy this somewhere safe, or download it, to move it to a new phone.</p>
         <textarea id="bk" readonly aria-label="Backup">${esc(data)}</textarea>
-        <div class="row-btns" style="margin-top:8px"><button class="btn small" data-act="copy">Copy</button>${url ? `<a class="btn small ghost" href="${url}" download="uni-backup.json">Download</a>` : ''}</div></div>
+        <div class="row-btns" style="margin-top:8px"><button class="btn small" data-act="copy">Copy</button>${url ? `<a class="btn small ghost" href="${url}" download="duodisco-backup.json">Download</a>` : ''}</div></div>
       <div class="set"><h2>Restore a backup</h2><p>Paste a backup here, or choose the file.</p>
         <textarea id="rs" aria-label="Paste a backup"></textarea>
         <div class="row-btns" style="margin-top:8px"><button class="btn small" data-act="restore">Restore</button><label class="btn small ghost" style="cursor:pointer">Choose file<input type="file" id="rsfile" accept="application/json,.json" hidden></label></div></div>
@@ -412,7 +412,7 @@
       const d = JSON.parse(text);
       if (!d || d.app !== 'uni' || !d.progress) throw new Error();
       P = Object.assign(blank(), d.progress); save(); toast('Backup restored'); go('home');
-    } catch (e) { toast('That doesn’t look like a Uni backup.'); }
+    } catch (e) { toast('That doesn’t look like a DuoDisco backup.'); }
   }
 
   /* ---------- routing ---------- */
@@ -440,7 +440,7 @@
     const cur = r.c;
     const link = (k, l) => `<button class="sl ${r.name === k ? 'on' : ''}" data-go="c-${cur.id}-${k}">${l}</button>`;
     return `<aside class="side" aria-label="Navigation">
-      <button class="brand" data-go="home">Uni</button>
+      <button class="brand" data-go="home">DuoDisco</button>
       <div class="slbl">Courses</div>
       ${courses().map(c => `<button class="sc ${cur && cur.id === c.id ? 'on' : ''}" style="${cv(c)}" data-go="c-${c.id}"><span class="dot"></span><span class="nm">${esc(c.short || c.name)}</span><span class="ct">${addedWeeks(c).length}/${c.weeks}</span></button>`).join('')}
       ${cur ? `<div class="slbl">${esc(cur.short || cur.name)}</div>
@@ -474,7 +474,7 @@
       case 'quiz': if (!session || session.route !== r.raw) startQuiz(c, r.n, r.raw); html = quizPage(c, r.n); break;
     }
     app.innerHTML = `<div class="layout">${side(r)}<div class="main">${html}</div></div>`;
-    document.title = c ? `${c.short || c.name} · Uni` : 'Uni';
+    document.title = c ? `${c.short || c.name} · DuoDisco` : 'DuoDisco';
     if (r.name === 'settings') document.getElementById('rsfile')?.addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(restore); });
     if (r.name === 'search') { const q = document.getElementById('q'), out = document.getElementById('results'); q.addEventListener('input', () => { out.innerHTML = searchResults(c, q.value); }); q.focus(); }
     current = r;

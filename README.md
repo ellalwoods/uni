@@ -1,6 +1,6 @@
-# Uni
+# DuoDisco
 
-A study app for my university courses. Each course has 13 weeks. When I add a week's notes, Claude turns them into the app's format using only what's in the notes: the notes themselves, topic by topic, plus flashcards and a quiz. I review whenever I want: there are no streaks, goals or schedules.
+A study app for my university courses. The name follows Duolingo, Duovino and Duologo: *disco* is Latin for “I learn”. Each course has 13 weeks. When I add a week's notes, Claude turns them into the app's format using only what's in the notes: the notes themselves, topic by topic, plus flashcards and a quiz. I review whenever I want: there are no streaks, goals or schedules.
 
 ## How it works
 

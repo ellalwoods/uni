@@ -1,6 +1,6 @@
 {
-  "name": "Uni",
-  "short_name": "Uni",
+  "name": "DuoDisco",
+  "short_name": "DuoDisco",
   "description": "Study each course, week by week, from your own notes.",
   "start_url": "./",
   "display": "standalone",

@@ -217,7 +217,7 @@ blockquote cite { display: block; font-style: normal; font-size: 12.5px; color: 
 .chip[disabled] { opacity: .4; }
 .why .ref { font-size: 12.5px; color: var(--soft); margin-top: 6px; }
 
-.toc { margin: 14px 0 4px; padding: 10px 14px; border-radius: 12px; background: #f6f6f4; }
+.toc { max-width: 68ch; margin: 14px 0 4px; padding: 10px 14px; border-radius: 12px; background: #f6f6f4; }
 .toc .lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--soft); }
 .toc button { display: block; text-align: left; font-size: 14px; font-weight: 600; color: var(--cd); padding: 5px 0; line-height: 1.3; }
 .prose .bh { scroll-margin-top: 16px; }
@@ -225,8 +225,9 @@ blockquote cite { display: block; font-style: normal; font-size: 12.5px; color: 
 /* ---------- laptop: a sidebar for navigation, notes at a reading width ---------- */
 .side { display: none; }
 @media (min-width: 960px) {
-  #app { max-width: none; background: transparent; }
-  .layout { display: grid; grid-template-columns: 272px minmax(0, 1fr); max-width: 1280px; min-height: 100dvh; margin: 0 auto; background: var(--bg); box-shadow: 0 0 0 1px var(--hair); }
+  body { background: var(--bg); }
+  #app { max-width: none; background: var(--bg); }
+  .layout { display: grid; grid-template-columns: 272px minmax(0, 1fr); min-height: 100dvh; background: var(--bg); }
   .main { position: relative; min-width: 0; }
   .side { display: flex; flex-direction: column; position: sticky; top: 0; height: 100dvh; overflow-y: auto; border-right: 1px solid var(--hair); padding: 26px 16px 20px; gap: 1px; }
   .brand { font-family: var(--display); font-weight: 800; font-size: 24px; letter-spacing: -.02em; padding: 0 8px 10px; }
@@ -268,4 +269,25 @@ blockquote cite { display: block; font-style: normal; font-size: 12.5px; color: 
   .lrow:hover, .crow:hover { background: #fafaf8; }
   .cell:not(.none):hover .n { opacity: .8; }
   .mode:not(.main):hover, .tool:hover { background: #f0f0ec; }
+}
+
+/* ---------- in-between widths (narrow browser windows, tablets): use the space, keep the phone layout ---------- */
+@media (min-width: 600px) and (max-width: 959px) {
+  body { background: var(--bg); }
+  #app { max-width: 720px; }
+  .screen { padding-left: 36px; padding-right: 36px; }
+  .dock { max-width: 720px; padding-left: 36px; padding-right: 36px; }
+  .tabs { margin-left: -36px; margin-right: -36px; padding-left: 36px; padding-right: 36px; }
+  .grid { grid-template-columns: repeat(4, 1fr); }
+  .ghostnum { right: max(16px, calc(50% - 344px)); }
+  .prose { max-width: 68ch; }
+}
+/* ---------- big screens: wider sidebar and content ---------- */
+@media (min-width: 1400px) {
+  .layout { grid-template-columns: 300px minmax(0, 1fr); }
+  .screen { max-width: 880px; padding-left: 56px; padding-right: 56px; }
+  .tabs { margin-left: -56px; margin-right: -56px; padding-left: 56px; padding-right: 56px; }
+  .dock { margin-left: -56px; margin-right: -56px; padding-left: 56px; padding-right: 56px; }
+  .grid { grid-template-columns: repeat(5, 1fr); }
+  .ghostnum { right: 56px; }
 }

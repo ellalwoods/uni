@@ -1,6 +1,6 @@
-# Uni: instructions for Claude
+# DuoDisco: instructions for Claude
 
-A study app for one person's university courses. Each course has weeks (13 by default). The user uploads a week's notes and asks Claude to add that week. The app then shows that week's notes topic by topic, flashcards, a quiz, and course-wide lists of cases, legislation and problem-question methods.
+DuoDisco (Latin *disco*, “I learn”) is a study app for one person's university courses. The repository is `uni`; internal names such as `UNI`, `uni.progress` and the backup's `app: 'uni'` stay as they are so saved progress and backups keep working. Each course has weeks (13 by default). The user uploads a week's notes and asks Claude to add that week. The app then shows that week's notes topic by topic, flashcards, a quiz, and course-wide lists of cases, legislation and problem-question methods.
 
 The notes are long and dense (a law week is typically 2,000 to 8,000 words, with dozens of cases, statutory sections, definitions, tables and a problem-question method). The app is built to hold all of it. **Don't condense the notes into a short summary.** Carry them across faithfully.
 
