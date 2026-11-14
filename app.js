@@ -47,7 +47,7 @@
     const r = await fetch(`${CLOUD.url.replace(/\/$/, '')}/rest/v1/rpc/${fn}`, { method: 'POST',
       headers: { apikey: CLOUD.key, ...(CLOUD.key.startsWith('eyJ') ? { Authorization: `Bearer ${CLOUD.key}` } : {}), 'Content-Type': 'application/json' },
       body: JSON.stringify(args) });
-    if (!r.ok) throw new Error(`sync ${fn} ${r.status}`);
+    if (!r.ok) { const e = new Error(`sync ${fn} ${r.status}`); e.status = r.status; throw e; }
     return r.json();
   }
   const snapshot = () => ({ app: 'uni', v: 2, progress: P, courses: CFG });
@@ -569,7 +569,13 @@
       Object.assign(W, { tiles: [], missing: false });
       toast(how === 'joined' ? `Welcome back, ${SYNC.name}` : `Hello, ${SYNC.name}. Use the same tiles on your other devices.`);
       if (location.hash === '#home') render(); else go('home');
-    } catch (e) { W.busy = false; W.err = 'Couldn’t reach DuoDisco. Check you’re online and try again.'; render(); }
+    } catch (e) {
+      W.busy = false;
+      W.err = e.status === 404 ? 'Signing in isn’t set up yet: the DuoDisco database hasn’t been created in Supabase. Tap Use without syncing for now.'
+        : e.status ? 'DuoDisco’s sync server had a problem. Try again in a moment, or use without syncing.'
+        : 'Couldn’t reach DuoDisco. Check you’re online and try again.';
+      render();
+    }
   }
   function restore(text) {
     try {
