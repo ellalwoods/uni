@@ -10,12 +10,12 @@ The notes are long and dense (a law week is typically 2,000 to 8,000 words, with
 
 ## Adding a week
 
-1. The notes go in `notes/<course-id>/week-NN.<ext>` (for example `notes/ica/week-02.pdf`). Commit them if the user uploaded them in chat. If the user uploads a whole-course document, take only the requested week (notes often mark weeks with a "Week N" line).
+1. Read the notes from wherever the user uploaded them. Don't commit the notes files themselves. If the user uploads a whole-course document, take only the requested week (notes often mark weeks with a "Week N" line).
 2. Read the whole week before writing anything. Convert `.docx` with `pandoc file.docx -t markdown`.
 3. Add one `UNI.addWeek(...)` call to `content/<course-id>.js`, in week order, using the shape below.
 4. Bump `CACHE` in `sw.js` (for example `uni-v2` → `uni-v3`) so phones pick up the change.
 5. Serve the folder (`python3 -m http.server`) and check on a phone-sized screen: the week opens, every topic reads cleanly, case names link to the case page, the method works, flashcard filters and the quiz work, and nothing runs off the side.
-6. Commit with a message like `Add Evidence week 6: Hearsay`.
+6. Commit with a message like `Add Evidence week 6: Hearsay`, and push. Don't open a pull request: pushing to a `claude/` branch (or `main`) publishes automatically (see Publishing).
 
 `content/example.js` is a complete worked example (Evidence week 6, Hearsay) built from the user's own notes. Match its depth and style.
 
@@ -68,6 +68,12 @@ Inside text: `**bold**`, `*italic*`, and `***Case name***` for case names (as th
 - **Quiz:** around 8 to 15 questions a week, four options each, spread across the topics. Wrong options should be plausible and drawn from the same notes, never jokes. Vary which position holds the right answer.
 - **Language:** plain, clear, academic English. Use the notes' terminology. No themed or playful wording anywhere: just courses, weeks, topics, notes, flashcards, quiz, cases and legislation.
 
+## Publishing
+
+`.github/workflows/publish.yml` merges any push to a `claude/` branch into `main`, then deploys `main` to GitHub Pages (https://ellalwoods.github.io/uni/). The user never merges anything. Check the Publish run succeeded after pushing. If the merge into `main` conflicts, the run fails: rebase the branch onto `origin/main` and push again.
+
+Don't commit the user's original notes files: they asked for them not to be kept. Read them from the upload, convert them, and don't save them in the repo.
+
 ## Adding a course
 
 Add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` tag for it in `index.html` (before `content/example.js`), and add it to `ASSETS` in `sw.js`. Course ids are lowercase letters and digits only. Colours are the riso inks: pink `#ff48b0`, blue `#0078bf`, green `#00a95c`, orange `#ff6c2f`, violet `#765ba7`. Use `weeks:` for a course that doesn't run for 13 weeks (the intensive course may differ: ask the user how it's taught).
@@ -84,5 +90,5 @@ Add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` t
 | `content/example.js` | Worked example (Evidence week 6), only shown when Settings → Example content is on |
 | `app.js` | Screens, notes reader, indexes, search, flashcards, quiz, progress, backup |
 | `sw.js`, `manifest.webmanifest`, `icon.svg` | Offline support and home-screen install |
-| `notes/` | The user's original notes |
+| `.github/workflows/publish.yml` | Automatic publishing to GitHub Pages |
 | `design/` | Earlier design mockups, not part of the app |

@@ -24,7 +24,7 @@ A study app for my university courses. Each course has 13 weeks. When I add a we
 
 ## Adding a week's notes
 
-1. Upload the notes to Claude (or put them in `notes/<course>/week-NN.pdf`).
+1. Upload the notes to Claude in chat.
 2. Ask Claude to add that week, for example "Add week 3 of Corporate Law from these notes".
 3. Claude follows `CLAUDE.md`: it carries the week's notes across faithfully, writes the flashcards and quiz only from them, then commits it.
 
@@ -39,12 +39,16 @@ python3 -m http.server 8000
 
 To try it before adding any notes, turn on **Settings → Example content**. It adds an Evidence course with week 6 (Hearsay), built from my Evidence notes.
 
-## Put it on your phone (GitHub Pages)
+## Publishing (automatic)
 
-1. Merge the pull request into `main`.
-2. In the repository: **Settings → Pages → Build and deployment → Deploy from a branch → `main` / `(root)` → Save**.
-3. After a minute or two the app is live at `https://ellalwoods.github.io/uni/`.
-4. On iPhone, open it in **Safari → Share → Add to Home Screen**. It then opens full-screen and works offline.
+There's nothing to merge. Whenever Claude pushes an update to a `claude/` branch, the **Publish** workflow (`.github/workflows/publish.yml`) merges it into `main` and deploys `main` to GitHub Pages. The app is at `https://ellalwoods.github.io/uni/`.
+
+One-time setup in the repository settings:
+
+1. **Settings → General → Default branch:** switch it to `main`.
+2. **Settings → Pages → Build and deployment → Source:** choose **GitHub Actions**.
+
+Then, on iPhone, open the link in **Safari → Share → Add to Home Screen**. It opens full-screen and works offline. On a laptop, just bookmark it.
 
 ## Your progress
 
