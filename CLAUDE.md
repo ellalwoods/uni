@@ -78,6 +78,10 @@ Don't commit the user's original notes files: they asked for them not to be kept
 
 `cloud-config.js` points at the user's Supabase project (shared with Good Word Charlie, not DuoVino); `supabase/duodisco.sql` creates the `duodisco_sync` table and the `duodisco_load` / `duodisco_save` functions, the only things the public key can use. Each device signs in on the Hello screen with a name and three of nine dance-floor tiles, in order; only a SHA-256 hash of `'duodisco:' + name (lowercased, spaces collapsed) + '|' + tile indexes joined with '-'` is sent. Changing that recipe would sign everyone out, so don't. The synced state is `{ app: 'uni', v: 2, progress, courses }`, where `progress` and `courses` each carry `_at`, the time they last changed; when syncing, the newer copy of each wins, and a device signing in to data that already exists merges both. If you change the shape of the synced state, keep it backwards compatible. If you change the SQL, the user has to re-run it in Supabase → SQL Editor.
 
+## The Ballroom
+
+`MILESTONES` in `app.js` lists 22 milestones, each earned by real study (notes added for every course, cards known, quizzes, methods practised, revision), never by setting things up or daily streaks. Milestone *i* unlocks look *i + 1* in `rewards.js`; keep the two lists the same length and order. Earned milestones are stored in `progress.rewards` and the chosen look in `progress.look`, so they sync. If you add or reorder milestones, don't change existing ids.
+
 ## Adding a course
 
 The app starts with no courses: the user adds them in the app. To add one in the code, add a line to `content/courses.js`, create `content/<id>.js`, add a `<script>` tag for it in `index.html` (before `app.js`), and add it to `ASSETS` in `sw.js`. Course ids are lowercase letters and digits only. Colours are the riso inks: pink `#ff48b0`, blue `#0078bf`, green `#00a95c`, orange `#ff6c2f`, violet `#765ba7`, red `#f15060`, teal `#00838a`, navy `#3255a4`.
@@ -99,7 +103,8 @@ The user can add, rename, recolour, change the weeks of, and remove courses in t
 | `uni.js` | Content registry (`UNI.addCourse`, `UNI.addWeek`) |
 | `content/courses.js` | The list of courses |
 | `content/<id>.js` | One course's weeks |
-| `app.js` | Screens, notes reader, indexes, search, flashcards, quiz, progress, backup |
+| `app.js` | Screens, notes reader, indexes, search, flashcards, quiz, progress, backup, milestones (`MILESTONES`) |
+| `rewards.js` | The Ballroom's disco balls: one look per milestone, in the same order as `MILESTONES` (plus Classic first) |
 | `sw.js`, `manifest.webmanifest` | Offline support and home-screen install |
 | `icon.svg`, `icon-180/192/512.png` | The pink disco ball logo. The PNGs are rendered from the SVG (iPhones need PNG home-screen icons): re-render them if the SVG changes |
 | `.github/workflows/publish.yml` | Automatic publishing to GitHub Pages |

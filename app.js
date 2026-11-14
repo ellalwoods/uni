@@ -16,8 +16,9 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   };
   const PKEY = 'uni.progress';
-  const blank = () => ({ weeks: {}, cards: {}, quiz: {} });
+  const blank = () => ({ weeks: {}, cards: {}, quiz: {}, stats: {}, methods: {}, mix: {}, exam: {}, rewards: {}, look: 'classic' });
   let P = Object.assign(blank(), store.get(PKEY, {}));
+  const ST = () => (P.stats = P.stats || {});
   const save = () => { P._at = Date.now(); store.set(PKEY, P); cloudPush(); };
   try { localStorage.removeItem('uni.example'); localStorage.removeItem('uni.progress.example'); } catch (e) {}
 
@@ -239,7 +240,7 @@
         <div class="st"><span>${a} of ${c.weeks} weeks added</span>${nw ? `<b>${nw} new</b>` : '<span></span>'}</div></button>`;
     }).join('');
     return `<div class="screen">
-      <div class="bar"><span class="logo"><img src="icon.svg" alt="" width="30" height="30">DuoDisco</span>
+      <div class="bar"><button class="logo" data-go="ballroom" aria-label="DuoDisco: open the Ballroom">${myBall(30)}DuoDisco</button>
         <span class="barbtns"><button class="iconbtn" data-go="new-course" aria-label="Add a course"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
         <button class="iconbtn" data-go="settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></span></div>
       <h1 class="title">Courses</h1>
@@ -441,6 +442,12 @@
     if (!s.started) return cardsSetup(c, n, route);
     const backTo = n === 'all' ? 'c-' + c.id : `c-${c.id}-w${n}`;
     const backLabel = n === 'all' ? (c.short || c.name) : 'Week ' + n;
+    if (!s.queue.length && !s.logged) {
+      s.logged = true;
+      if (n === 'all') { P.mix = P.mix || {}; P.mix[c.id] = Date.now(); }
+      else if (s.total >= 5 && s.got === s.total && (Date.now() - (P.weeks[wkey(c, n)] || Date.now())) > 21 * 864e5) ST().encore = Date.now();
+      save();
+    }
     if (!s.queue.length) return `<div class="screen result" style="${cv(c)}">
         <div class="bar">${back(backTo, backLabel)}<span class="meta">Flashcards</span></div>
         <div class="big">${s.got}/${s.total}</div><p>You knew ${s.got} of ${s.total} cards first time.</p>
@@ -461,7 +468,9 @@
   function answerCard(c, gotIt) {
     const s = session, cur = s.queue.shift(), id = cardId(c, cur.n, cur.item);
     const rec = P.cards[id] || { got: 0, again: 0 };
-    rec[gotIt ? 'got' : 'again']++; rec.last = gotIt && !cur.missed ? 'got' : 'again'; rec.at = Date.now(); P.cards[id] = rec; save();
+    rec[gotIt ? 'got' : 'again']++; rec.last = gotIt && !cur.missed ? 'got' : 'again'; rec.at = Date.now(); P.cards[id] = rec;
+    if (gotIt) ST().got = (ST().got || 0) + 1;
+    save();
     if (gotIt) { if (!cur.missed) s.got++; s.done++; }
     else { if (!cur.missed) s.again.push(cur); cur.missed = true; s.queue.push(cur); }
     s.open = false;
@@ -479,7 +488,16 @@
     const backLabel = n === 'all' ? (c.short || c.name) : 'Week ' + n;
     if (!s.items.length) return emptyStudy(c, backTo, backLabel, 'There are no quiz questions here yet.');
     if (s.i >= s.items.length) {
-      if (n !== 'all' && !s.saved) { const k = wkey(c, n), prev = P.quiz[k]; if (!prev || s.score >= prev.best) P.quiz[k] = { best: s.score, of: s.items.length, at: Date.now() }; save(); s.saved = true; }
+      if (!s.saved) {
+        s.saved = true;
+        if (n === 'all') { P.exam = P.exam || {}; P.exam[c.id] = Math.max(P.exam[c.id] || 0, s.score / s.items.length); }
+        else {
+          const k = wkey(c, n), prev = P.quiz[k], low = !!(prev && prev.low) || s.score < s.items.length / 2;
+          if (s.score === s.items.length && prev && prev.low) ST().comeback = Date.now();
+          P.quiz[k] = (!prev || s.score >= prev.best) ? { best: s.score, of: s.items.length, at: Date.now(), low } : { ...prev, low };
+        }
+        save();
+      }
       return `<div class="screen result" style="${cv(c)}">
         <div class="bar">${back(backTo, backLabel)}<span class="meta">Quiz</span></div>
         <div class="big">${s.score}/${s.items.length}</div><p>${s.score === s.items.length ? 'All correct.' : `You got ${s.score} of ${s.items.length} right.`}</p>
@@ -511,6 +529,7 @@
       <div class="bar">${back('home', 'Courses')}<span class="meta">Settings</span></div>
       <h1 class="title">Settings</h1>
       ${cloudOn ? syncSection() : ''}
+      <div class="set"><button class="crs" data-go="ballroom">${myBall(26)}<span class="nm">The Ballroom</span><span class="ed">${earnedCount()} of ${MILESTONES.length}</span></button></div>
       <div class="set"><h2>Courses</h2><p>Add, rename, recolour or remove a course.</p>
         ${courses().map(c => `<button class="crs" style="${cv(c)}" data-go="edit-${c.id}"><span class="dot"></span><span class="nm">${esc(c.name)}</span><span class="ed">Edit</span></button>`).join('')}
         <button class="crs add" data-go="new-course"><span class="dot">+</span><span class="nm">Add a course</span></button>
@@ -541,7 +560,7 @@
   function welcomePage() {
     const ready = W.name.trim() && W.tiles.length === 3;
     return `<div class="welcome">
-      <div class="logo"><img src="icon.svg" alt="" width="30" height="30">DuoDisco</div>
+      <div class="logo">${myBall(30)}DuoDisco</div>
       <h1 class="hello">Hello</h1>
       <p class="wsub">Type your name, then light up three tiles in order. Use the same ones on every device, and your courses and progress follow you.</p>
       <label class="wl" for="w-name">Your name</label>
@@ -584,6 +603,97 @@
       if (d.courses) { CFG = Object.assign(blankCfg(), d.courses); saveCfg(); }
       toast('Backup restored'); go('home');
     } catch (e) { toast('That doesn’t look like a DuoDisco backup.'); }
+  }
+
+  /* ---------- the Ballroom: milestones for real work, each unlocking a disco ball ---------- */
+  const LOOKS = window.BALLROOM.LOOKS;
+  const myBall = size => window.BALLROOM.ball(window.BALLROOM.byId(P.look), size);
+  // Every course has week n added (n can depend on the course's length).
+  const allHave = f => { const cs = courses(); return cs.length > 0 && cs.every(c => week(c, Math.min(c.weeks, f(c)))); };
+  const allCards = () => courses().flatMap(c => addedWeeks(c).flatMap(n => (week(c, n).cards || []).map(card => [c, n, card])));
+  const weekSwept = (c, n) => { const cs = week(c, n).cards || []; return cs.length > 0 && cs.every(card => known(c, n, card)); };
+  const sweptWeeks = () => courses().reduce((t, c) => t + addedWeeks(c).filter(n => weekSwept(c, n)).length, 0);
+  const courseKnown = c => { const cs = addedWeeks(c).flatMap(n => (week(c, n).cards || []).map(card => known(c, n, card))); return cs.length ? cs.filter(Boolean).length / cs.length : 0; };
+  const full = c => addedWeeks(c).length === c.weeks;
+  const perfectWeek = c => addedWeeks(c).some(n => { const q = P.quiz[wkey(c, n)]; return q && q.best === q.of && q.of > 0; });
+  const methodsOf = c => addedWeeks(c).filter(n => week(c, n).method);
+  const totalAdded = () => courses().reduce((t, c) => t + addedWeeks(c).length, 0);
+  const got = () => (P.stats || {}).got || 0;
+  const MILESTONES = [
+    ['opening', 'Opening night', 'The first week of notes added to any course', () => totalAdded() > 0],
+    ['week1', 'Week one, all in', 'Week 1 added for every course (two or more)', () => courses().length >= 2 && allHave(() => 1)],
+    ['got100', 'First 100', '100 flashcards answered “Got it”', () => got() >= 100],
+    ['fullmarks', 'Full marks', 'A perfect score on a week’s quiz', () => courses().some(perfectWeek)],
+    ['method', 'Method actor', 'A problem-question method practised from memory, all the way through', () => Object.keys(P.methods || {}).length > 0],
+    ['month', 'A month in', 'Week 4 added for every course', () => allHave(() => 4)],
+    ['sweep', 'Clean sweep', 'Every flashcard in a week known', () => sweptWeeks() >= 1],
+    ['caughtup', 'Caught up', 'At least 6 weeks added, and every one of them opened', () => totalAdded() >= 6 && courses().every(c => newCount(c) === 0)],
+    ['halfway', 'Halfway', 'Week 7 added for every course', () => allHave(c => Math.ceil(c.weeks / 2))],
+    ['got500', '500 cards', '500 flashcards answered “Got it”', () => got() >= 500],
+    ['comeback', 'Comeback', 'Full marks on a quiz you once scored under half on', () => !!(P.stats || {}).comeback],
+    ['sweep5', 'Five sweeps', 'Five weeks with every flashcard known', () => sweptWeeks() >= 5],
+    ['homestretch', 'Home stretch', 'Week 10 added for every course', () => allHave(c => Math.ceil(c.weeks * 10 / 13))],
+    ['mixtape', 'Mixtape', 'A round of flashcards from all weeks finished', () => Object.keys(P.mix || {}).length > 0],
+    ['got1000', '1,000 cards', '1,000 flashcards answered “Got it”', () => got() >= 1000],
+    ['encore', 'Encore', 'Every card right first time in a week you opened over 3 weeks ago', () => !!(P.stats || {}).encore],
+    ['methodsall', 'Method in the madness', 'Every problem method in a course practised (at least 3)', () => courses().some(c => { const ms = methodsOf(c); return ms.length >= 3 && ms.every(n => (P.methods || {})[wkey(c, n)]); })],
+    ['marksall', 'Full marks everywhere', 'A perfect week’s quiz in every course (two or more)', () => courses().length >= 2 && courses().every(perfectWeek)],
+    ['fullsem', 'Full semester', 'Every week added for every course', () => courses().length > 0 && courses().every(full)],
+    ['examready', 'Exam ready', '80% or more on a whole-course quiz, in every course', () => courses().length > 0 && courses().every(c => ((P.exam || {})[c.id] || 0) >= .8)],
+    ['mastered', 'Mastered', 'Every flashcard in a whole course known, with all its weeks added', () => courses().some(c => full(c) && courseKnown(c) === 1)],
+    ['finalbow', 'Final bow', 'Every course fully added, with 80% of its flashcards known', () => courses().length > 0 && courses().every(c => full(c) && courseKnown(c) >= .8)],
+  ];
+  const earnedCount = () => Object.keys(P.rewards || {}).length;
+  const lookFor = i => LOOKS[i + 1];          // milestone i unlocks look i + 1; Classic is yours from the start
+  let unlockQueue = [];
+  function checkRewards() {
+    P.rewards = P.rewards || {};
+    const fresh = MILESTONES.filter(([id, , , test]) => !P.rewards[id] && test());
+    if (!fresh.length) return;
+    fresh.forEach(([id]) => { P.rewards[id] = Date.now(); unlockQueue.push(id); });
+    save();
+  }
+  // Don't interrupt a flashcard or quiz in progress; show unlocks between things.
+  const busy = () => session && ((session.kind === 'cards' && session.started && session.queue.length) || (session.kind === 'quiz' && session.i < session.items.length));
+  function showUnlock() {
+    if (!unlockQueue.length || busy() || document.querySelector('.unlock')) return;
+    const id = unlockQueue.shift(), i = MILESTONES.findIndex(m => m[0] === id), m = MILESTONES[i], look = lookFor(i);
+    const inks = ['#ff48b0', '#0078bf', '#00a95c', '#ff6c2f', '#765ba7', '#f15060', '#00838a', '#3255a4', '#ffe800'];
+    const el = document.createElement('div');
+    el.className = 'unlock'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'u-name');
+    el.innerHTML = `<div class="beam"></div><div class="confetti">${inks.concat(inks, inks).map((k, n) => `<i style="left:${(n * 37) % 100}%;background:${k};animation-delay:${(n % 7) * .12}s;animation-duration:${2.2 + (n % 5) * .3}s"></i>`).join('')}</div>
+      <div class="ucard">
+        <div class="eyebrow">New disco ball</div>
+        <div class="prize"><span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span><div class="drop">${window.BALLROOM.ball(look, 200)}</div></div>
+        <h2 class="uname" id="u-name">${esc(look.name)}</h2>
+        <p class="uwhy">For <b>${esc(m[1])}</b>: ${esc(m[2].charAt(0).toLowerCase() + m[2].slice(1))}.</p>
+        <div class="ubtns"><button class="btn" data-u="wear" data-look="${look.id}">Put it on</button><button class="ughost" data-u="ballroom">See the Ballroom</button><button class="ughost" data-u="close">Not now</button></div>
+      </div>`;
+    document.body.appendChild(el);
+    el.querySelector('[data-u="wear"]').focus();
+    el.addEventListener('click', e => {
+      const b = e.target.closest('[data-u]'); if (!b) return;
+      if (b.dataset.u === 'wear') { P.look = b.dataset.look; save(); }
+      el.remove();
+      if (b.dataset.u === 'ballroom') go('ballroom'); else render();
+    });
+  }
+  function ballroomPage() {
+    const have = id => id === 'classic' || MILESTONES.some((m, i) => lookFor(i).id === id && (P.rewards || {})[m[0]]);
+    const cur = window.BALLROOM.byId(P.look);
+    const next = MILESTONES.findIndex(m => !(P.rewards || {})[m[0]]);
+    return `<div class="screen">
+      <div class="bar">${back('home', 'Courses')}<span class="meta">${earnedCount()} of ${MILESTONES.length} milestones</span></div>
+      <h1 class="title">The Ballroom</h1>
+      <p class="note" style="margin-top:-6px">A disco ball for each milestone you reach this semester. Tap one you’ve unlocked to wear it.</p>
+      <div class="current">${myBall(64)}<div><b>Wearing: ${esc(cur.name)}</b><span>${cur.id === 'classic' ? 'The original' : 'Unlocked for ' + esc((MILESTONES.find((m, i) => lookFor(i).id === cur.id) || [])[1] || '')}</span></div></div>
+      ${next >= 0 ? `<p class="nextup"><b>Next up: ${esc(MILESTONES[next][1])}.</b> ${esc(MILESTONES[next][2])}.</p>` : `<p class="nextup"><b>Every milestone reached.</b> What a semester.</p>`}
+      <div class="wgrid">${LOOKS.map((l, k) => {
+        const m = k ? MILESTONES[k - 1] : null;
+        return have(l.id) ? `<button class="witem ${P.look === l.id ? 'on' : ''}" data-look="${l.id}" aria-pressed="${P.look === l.id}">${window.BALLROOM.ball(l, 60)}<span>${esc(l.name)}</span><small>${m ? esc(m[1]) : 'The original'}</small></button>`
+          : `<div class="witem lock">${window.BALLROOM.ball(l, 60, { locked: true })}<span>${esc(l.name)}</span><small>${esc(m[2])}</small></div>`;
+      }).join('')}</div>
+    </div>`;
   }
 
   /* ---------- adding and editing courses ---------- */
@@ -633,7 +743,7 @@
     const h = location.hash.slice(1) || 'home';
     if (cloudOn && !SYNC && !store.get('uni.skip', false) && h !== 'welcome') return { name: 'welcome', raw: h };
     if (h === 'welcome') return SYNC ? { name: 'home', raw: 'home' } : { name: 'welcome', raw: h };
-    if (h === 'home' || h === 'settings') return { name: h, raw: h };
+    if (h === 'home' || h === 'settings' || h === 'ballroom') return { name: h, raw: h };
     if (h === 'new-course') return { name: 'form', raw: h };
     if (h.startsWith('edit-')) { const c = course(h.slice(5)); return c ? { name: 'form', c, raw: h } : { name: 'home', raw: 'home' }; }
     const m = h.match(/^c-([a-z0-9]+)(?:-(.*))?$/);
@@ -657,7 +767,7 @@
     const cur = r.c;
     const link = (k, l) => `<button class="sl ${r.name === k ? 'on' : ''}" data-go="c-${cur.id}-${k}">${l}</button>`;
     return `<aside class="side" aria-label="Navigation">
-      <button class="brand" data-go="home"><img src="icon.svg" alt="" width="34" height="34">DuoDisco</button>
+      <button class="brand" data-go="home">${myBall(34)}DuoDisco</button>
       <div class="slbl">Courses</div>
       ${courses().map(c => `<button class="sc ${cur && cur.id === c.id ? 'on' : ''}" style="${cv(c)}" data-go="c-${c.id}"><span class="dot"></span><span class="nm">${esc(c.short || c.name)}</span><span class="ct">${addedWeeks(c).length}/${c.weeks}</span></button>`).join('')}
       <button class="sc sadd" data-go="new-course"><span class="dot">+</span><span class="nm">Add a course</span></button>
@@ -665,6 +775,7 @@
         <div style="${cv(cur)}">${weeksOf(cur).map(n => { const w = week(cur, n), s = state(cur, n);
           return `<button class="sw ${s} ${r.n === n ? 'on' : ''}" ${w ? `data-go="c-${cur.id}-w${n}"` : `data-none="${n}"`}><b>${pad(n)}</b><span>${w ? esc(w.title) : 'Not added yet'}</span></button>`; }).join('')}
         <div class="slinks">${link('cases', 'Cases')}${link('law', 'Legislation')}${link('methods', 'Methods')}${link('search', 'Search')}</div></div>` : ''}
+      <button class="sset sball" data-go="ballroom">${myBall(18)}The Ballroom <span class="ct">${earnedCount()}/${MILESTONES.length}</span></button>
       <button class="sset" data-go="settings">Settings</button>
     </aside>`;
   }
@@ -678,6 +789,7 @@
         document.getElementById('w-name').addEventListener('input', e => { W.name = e.target.value; W.missing = false; const g = app.querySelector('[data-act="w-go"]'); if (g) g.disabled = !(W.name.trim() && W.tiles.length === 3); });
         return;
       case 'settings': html = settingsPage(); break;
+      case 'ballroom': html = ballroomPage(); break;
       case 'form': html = courseForm(c); break;
       case 'course': html = coursePage(c); break;
       case 'cases': html = casesPage(c); break;
@@ -702,6 +814,7 @@
     if (r.name === 'settings') document.getElementById('rsfile')?.addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(restore); });
     if (r.name === 'search') { const q = document.getElementById('q'), out = document.getElementById('results'); q.addEventListener('input', () => { out.innerHTML = searchResults(c, q.value); }); q.focus(); }
     current = r;
+    checkRewards(); setTimeout(showUnlock, 350);
   }
   addEventListener('hashchange', () => {
     if (session && session.route !== location.hash.slice(1)) session = null;
@@ -710,10 +823,11 @@
   });
 
   app.addEventListener('click', e => {
-    const t = e.target.closest('[data-go],[data-act],[data-pick],[data-none],[data-filter],[data-len],[data-scroll],[data-tile]');
+    const t = e.target.closest('[data-go],[data-act],[data-pick],[data-none],[data-filter],[data-len],[data-scroll],[data-tile],[data-look]');
     if (!t || t.disabled) return;
     if (t.dataset.scroll) { document.getElementById(t.dataset.scroll)?.scrollIntoView({ behavior: 'smooth' }); return; }
     if (t.dataset.go) { go(t.dataset.go); return; }
+    if (t.dataset.look) { P.look = t.dataset.look; save(); toast('Now wearing ' + window.BALLROOM.byId(P.look).name); render(); return; }
     if (t.dataset.tile != null) { const i = +t.dataset.tile, k = W.tiles.indexOf(i); if (k >= 0) W.tiles.splice(k, 1); else if (W.tiles.length < 3) W.tiles.push(i); W.missing = false; W.err = ''; render(); return; }
     if (t.dataset.none) { toast(`Week ${t.dataset.none} hasn’t been added yet.`); return; }
     const c = current?.c;
@@ -733,7 +847,10 @@
       case 'next': session.i++; session.picked = null; render(); window.scrollTo(0, 0); break;
       case 'quiz-again': startQuiz(c, current.n, current.raw); render(); break;
       case 'practise': practise = { key: wkey(c, current.n), shown: 0 }; render(); break;
-      case 'practise-next': practise.shown++; render(); break;
+      case 'practise-next':
+        practise.shown++;
+        if (practise.shown >= week(c, current.n).method.steps.length) { P.methods = P.methods || {}; P.methods[wkey(c, current.n)] = Date.now(); save(); }
+        render(); break;
       case 'practise-stop': practise = null; render(); break;
       case 'remove-course': {
         if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to remove'; break; }

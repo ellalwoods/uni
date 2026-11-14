@@ -22,6 +22,10 @@ A study app for my university courses. The name follows Duolingo, Duovino and Du
   - **Problem method:** read it, or practise it from memory one step at a time.
 - **Reviewing a whole course:** the Flashcards and Quiz buttons on a course mix every week together.
 
+## The Ballroom
+
+22 milestones across the semester, each earned by real work: adding a week's notes to every course (week 1, 4, 7, 10 and the full semester), flashcards answered "Got it" (100, 500, 1,000), weeks where every card is known, perfect quizzes, practising problem methods from memory, whole-course revision, and the final bow. Each one unlocks a new disco ball, with a little celebration that never interrupts a flashcard round or quiz. Choose which ball to wear in **the Ballroom** (tap the logo, or Settings): it shows in the header, the sidebar and the Hello screen. Rewards sync with your progress. Resetting progress resets them too.
+
 ## Managing courses
 
 - **Add a course** with the **+** button on the Courses screen (or in the sidebar on a computer): give it a name, an optional short name, a colour and the number of weeks.
