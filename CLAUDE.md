@@ -76,7 +76,7 @@ Don't commit the user's original notes files: they asked for them not to be kept
 
 ## Sync (Supabase)
 
-`cloud-config.js` points at the user's Supabase project (shared with DuoVino); `supabase/duodisco.sql` creates the `duodisco_sync` table and the `duodisco_load` / `duodisco_save` functions, the only things the public key can use. Each device signs in with a sync phrase; only its SHA-256 hash (`'duodisco:' + phrase`, lowercased, spaces collapsed) is sent. The synced state is `{ app: 'uni', v: 2, progress, courses }`, where `progress` and `courses` each carry `_at`, the time they last changed; when syncing, the newer copy of each wins, and a device joining an existing phrase merges both. If you change the shape of the synced state, keep it backwards compatible. If you change the SQL, the user has to re-run it in Supabase → SQL Editor.
+`cloud-config.js` points at the user's Supabase project (shared with DuoVino); `supabase/duodisco.sql` creates the `duodisco_sync` table and the `duodisco_load` / `duodisco_save` functions, the only things the public key can use. Each device signs in on the Hello screen with a name and three of nine dance-floor tiles, in order; only a SHA-256 hash of `'duodisco:' + name (lowercased, spaces collapsed) + '|' + tile indexes joined with '-'` is sent. Changing that recipe would sign everyone out, so don't. The synced state is `{ app: 'uni', v: 2, progress, courses }`, where `progress` and `courses` each carry `_at`, the time they last changed; when syncing, the newer copy of each wins, and a device joining an existing phrase merges both. If you change the shape of the synced state, keep it backwards compatible. If you change the SQL, the user has to re-run it in Supabase → SQL Editor.
 
 ## Adding a course
 

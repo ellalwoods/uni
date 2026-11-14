@@ -340,3 +340,31 @@ blockquote cite { display: block; font-style: normal; font-size: 12.5px; color: 
 .sdot.ok { background: #00a95c; }
 .sdot.err { background: #e5484d; }
 .form .show { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 13.5px; color: var(--soft); margin-top: 4px; }
+
+/* ---------- welcome: name + dance floor ---------- */
+.welcome { max-width: 420px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; padding: calc(var(--safe-top) + 26px) 22px calc(var(--safe-bot) + 22px); background: var(--bg); }
+.hello { font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 1; letter-spacing: -.02em; margin: 20px 0 8px; }
+.wsub { color: var(--soft); font-size: 14.5px; margin: 0 0 6px; line-height: 1.45; }
+.wl { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--soft); margin: 16px 0 6px; display: block; }
+.wname { font: inherit; font-size: 17px; padding: 13px 15px; border-radius: 14px; border: 1.5px solid var(--hair); background: #fafaf8; width: 100%; }
+.wname:focus { outline: none; border-color: #ff48b0; background: #fff; }
+.floor { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; background: #141414; border-radius: 18px; width: min(100%, 272px); margin: 0 auto; }
+.tile { aspect-ratio: 1 / 1; align-self: start; width: 100%; border-radius: 8px; background: color-mix(in srgb, var(--k) 22%, #141414); display: flex; align-items: center; justify-content: center; transition: background .15s, box-shadow .15s, transform .1s; }
+.tile:active { transform: scale(.96); }
+.tile.on { background: var(--k); box-shadow: 0 0 20px var(--k), inset 0 0 0 2px #ffffff55; }
+.tile b { font-family: var(--display); font-weight: 800; font-size: 24px; color: #fff; text-shadow: 0 1px 3px #0005; }
+.tile:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+.worder { text-align: center; font-size: 13px; color: var(--soft); margin: 8px 0 0; }
+.wnew { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: #fff0f7; font-size: 14px; line-height: 1.45; }
+.wnew span { display: block; color: var(--soft); font-size: 13px; margin-top: 4px; }
+.wbtns { margin-top: auto; padding-top: 16px; display: grid; gap: 8px; }
+.wbtns .btn { --c: #ff48b0; }
+.wskip { text-align: center; font-size: 14px; font-weight: 600; color: var(--soft); padding: 8px; }
+.welcome .formerr { text-align: center; }
+.who { display: flex; gap: 14px; align-items: center; margin: 8px 0 4px; }
+.who b { display: block; font-size: 17px; }
+.who > div > span { font-size: 13px; color: var(--soft); line-height: 1.4; display: block; }
+.minifloor { display: grid; grid-template-columns: repeat(3, 16px); gap: 3px; padding: 5px; background: #141414; border-radius: 7px; flex: 0 0 auto; }
+.minifloor i { width: 16px; height: 16px; border-radius: 3px; background: color-mix(in srgb, var(--k) 25%, #141414); font-style: normal; font-size: 10px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; }
+.minifloor i.on { background: var(--k); }
+@media (min-width: 960px) { .welcome { padding-top: 70px; min-height: auto; } body:has(.welcome) { background: var(--outside); } }

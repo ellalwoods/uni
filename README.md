@@ -60,8 +60,8 @@ Then, on iPhone, open the link in **Safari → Share → Add to Home Screen**. I
 DuoDisco syncs your courses, course changes and progress through Supabase, in the same project as DuoVino (its own `duodisco_` table, separate from DuoVino's).
 
 - **One-time setup:** in Supabase, open **SQL Editor**, paste `supabase/duodisco.sql` and run it.
-- **On each device:** **Settings → Sync between devices**, enter the same sync phrase. The first device starts the sync; others join it and merge in what they already had.
-- The phrase is never stored or sent: only a SHA-256 hash of it is. If it's forgotten, start again with a new phrase (each device keeps its own copy meanwhile).
+- **On each device:** the first time DuoDisco opens, it says **Hello**: type your name and light up three tiles on the dance floor, in order. Use the same name and tiles on every device. The first device starts your DuoDisco; others join it and merge in what they already had. (You can also choose **Use without syncing**, and sign in later from Settings.)
+- Your name and tiles are never stored on the server or sent: only a SHA-256 hash of them is. Settings shows your tiles as a reminder. Signing out keeps the data on that device.
 - Offline changes are kept on the device and sync when it's back online.
 
 ## Your progress

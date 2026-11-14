@@ -28,17 +28,19 @@
   let CFG = Object.assign(blankCfg(), store.get(CKEY, {}));
   const saveCfg = () => { CFG._at = Date.now(); store.set(CKEY, CFG); applyCfg(); cloudPush(); };
   /* ---------- sync between devices (Supabase) ----------
-   * The phrase is never stored: only its SHA-256 hash, which is the row id. Progress and course
+   * You sign in with your name and three dance-floor tiles; only a SHA-256 hash of them is sent, as the row id. Progress and course
    * changes each carry the time they last changed (_at); when syncing, the newer copy of each wins.
-   * Turning sync on for a phrase that already has data merges the two, so nothing is lost. */
+   * Signing in on a device whose name and tiles already have data merges the two, so nothing is lost. */
   const CLOUD = window.DUODISCO_CLOUD || {};
   const cloudOn = !!(CLOUD.url && CLOUD.key);
   const SKEY = 'uni.sync';
-  let SYNC = store.get(SKEY, null);   // { id, at } once sync is on
+  let SYNC = store.get(SKEY, null);   // { id, name, tiles, at } once signed in
   let syncState = '';                 // '', 'syncing', 'error'
-  const normPhrase = p => String(p || '').toLowerCase().trim().replace(/\s+/g, ' ');
-  async function phraseId(p) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('duodisco:' + normPhrase(p)));
+  // The dance floor: nine tiles, you light up three in order. Name + tiles make your sign-in.
+  const FLOOR = ['#ff48b0', '#0078bf', '#00a95c', '#ff6c2f', '#765ba7', '#f15060', '#00838a', '#3255a4', '#ffe800'];
+  const normName = n => String(n || '').toLowerCase().trim().replace(/\s+/g, ' ');
+  async function loginId(name, tiles) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('duodisco:' + normName(name) + '|' + tiles.join('-')));
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
   }
   async function rpc(fn, args) {
@@ -72,7 +74,7 @@
     if (remote && remote.courses && (remote.courses._at || 0) > (CFG._at || 0)) { CFG = Object.assign(blankCfg(), remote.courses); store.set(CKEY, CFG); applyCfg(); changed = true; }
     return changed;
   }
-  // Used once, when a device joins a phrase that already has data: keep everything from both.
+  // Used once, when a device signs in to data that already exists: keep everything from both.
   function mergeAll(remote) {
     const rp = Object.assign(blank(), remote.progress || {}), rc = Object.assign(blankCfg(), remote.courses || {});
     for (const [k, v] of Object.entries(rp.weeks)) P.weeks[k] = Math.min(P.weeks[k] || v, v);
@@ -94,14 +96,18 @@
       if (!res || (res.state && ((P._at || 0) > (res.state.progress?._at || 0) || (CFG._at || 0) > (res.state.courses?._at || 0)))) cloudPush(true);
     } catch (e) { syncDone('error'); }
   }
-  async function syncStart(phrase) {
-    const id = await phraseId(phrase);
-    const res = await rpc('duodisco_load', { p_id: id });
-    if (res && res.state) { mergeAll(res.state); SYNC = { id }; store.set(SKEY, SYNC); await cloudPush(true); return 'joined'; }
+  // Returns 'joined' (found and merged), 'missing' (nothing saved under these yet) or 'created'.
+  async function signIn(name, tiles, create) {
+    const id = await loginId(name, tiles), who = { id, name: name.trim(), tiles };
+    if (!create) {
+      const res = await rpc('duodisco_load', { p_id: id });
+      if (!res || !res.state) return 'missing';
+      mergeAll(res.state); SYNC = who; store.set(SKEY, SYNC); await cloudPush(true); return 'joined';
+    }
     P._at = P._at || Date.now(); CFG._at = CFG._at || Date.now();
     const ok = await rpc('duodisco_save', { p_id: id, p_state: snapshot(), p_create: true });
     if (!ok) throw new Error('create failed');
-    SYNC = { id }; store.set(SKEY, SYNC); syncDone(''); return 'created';
+    SYNC = who; store.set(SKEY, SYNC); syncDone(''); return 'created';
   }
   function syncLine() {
     if (syncState === 'error') return `<span class="sdot err"></span>Couldn’t reach the sync server. Changes are kept on this device and sync when you’re back online.`;
@@ -521,31 +527,49 @@
         <button class="btn small ghost" data-act="reset">Reset progress</button></div>
     </div>`;
   }
+  const miniFloor = tiles => `<span class="minifloor" aria-label="Your tiles">${FLOOR.map((k, i) => { const o = tiles.indexOf(i); return `<i style="--k:${k}" class="${o >= 0 ? 'on' : ''}">${o >= 0 ? o + 1 : ''}</i>`; }).join('')}</span>`;
   function syncSection() {
-    if (SYNC) return `<div class="set"><h2>Sync between devices</h2>
+    if (SYNC) return `<div class="set"><h2>Signed in</h2>
+        <div class="who">${SYNC.tiles ? miniFloor(SYNC.tiles) : ''}<div><b>${esc(SYNC.name || 'You')}</b><span>Your name and these three tiles, in this order, sign you in on any device.</span></div></div>
         <p id="syncstat" class="syncstat">${syncLine()}</p>
-        <p>Your courses, course changes and progress stay the same on every device where you’ve entered your sync phrase.</p>
-        <div class="row-btns"><button class="btn small" data-act="sync-now">Sync now</button><button class="btn small ghost" data-act="sync-off">Stop syncing on this device</button></div></div>`;
+        <div class="row-btns"><button class="btn small" data-act="sync-now">Sync now</button><button class="btn small ghost" data-act="sync-off">Sign out on this device</button></div></div>`;
     return `<div class="set"><h2>Sync between devices</h2>
-        <p>Keep your courses and progress the same on your phone and laptop. Choose a sync phrase and enter the same phrase on each device. It isn’t stored anywhere: only a scrambled code made from it is used, so if you forget it, start again with a new one.</p>
-        <form id="syncform" class="form" novalidate>
-          <label for="f-phrase">Sync phrase <small>at least 8 characters; capitals and spacing don’t matter</small></label>
-          <input id="f-phrase" name="phrase" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. pink disco ball forever">
-          <label class="show"><input type="checkbox" id="f-show"> Show phrase</label>
-          <p class="formerr" id="serr" role="alert"></p>
-          <button class="btn" type="submit">Turn on sync</button>
-        </form></div>`;
+        <p>Sign in with your name and three tiles to keep your courses and progress the same on your phone and laptop.</p>
+        <button class="btn small" data-go="welcome">Sign in</button></div>`;
   }
-  async function syncSubmit() {
-    const f = document.getElementById('syncform'), err = document.getElementById('serr'), btn = f.querySelector('button[type=submit]');
-    const phrase = f.elements['phrase'].value;
-    if (normPhrase(phrase).length < 8) { err.textContent = 'Use at least 8 characters.'; return; }
-    btn.disabled = true; btn.textContent = 'Connecting…'; err.textContent = '';
+  /* ---------- the welcome screen: name + dance floor ---------- */
+  const W = { name: '', tiles: [], err: '', missing: false, busy: false };
+  function welcomePage() {
+    const ready = W.name.trim() && W.tiles.length === 3;
+    return `<div class="welcome">
+      <div class="logo"><img src="icon.svg" alt="" width="30" height="30">DuoDisco</div>
+      <h1 class="hello">Hello</h1>
+      <p class="wsub">Type your name, then light up three tiles in order. Use the same ones on every device, and your courses and progress follow you.</p>
+      <label class="wl" for="w-name">Your name</label>
+      <input class="wname" id="w-name" value="${esc(W.name)}" placeholder="Your name" autocomplete="given-name" autocapitalize="words" spellcheck="false">
+      <div class="wl">Your three tiles</div>
+      <div class="floor" role="group" aria-label="Dance floor">${FLOOR.map((k, i) => { const o = W.tiles.indexOf(i);
+        return `<button class="tile ${o >= 0 ? 'on' : ''}" style="--k:${k}" data-tile="${i}" aria-label="Tile ${i + 1}${o >= 0 ? ', number ' + (o + 1) : ''}" aria-pressed="${o >= 0}"><b>${o >= 0 ? o + 1 : ''}</b></button>`; }).join('')}</div>
+      <p class="worder">${W.tiles.length < 3 ? `Tap ${3 - W.tiles.length} more ${W.tiles.length === 2 ? 'tile' : 'tiles'}.` : 'Tap a lit tile to undo it.'}</p>
+      ${W.missing ? `<div class="wnew"><b>New here?</b> There’s no DuoDisco yet for ${esc(W.name.trim())} with these tiles. Start one, and it brings what’s already on this device.<span>Already have one? Check the tiles and their order.</span></div>` : ''}
+      <p class="formerr" role="alert">${esc(W.err)}</p>
+      <div class="wbtns">
+        ${W.missing ? `<button class="btn" data-act="w-create" ${W.busy ? 'disabled' : ''}>${W.busy ? 'Starting…' : 'Start my DuoDisco'}</button><button class="btn ghost" data-act="w-back">Check my tiles</button>`
+                    : `<button class="btn" data-act="w-go" ${ready && !W.busy ? '' : 'disabled'}>${W.busy ? 'Opening…' : 'Open DuoDisco'}</button>`}
+        ${SYNC ? '' : `<button class="wskip" data-act="w-skip">Use without syncing</button>`}
+      </div>
+    </div>`;
+  }
+  async function welcomeGo(create) {
+    W.busy = true; W.err = ''; render();
     try {
-      const how = await syncStart(phrase);
-      toast(how === 'joined' ? 'Synced: this device now matches your others' : 'Sync is on. Enter the same phrase on your other devices.');
-      render();
-    } catch (e) { btn.disabled = false; btn.textContent = 'Turn on sync'; err.textContent = 'Couldn’t reach the sync server. Check you’re online and try again.'; }
+      const how = await signIn(W.name, W.tiles, create);
+      W.busy = false;
+      if (how === 'missing') { W.missing = true; return render(); }
+      Object.assign(W, { tiles: [], missing: false });
+      toast(how === 'joined' ? `Welcome back, ${SYNC.name}` : `Hello, ${SYNC.name}. Use the same tiles on your other devices.`);
+      if (location.hash === '#home') render(); else go('home');
+    } catch (e) { W.busy = false; W.err = 'Couldn’t reach DuoDisco. Check you’re online and try again.'; render(); }
   }
   function restore(text) {
     try {
@@ -602,6 +626,8 @@
   /* ---------- routing ---------- */
   function parse() {
     const h = location.hash.slice(1) || 'home';
+    if (cloudOn && !SYNC && !store.get('uni.skip', false) && h !== 'welcome') return { name: 'welcome', raw: h };
+    if (h === 'welcome') return SYNC ? { name: 'home', raw: 'home' } : { name: 'welcome', raw: h };
     if (h === 'home' || h === 'settings') return { name: h, raw: h };
     if (h === 'new-course') return { name: 'form', raw: h };
     if (h.startsWith('edit-')) { const c = course(h.slice(5)); return c ? { name: 'form', c, raw: h } : { name: 'home', raw: 'home' }; }
@@ -642,6 +668,10 @@
     let html;
     switch (r.name) {
       case 'home': html = home(); break;
+      case 'welcome':
+        app.innerHTML = welcomePage(); current = r; document.title = 'DuoDisco';
+        document.getElementById('w-name').addEventListener('input', e => { W.name = e.target.value; W.missing = false; const g = app.querySelector('[data-act="w-go"]'); if (g) g.disabled = !(W.name.trim() && W.tiles.length === 3); });
+        return;
       case 'settings': html = settingsPage(); break;
       case 'form': html = courseForm(c); break;
       case 'course': html = coursePage(c); break;
@@ -664,10 +694,6 @@
     app.innerHTML = `<div class="layout">${side(r)}<div class="main">${html}</div></div>`;
     document.title = c ? `${c.short || c.name} · DuoDisco` : 'DuoDisco';
     if (r.name === 'form') document.getElementById('cform').addEventListener('submit', e => { e.preventDefault(); saveCourse(r.c); });
-    if (r.name === 'settings' && document.getElementById('syncform')) {
-      document.getElementById('syncform').addEventListener('submit', e => { e.preventDefault(); syncSubmit(); });
-      document.getElementById('f-show').addEventListener('change', e => { document.getElementById('f-phrase').type = e.target.checked ? 'text' : 'password'; });
-    }
     if (r.name === 'settings') document.getElementById('rsfile')?.addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(restore); });
     if (r.name === 'search') { const q = document.getElementById('q'), out = document.getElementById('results'); q.addEventListener('input', () => { out.innerHTML = searchResults(c, q.value); }); q.focus(); }
     current = r;
@@ -679,10 +705,11 @@
   });
 
   app.addEventListener('click', e => {
-    const t = e.target.closest('[data-go],[data-act],[data-pick],[data-none],[data-filter],[data-len],[data-scroll]');
+    const t = e.target.closest('[data-go],[data-act],[data-pick],[data-none],[data-filter],[data-len],[data-scroll],[data-tile]');
     if (!t || t.disabled) return;
     if (t.dataset.scroll) { document.getElementById(t.dataset.scroll)?.scrollIntoView({ behavior: 'smooth' }); return; }
     if (t.dataset.go) { go(t.dataset.go); return; }
+    if (t.dataset.tile != null) { const i = +t.dataset.tile, k = W.tiles.indexOf(i); if (k >= 0) W.tiles.splice(k, 1); else if (W.tiles.length < 3) W.tiles.push(i); W.missing = false; W.err = ''; render(); return; }
     if (t.dataset.none) { toast(`Week ${t.dataset.none} hasn’t been added yet.`); return; }
     const c = current?.c;
     if (t.dataset.filter) { session.filter = t.dataset.filter; render(); return; }
@@ -713,8 +740,13 @@
       case 'restore-course': CFG.removed = CFG.removed.filter(x => x !== t.dataset.id); saveCfg(); toast('Course brought back'); render(); break;
       case 'sync-now': t.disabled = true; cloudPush(true).then(cloudPull).then(() => { t.disabled = false; }); break;
       case 'sync-off':
-        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to stop syncing'; break; }
-        SYNC = null; syncState = ''; try { localStorage.removeItem(SKEY); } catch (e) {} toast('Sync is off on this device. Your data here is kept.'); render(); break;
+        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to sign out'; break; }
+        SYNC = null; syncState = ''; try { localStorage.removeItem(SKEY); } catch (e) {} store.set('uni.skip', true);
+        toast('Signed out on this device. Your data here is kept.'); render(); break;
+      case 'w-go': welcomeGo(false); break;
+      case 'w-create': welcomeGo(true); break;
+      case 'w-back': W.missing = false; W.tiles = []; render(); break;
+      case 'w-skip': store.set('uni.skip', true); go('home'); render(); break;
       case 'copy': { const ta = document.getElementById('bk'); (navigator.clipboard ? navigator.clipboard.writeText(ta.value) : Promise.reject()).then(() => toast('Copied'), () => { ta.select(); toast('Select all and copy'); }); break; }
       case 'restore': restore(document.getElementById('rs').value); break;
       case 'reset':
