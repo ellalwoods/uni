@@ -1,5 +1,5 @@
 -- DuoDisco sync: one row per sync phrase, holding that person's progress and course changes.
--- Safe to run in a shared Supabase project (it shares DuoVino's): everything is prefixed duodisco_
+-- Safe to run in a shared Supabase project (it shares Good Word Charlie's): everything is prefixed duodisco_
 -- and touches no other tables. Run it once in Supabase → SQL Editor. Running it again is harmless.
 --
 -- How it stays private:
