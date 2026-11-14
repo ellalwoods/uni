@@ -435,6 +435,21 @@
     return { ...r, name: w[2] === 'cases' ? 'wcases' : w[2] === 'law' ? 'wlaw' : w[2], n };
   }
   let current = null;
+  /* The laptop sidebar: courses, then the open course's weeks and lists. Hidden on phones by CSS. */
+  function side(r) {
+    const cur = r.c;
+    const link = (k, l) => `<button class="sl ${r.name === k ? 'on' : ''}" data-go="c-${cur.id}-${k}">${l}</button>`;
+    return `<aside class="side" aria-label="Navigation">
+      <button class="brand" data-go="home">Uni</button>
+      <div class="slbl">Courses</div>
+      ${courses().map(c => `<button class="sc ${cur && cur.id === c.id ? 'on' : ''}" style="${cv(c)}" data-go="c-${c.id}"><span class="dot"></span><span class="nm">${esc(c.short || c.name)}</span><span class="ct">${addedWeeks(c).length}/${c.weeks}</span></button>`).join('')}
+      ${cur ? `<div class="slbl">${esc(cur.short || cur.name)}</div>
+        <div style="${cv(cur)}">${weeksOf(cur).map(n => { const w = week(cur, n), s = state(cur, n);
+          return `<button class="sw ${s} ${r.n === n ? 'on' : ''}" ${w ? `data-go="c-${cur.id}-w${n}"` : `data-none="${n}"`}><b>${pad(n)}</b><span>${w ? esc(w.title) : 'Not added yet'}</span></button>`; }).join('')}
+        <div class="slinks">${link('cases', 'Cases')}${link('law', 'Legislation')}${link('methods', 'Methods')}${link('search', 'Search')}</div></div>` : ''}
+      <button class="sset" data-go="settings">Settings</button>
+    </aside>`;
+  }
   function render() {
     const r = parse(), c = r.c;
     let html;
@@ -458,7 +473,7 @@
         html = cardsPage(c, r.n, r.raw); break;
       case 'quiz': if (!session || session.route !== r.raw) startQuiz(c, r.n, r.raw); html = quizPage(c, r.n); break;
     }
-    app.innerHTML = html;
+    app.innerHTML = `<div class="layout">${side(r)}<div class="main">${html}</div></div>`;
     document.title = c ? `${c.short || c.name} · Uni` : 'Uni';
     if (r.name === 'settings') document.getElementById('rsfile')?.addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(restore); });
     if (r.name === 'search') { const q = document.getElementById('q'), out = document.getElementById('results'); q.addEventListener('input', () => { out.innerHTML = searchResults(c, q.value); }); q.focus(); }
