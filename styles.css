@@ -368,3 +368,4 @@ blockquote cite { display: block; font-style: normal; font-size: 12.5px; color: 
 .minifloor i { width: 16px; height: 16px; border-radius: 3px; background: color-mix(in srgb, var(--k) 25%, #141414); font-style: normal; font-size: 10px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; }
 .minifloor i.on { background: var(--k); }
 @media (min-width: 960px) { .welcome { padding-top: 70px; min-height: auto; } body:has(.welcome) { background: var(--outside); } }
+.empty p { margin: 0 0 14px; }
