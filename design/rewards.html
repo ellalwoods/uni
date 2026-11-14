@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DuoDisco rewards ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: three concepts, each as two phone screens (the unlock moment, then the collection). Light, white, riso inks. */
+  --ink:#1a1a1a; --soft:#5c5a55; --hair:#ebebeb; --faint:#dedede; --page:#f4f3ef; --pink:#ff48b0;
+  --display:'Bricolage Grotesque','Hanken Grotesk',system-ui,sans-serif; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.top{max-width:1100px;margin:0 auto;padding:30px 24px 0}
+.top h1{font-family:var(--display);font-weight:800;font-size:34px;letter-spacing:-.02em;margin:0 0 6px;line-height:1.05}
+.top p{margin:0;color:var(--soft);max-width:72ch}
+section{max-width:1100px;margin:0 auto;padding:34px 24px 10px}
+section > h2{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.015em;margin:0 0 4px}
+section > p{margin:0 0 16px;color:var(--soft);max-width:70ch}
+.pair{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.ph{width:320px;flex:0 0 320px}
+.cap{display:flex;justify-content:space-between;align-items:baseline;margin:0 6px 8px}
+.cap span{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--soft)}
+.cap button{font-size:13px;font-weight:700;color:var(--pink)}
+.scr{width:320px;height:680px;border-radius:40px;overflow:hidden;position:relative;border:8px solid #fff;box-shadow:0 22px 46px #1a1a1a1f,0 0 0 1px #1a1a1a14;background:#fff}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:92px;height:24px;background:#111;border-radius:20px;z-index:20}
+.in{position:absolute;inset:0;padding:48px 18px 18px;overflow:hidden;display:flex;flex-direction:column}
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;font-weight:600;color:var(--soft)}
+.ttl{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;letter-spacing:-.02em;margin:12px 0 4px}
+.sub{font-size:13px;color:var(--soft);margin:0}
+.meter{display:flex;gap:2px;margin:10px 0 2px}
+.meter i{flex:1;height:5px;border-radius:2px;background:var(--hair)}
+.meter i.on{background:var(--pink)}
+
+/* ---- the unlock moment (shared) ---- */
+.unlock{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 34%,#ffe6f3 0%,#fff 58%);display:flex;flex-direction:column;align-items:center;padding:54px 22px 22px;text-align:center;overflow:hidden}
+.beam{position:absolute;top:-40px;left:50%;width:360px;height:520px;transform:translateX(-50%);background:conic-gradient(from 180deg at 50% 0%,transparent 160deg,#ff48b022 170deg,#ff48b03d 180deg,#ff48b022 190deg,transparent 200deg);pointer-events:none}
+.eyebrow{position:relative;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--pink);margin-top:6px}
+.prize{position:relative;margin:22px 0 14px;height:220px;display:flex;align-items:center;justify-content:center}
+.drop{animation:drop 1.1s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes drop{0%{transform:translateY(-260px) rotate(-12deg);opacity:0}60%{opacity:1}100%{transform:none}}
+.spin{animation:slow 9s linear infinite}
+@keyframes slow{to{transform:rotate(360deg)}}
+.spark{position:absolute;animation:tw 1.6s ease-in-out infinite both}
+@keyframes tw{0%,100%{transform:scale(.4);opacity:.2}50%{transform:scale(1);opacity:1}}
+.uname{position:relative;font-family:var(--display);font-weight:800;font-size:30px;line-height:1.05;letter-spacing:-.02em}
+.uwhy{position:relative;font-size:14px;color:var(--soft);margin:8px 0 0;max-width:30ch}
+.uwhy b{color:var(--ink)}
+.ubtns{position:relative;margin-top:auto;width:100%;display:grid;gap:6px}
+.btn{display:block;width:100%;text-align:center;padding:14px;border-radius:999px;font-weight:700;font-size:15px;color:#fff;background:var(--pink)}
+.ghost{color:var(--soft);font-weight:600;font-size:14px;padding:8px}
+.confetti{position:absolute;inset:0;pointer-events:none}
+.confetti i{position:absolute;top:-12px;width:8px;height:8px;border-radius:2px;animation:fall 2.6s ease-in both}
+@keyframes fall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(720px) rotate(540deg);opacity:.9}}
+
+/* ---- wardrobe ---- */
+.current{display:flex;gap:14px;align-items:center;margin:14px 0 6px;padding:12px;border-radius:16px;background:#fff0f7}
+.current b{display:block;font-family:var(--display);font-weight:800;font-size:18px}
+.current span{font-size:12.5px;color:var(--soft)}
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;overflow:auto;padding-bottom:6px}
+.witem{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 7px;border-radius:14px;box-shadow:inset 0 0 0 1.5px var(--hair);font-size:11.5px;font-weight:700;line-height:1.15;text-align:center}
+.witem.on{box-shadow:inset 0 0 0 2.5px var(--pink);background:#fff7fb}
+.witem.lock{color:var(--soft);font-weight:600}
+.witem.lock small{font-weight:500;font-size:10px;color:#8a877f}
+
+/* ---- crate ---- */
+.crate{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px;overflow:auto;padding-bottom:8px}
+.rec{position:relative;padding-right:14px}
+.rec .vinyl{position:absolute;right:0;top:6%;width:88%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#1b1b1b 0 2px,#262626 2px 4px)}
+.rec .vinyl::after{content:"";position:absolute;inset:34%;border-radius:50%;background:var(--k)}
+.rec .cover{position:relative;aspect-ratio:1;border-radius:4px;overflow:hidden;box-shadow:0 3px 8px #0002}
+.rec .t{font-size:11.5px;font-weight:700;line-height:1.2;margin-top:6px}
+.rec .w{font-size:10.5px;color:var(--soft)}
+.rec.lock .cover{background:#f1efe9;box-shadow:inset 0 0 0 1.5px var(--hair);display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#8a877f;text-align:center;padding:10px;line-height:1.3}
+.rec.lock .vinyl{display:none}
+
+/* ---- dance floor ---- */
+.bigfloor{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:8px;background:#f1efe9;border-radius:16px;margin-top:12px}
+.bt{aspect-ratio:1;border-radius:5px;background:#e3e0d8;position:relative}
+.bt.on{background:var(--k);box-shadow:0 0 12px color-mix(in srgb,var(--k) 55%,transparent)}
+.bt.new{animation:glow 1.4s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 22px var(--k),0 0 0 2px #fff inset}}
+.mlist{margin:12px 0 0;padding:0;list-style:none;overflow:auto;flex:1}
+.mlist li{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--hair);font-size:13px;line-height:1.25}
+.mlist li i{width:16px;height:16px;border-radius:4px;flex:0 0 auto;background:var(--k,#e3e0d8)}
+.mlist li.todo{color:var(--soft)}
+.mlist li small{display:block;color:var(--soft);font-size:11.5px}
+
+.milestones{max-width:1100px;margin:0 auto;padding:34px 24px 60px}
+.milestones h2{font-family:var(--display);font-weight:800;font-size:22px;margin:0 0 4px}
+.milestones p{margin:0 0 12px;color:var(--soft)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--hair);vertical-align:top}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:700}
+td:first-child{font-weight:700;white-space:nowrap}
+td.when{white-space:nowrap;color:var(--soft)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Rewards for real milestones</h1>
+  <p>Three ways to show the same milestones. Each concept has the moment you unlock something (tap <b>Replay</b> to watch it again) and the place you collect them. The milestones, listed at the bottom, are all earned by adding notes, studying, getting cards right or scoring well, spaced out across the semester.</p>
+</div>
+
+<section>
+  <h2>1. The Mirror Ball Wardrobe</h2>
+  <p>The disco ball is DuoDisco’s character. Each milestone unlocks a new look for it, and the one you choose shows in the header, the sidebar and on the Hello screen.</p>
+  <div class="pair">
+    <div class="ph"><div class="cap"><span>The unlock moment</span><button data-replay="w">Replay</button></div><div class="scr"><div class="notch"></div><div id="u-w"></div></div></div>
+    <div class="ph"><div class="cap"><span>The wardrobe</span></div><div class="scr"><div class="notch"></div><div class="in" id="c-w"></div></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>2. The Record Crate</h2>
+  <p>Each milestone presses a record with its own cover and title. They line up in a crate in the order you earned them, so the crate tells the story of your semester.</p>
+  <div class="pair">
+    <div class="ph"><div class="cap"><span>The unlock moment</span><button data-replay="r">Replay</button></div><div class="scr"><div class="notch"></div><div id="u-r"></div></div></div>
+    <div class="ph"><div class="cap"><span>The crate</span></div><div class="scr"><div class="notch"></div><div class="in" id="c-r"></div></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>3. Your Dance Floor</h2>
+  <p>A 5×5 floor, one tile per milestone. Each one lights up for good in its own colour. By the end of semester the whole floor is lit.</p>
+  <div class="pair">
+    <div class="ph"><div class="cap"><span>The unlock moment</span><button data-replay="f">Replay</button></div><div class="scr"><div class="notch"></div><div id="u-f"></div></div></div>
+    <div class="ph"><div class="cap"><span>The floor</span></div><div class="scr"><div class="notch"></div><div class="in" id="c-f"></div></div></div>
+  </div>
+</section>
+
+<div class="milestones">
+  <h2>The milestones</h2>
+  <p>About 22 across a 13-week semester: roughly one or two a week, each for real work. Nothing for setting up, and no daily streaks.</p>
+  <div class="tw"><table id="mtable"></table></div>
+</div>
+
+<script>
+/* ---------- the milestones ---------- */
+const M=[
+ ['Opening night','The first week of notes added to any course','Week 1'],
+ ['Week one, all in','Week 1 added for every course','Week 1–2'],
+ ['First 100','100 flashcards answered “Got it”','Week 2–3'],
+ ['Full marks','Your first perfect quiz score','Week 2–4'],
+ ['Method actor','A problem-question method practised from memory','Week 3–5'],
+ ['A month in','Week 4 added for every course','Week 4–5'],
+ ['Clean sweep','Every card in a week known','Week 4–6'],
+ ['Caught up','Every added week opened, nothing left “New” (once each third of semester)','Weeks 4, 8, 12'],
+ ['Halfway','Week 7 added for every course','Week 7'],
+ ['500 cards','500 flashcards answered “Got it”','Week 6–8'],
+ ['Comeback','A perfect quiz on a week you once scored under half on','Any time'],
+ ['Five sweeps','Five weeks fully known','Week 8–10'],
+ ['Home stretch','Week 10 added for every course','Week 10'],
+ ['Mixtape','A “Flashcards from all weeks” round finished in a course','Week 10+'],
+ ['1,000 cards','1,000 flashcards answered “Got it”','Week 10–11'],
+ ['Encore','Every card right in a week you studied over 3 weeks ago','Week 9+'],
+ ['Method in the madness','Every method in a course practised','Week 11+'],
+ ['Full marks everywhere','A perfect quiz in every course','Week 11+'],
+ ['Full semester','Every week added for every course','Week 13'],
+ ['Exam ready','80%+ on a whole-course quiz, for every course','Exam period'],
+ ['Mastered','Every card in a whole course known','Exam period'],
+ ['Final bow','Every course fully added, with 80% of its cards known','End of semester'],
+];
+document.getElementById('mtable').innerHTML='<tr><th>Milestone</th><th>Earned by</th><th>Roughly when</th></tr>'+M.map(m=>`<tr><td>${m[0]}</td><td>${m[1]}</td><td class="when">${m[2]}</td></tr>`).join('');
+
+/* ---------- drawing ---------- */
+const sparkle=(c,s)=>`<svg width="${s}" height="${s}" viewBox="0 0 20 20"><path d="M10 0 Q11.6 8.4 20 10 Q11.6 11.6 10 20 Q8.4 11.6 0 10 Q8.4 8.4 10 0Z" fill="${c}"/></svg>`;
+// A tiled mirror ball. skin(i,j,d) returns a tile colour; d runs 0 (top left) to 16 (bottom right).
+function ball(skin,size,extra=''){
+  const n=9,r=176,cx=256,cy=270,s=2*r/n;let o='';
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){const x=cx-r+i*s,y=cy-r+j*s,dx=x+s/2-cx,dy=y+s/2-cy;if(dx*dx+dy*dy>(r*1.03)**2)continue;
+    o+=`<rect x="${x+4}" y="${y+4}" width="${s-8}" height="${s-8}" rx="5" fill="${skin(i,j,i+j)}"/>`;}
+  return `<svg width="${size}" height="${size}" viewBox="0 0 512 512">${o}${extra}</svg>`;
+}
+const shade=(a,b,c)=>(i,j,d)=>d<6?a:d<12?b:c;
+const hash=(i,j)=>((i*73+j*151)%17);
+const SKINS=[
+ {n:'Classic',f:shade('#ffb3dc','#ff48b0','#d92f8f'),got:1},
+ {n:'Gold Rush',f:(i,j,d)=>hash(i,j)===3?'#fff6d6':shade('#ffe9a3','#f2c14e','#c9921f')(i,j,d),got:1,why:'Week one, all in'},
+ {n:'Holographic',f:(i,j)=>`hsl(${(i*28+j*17)%360} 85% 72%)`,got:1,why:'Full marks'},
+ {n:'Midnight',f:(i,j,d)=>hash(i,j)<2?'#ffffff':shade('#5b72c4','#3255a4','#1d2f66')(i,j,d),got:1,why:'Halfway'},
+ {n:'Strawberry',f:(i,j,d)=>hash(i,j)%5===0?'#ffe58a':shade('#ff8f9b','#f15060','#c0313f')(i,j,d),got:1,why:'Clean sweep'},
+ {n:'Riso Blue',f:shade('#8fc3e6','#0078bf','#005489'),got:1,why:'First 100'},
+ {n:'Glitter Bomb',f:(i,j,d)=>hash(i,j)%3===0?'#ffffff':shade('#ffc7e5','#ff79c4','#ff48b0')(i,j,d),got:0,why:'500 cards'},
+ {n:'Moonball',f:(i,j,d)=>[[3,3],[3,4],[4,3],[6,5],[2,6]].some(([a,b])=>a===i&&b===j)?'#9a978f':shade('#ecebe6','#cfccc4','#aeaaa1')(i,j,d),got:0,why:'Five sweeps'},
+ {n:'Mint Choc',f:(i,j,d)=>hash(i,j)%6===1?'#5a3a2a':shade('#c8f0dc','#7ad3a8','#3fae7b')(i,j,d),got:0,why:'Comeback'},
+ {n:'Sunset',f:(i,j)=>['#ffe800','#ffc23d','#ff8b3d','#ff6c2f','#f15060','#d94a8a','#9a4fb0','#765ba7','#5a4a9a'][j],got:0,why:'Home stretch'},
+ {n:'Pixel Party',f:(i,j)=>['#ff48b0','#0078bf','#00a95c','#ff6c2f','#ffe800'][(i+j*2)%5],got:0,why:'Mixtape'},
+ {n:'Graduation',f:shade('#ffb3dc','#ff48b0','#d92f8f'),cap:1,got:0,why:'Final bow'},
+];
+const capSVG=`<g><path d="M256 40 L430 96 L256 152 L82 96Z" fill="#1a1a1a"/><path d="M160 122 V170 Q256 210 352 170 V122 L256 152Z" fill="#2b2b2b"/><path d="M410 102 V170" stroke="#ffe800" stroke-width="10"/><circle cx="410" cy="178" r="14" fill="#ffe800"/></g>`;
+const skinBall=(k,size)=>ball(SKINS[k].f,size,SKINS[k].cap?capSVG:'');
+const lockBall=size=>ball(()=>'#e8e6e0',size);
+
+// Riso-style record covers, drawn from shapes and a title.
+const COVERS=[
+ {t:'Opening Night',w:'Week 1',k:'#ff48b0',bg:'#ffe800',art:'<circle cx="60" cy="70" r="42" fill="#ff48b0" style="mix-blend-mode:multiply"/><circle cx="92" cy="54" r="30" fill="#0078bf" style="mix-blend-mode:multiply"/>'},
+ {t:'Week One (Extended Mix)',w:'Week 2',k:'#0078bf',bg:'#bfe3f7',art:'<text x="12" y="104" font-family="Bricolage Grotesque" font-weight="800" font-size="92" fill="#0078bf">01</text><rect x="12" y="16" width="96" height="8" fill="#ff48b0"/>'},
+ {t:'Got It (100 Times)',w:'Week 3',k:'#00a95c',bg:'#fff',art:'<g fill="#00a95c">'+[...Array(25)].map((_,i)=>`<rect x="${14+(i%5)*20}" y="${14+Math.floor(i/5)*20}" width="14" height="14" rx="3"/>`).join('')+'</g>'},
+ {t:'Full Marks',w:'Week 3',k:'#ff6c2f',bg:'#ffd7c2',art:'<path d="M60 12 L72 46 L108 46 L79 67 L90 102 L60 81 L30 102 L41 67 L12 46 L48 46Z" fill="#ff6c2f"/>'},
+ {t:'Halfway There',w:'Week 7',k:'#765ba7',bg:'#e5dcf5',art:'<rect x="0" y="0" width="60" height="120" fill="#765ba7"/><circle cx="60" cy="60" r="34" fill="#ffe800"/><rect x="0" y="0" width="60" height="120" fill="#765ba7" opacity=".55"/>'},
+];
+const cover=(c,size)=>`<svg width="${size}" height="${size}" viewBox="0 0 120 120"><rect width="120" height="120" fill="${c.bg}"/>${c.art}<text x="8" y="114" font-family="Hanken Grotesk" font-weight="700" font-size="9" fill="#1a1a1a">DUODISCO RECORDS</text></svg>`;
+const LOCKED_REC=['Home Stretch','Full Semester','Mixtape','Exam Ready','Final Bow','Encore','Mastered'];
+const HINTS={ 'Home Stretch':'Add week 10 for every course','Full Semester':'Add every week for every course','Mixtape':'Finish a round of flashcards from all weeks','Exam Ready':'80% on a whole-course quiz in every course','Final Bow':'Finish the semester','Encore':'Ace a week from over 3 weeks ago','Mastered':'Know every card in a course'};
+
+const FLOORC=['#ff48b0','#0078bf','#00a95c','#ff6c2f','#765ba7','#f15060','#00838a','#3255a4','#ffe800'];
+const litCount=9;
+
+function confetti(){return `<div class="confetti">${[...Array(26)].map((_,i)=>`<i style="left:${(i*37)%100}%;background:${FLOORC[i%9]};animation-delay:${(i%7)*.12}s;animation-duration:${2.2+(i%5)*.3}s"></i>`).join('')}</div>`;}
+const sparks=()=>`<span class="spark" style="left:16%;top:18%">${sparkle('#ff48b0',26)}</span><span class="spark" style="right:14%;top:8%;animation-delay:.5s">${sparkle('#ffe800',20)}</span><span class="spark" style="right:20%;bottom:10%;animation-delay:.9s">${sparkle('#0078bf',16)}</span><span class="spark" style="left:22%;bottom:4%;animation-delay:1.2s">${sparkle('#ff48b0',14)}</span>`;
+
+const unlocks={
+ w:()=>`<div class="unlock"><div class="beam"></div>${confetti()}<div class="eyebrow">New look unlocked</div>
+   <div class="prize">${sparks()}<div class="drop">${skinBall(3,200)}</div></div>
+   <div class="uname">Midnight</div><p class="uwhy">For reaching <b>Halfway</b>: week 7 added for all four of your courses.</p>
+   <div class="ubtns"><button class="btn">Wear it</button><button class="ghost">See the wardrobe</button></div></div>`,
+ r:()=>`<div class="unlock"><div class="beam"></div>${confetti()}<div class="eyebrow">New record pressed</div>
+   <div class="prize">${sparks()}<div class="drop" style="position:relative;width:200px;height:200px"><div class="spin" style="position:absolute;left:58px;top:10px;width:180px;height:180px;border-radius:50%;background:repeating-radial-gradient(circle,#1b1b1b 0 2px,#262626 2px 4px)"><div style="position:absolute;inset:34%;border-radius:50%;background:#765ba7"></div></div><div style="position:absolute;left:0;top:10px;box-shadow:0 8px 20px #0003">${cover(COVERS[4],180)}</div></div></div>
+   <div class="uname">Halfway There</div><p class="uwhy">For reaching <b>Halfway</b>: week 7 added for all four of your courses.</p>
+   <div class="ubtns"><button class="btn">Play it</button><button class="ghost">See the crate</button></div></div>`,
+ f:()=>`<div class="unlock"><div class="beam"></div>${confetti()}<div class="eyebrow">A new tile lights up</div>
+   <div class="prize">${sparks()}<div class="drop" style="width:220px">${floor(litCount,true,40)}</div></div>
+   <div class="uname">Halfway</div><p class="uwhy">Week 7 added for all four of your courses. <b>${litCount} of 25 tiles lit.</b></p>
+   <div class="ubtns"><button class="btn">Nice</button><button class="ghost">See the floor</button></div></div>`,
+};
+function floor(lit,newOne,cell){
+  return `<div class="bigfloor" style="${cell?'margin:0':''}">${[...Array(25)].map((_,i)=>`<i class="bt ${i<lit?'on':''} ${newOne&&i===lit-1?'new':''}" style="--k:${FLOORC[(i*4)%9]}"></i>`).join('')}</div>`;
+}
+const collections={
+ w:()=>`<div class="bar"><span>‹ Settings</span><span>6 of 12</span></div>
+   <div class="ttl">Wardrobe</div><p class="sub">Each look is unlocked by a milestone.</p>
+   <div class="current">${skinBall(3,64)}<div><b>Wearing: Midnight</b><span>Unlocked for Halfway</span></div></div>
+   <div class="wgrid">${SKINS.map((s,k)=>s.got?`<button class="witem ${k===3?'on':''}">${skinBall(k,62)}${s.n}</button>`:`<div class="witem lock">${lockBall(62)}${s.n}<small>${s.why}</small></div>`).join('')}</div>`,
+ r:()=>`<div class="bar"><span>‹ Settings</span><span>5 of 22</span></div>
+   <div class="ttl">The Crate</div><p class="sub">A record for every milestone, in the order you earned them.</p>
+   <div class="crate">${COVERS.slice().reverse().map(c=>`<div class="rec" style="--k:${c.k}"><div class="vinyl"></div><div class="cover">${cover(c,'100%')}</div><div class="t">${c.t}</div><div class="w">${c.w}</div></div>`).join('')}
+   ${LOCKED_REC.map(t=>`<div class="rec lock"><div class="cover">${HINTS[t]}</div><div class="t" style="color:#8a877f">?</div></div>`).join('')}</div>`,
+ f:()=>`<div class="bar"><span>‹ Settings</span><span>${litCount} of 25</span></div>
+   <div class="ttl">Your floor</div><p class="sub">One tile for each milestone this semester.</p>
+   ${floor(litCount,false)}
+   <ul class="mlist">${M.slice(0,12).map((m,i)=>`<li class="${i<litCount?'':'todo'}"><i style="${i<litCount?`--k:${FLOORC[(i*4)%9]}`:''}"></i><span>${m[0]}<small>${m[1]}</small></span></li>`).join('')}</ul>`,
+};
+function show(k){document.getElementById('u-'+k).innerHTML=unlocks[k]();}
+['w','r','f'].forEach(k=>{show(k);document.getElementById('c-'+k).innerHTML=collections[k]();});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-replay]');if(b){const k=b.dataset.replay,el=document.getElementById('u-'+k);el.innerHTML='';requestAnimationFrame(()=>show(k));}});
+</script>
+</body>
+</html>
