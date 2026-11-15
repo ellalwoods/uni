@@ -658,10 +658,11 @@
         <div class="k">Rapid recall · ${esc(secName(x, w))}</div><h1 class="dq">${esc(x.kind === 'para' ? x.title : w.title)}</h1>
         ${prev ? `<p class="prevline">${prev.thesis ? '<b>Thesis.</b> ' : ''}${fmt(prev.s, null)}</p>` : ''}
         <div class="sentno">${t.thesis ? 'The thesis' : `Sentence ${k} of ${x.sentences.length}`} ${tagChips(t.tags)}</div>
-        ${res ? `<div class="verdict ${res.ok ? 'ok' : 'no'}"><b>${res.ok ? 'Got it' : res.shown ? 'Shown' : 'Not that one'}</b><span>${res.shown ? '' : esc(s.answer)}</span></div>
+        <input id="ans" class="ans rapidin${res ? ' done' : ''}" placeholder="${res ? '' : 'One or two words'}" value="${esc(s.answer)}" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="${res ? 'next' : 'go'}">
+        ${res ? `<div class="verdict ${res.ok ? 'ok' : 'no'}"><b>${res.ok ? 'Got it' : res.shown ? 'Shown' : 'Not that one'}</b><span></span></div>
             <div class="model"><span>The sentence</span>${marked(t.s, res)}</div>
             <p class="keys">Words that count: ${[...res.K.keys()].map(k => `<b class="${res.hit.has(k) ? 'yes' : ''}">${esc((res.K.disp && res.K.disp.get(k)) || k)}</b>`).join(' ')}</p>`
-          : `<input id="ans" class="ans rapidin" placeholder="One or two words" value="${esc(s.answer)}" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">`}
+          : ''}
         <div class="dock">${res ? `<button class="btn" data-act="e-next">Next</button>` : `<div class="two"><button class="btn ghost" data-act="e-show">Show me</button><button class="btn" data-act="e-check">Check</button></div>`}</div>
       </div>`;
     }
@@ -1055,8 +1056,14 @@
       const sf = document.querySelector('.sofar'); if (sf) sf.scrollTop = sf.scrollHeight;
       const ta = document.getElementById('ans');
       if (ta) {
-        ta.addEventListener('input', () => { session.answer = ta.value; });
-        ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (ta.value.trim()) { drillCheck(c, false); render(); } } });
+        ta.addEventListener('input', () => { if (!session.res) session.answer = ta.value; });
+        ta.addEventListener('keydown', e => {
+          if (e.key !== 'Enter' || e.shiftKey) return;
+          e.preventDefault();
+          // Enter checks; once checked (rapid recall keeps the box on screen), Enter again goes to the next sentence
+          if (session.res) { Object.assign(session, { i: session.i + 1, res: null, answer: '', hint: false, first: true, plan: null }); render(); window.scrollTo(0, 0); }
+          else if (ta.value.trim()) { drillCheck(c, false); render(); }
+        });
         if (matchMedia('(hover: hover)').matches || ta.classList.contains('rapidin')) ta.focus();
       }
       document.querySelectorAll('.pin').forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const nx = el.closest('.prow').nextElementSibling?.querySelector('.pin'); if (nx) nx.focus(); else { drillCheck(c, false); render(); } } }));

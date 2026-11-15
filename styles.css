@@ -473,3 +473,4 @@ mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 
 .keys { font-size: 12.5px; color: var(--soft); margin: 10px 0 0; line-height: 1.8; }
 .keys b { font-weight: 600; padding: 1px 6px; border-radius: 4px; background: #f1f0ec; color: var(--ink); }
 .keys b.yes { background: #d6f3e2; }
+.rapidin.done { background: #f8f8f6; color: var(--soft); caret-color: transparent; }
