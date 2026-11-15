@@ -595,6 +595,10 @@
     else if (what === 'theses') addedWeeks(c).filter(m => isEssay(week(c, m))).forEach(thesis);
     else if (what === 'plans') addedWeeks(c).filter(m => isEssay(week(c, m))).forEach(plan);
     else if (/^s\d+$/.test(what)) sents(n, +what.slice(1));
+    else if (what === 'rapid' || /^r\d+$/.test(what)) {
+      const only = what === 'rapid' ? null : +what.slice(1);
+      secsOf(week(c, n)).forEach((x, si) => { if (only == null || si === only) x.sentences.forEach((t, j) => steps.push({ t: 'rapid', n, si, j })); });
+    }
     return steps;
   }
   function startDrill(c, what, n, route) {
@@ -603,6 +607,27 @@
   }
   const stepModel = (c, st) => { const w = week(c, st.n); return st.t === 'thesis' ? thesisOf(w) : secsOf(w)[st.si].sentences[st.j].s; };
   const stepKey = st => st.t === 'thesis' ? 'thesis' : st.t === 'plan' ? 'plan' : `s${st.si}-${st.j}`;
+  /* Rapid recall: one or two words per sentence. A word counts only if it's distinctive to that sentence:
+   * a name, a year or a capitalised term, or a word used in at most two sentences of the essay. */
+  const RAPID = {};
+  function distinctive(c, n, si, j) {
+    const key = ekey(c, n, 'all');
+    if (!RAPID[key]) {
+      const counts = new Map();
+      secsOf(week(c, n)).forEach(x => x.sentences.forEach(t => new Set(keywords(t.s).keys()).forEach(k => counts.set(k, (counts.get(k) || 0) + 1))));
+      RAPID[key] = counts;
+    }
+    const text = secsOf(week(c, n))[si].sentences[j].s, K = keywords(text), D = new Map();
+    K.forEach((wt, k) => { if (wt > 1 || (RAPID[key].get(k) || 0) <= 2) D.set(k, wt); });
+    const out = D.size ? D : K;
+    out.disp = new Map(); words(text).forEach(w => { const k = stem(w); if (out.has(k) && !out.disp.has(k)) out.disp.set(k, w); });
+    return out;
+  }
+  function rapidCheck(c, st, answer) {
+    const D = distinctive(c, st.n, st.si, st.j), A = [...new Set(words(answer).map(stem))];
+    const hit = new Set([...D.keys()].filter(k => A.includes(k) || A.some(a => a.length >= 4 && k.length >= 4 && a.slice(0, 3) === k.slice(0, 3) && lev(a, k) <= (k.length >= 8 ? 2 : 1))));
+    return { ok: hit.size > 0, hit, K: D, pct: hit.size ? 1 : 0 };
+  }
   function drillPage(c) {
     const s = session, backTo = s.what === 'theses' || s.what === 'plans' ? 'c-' + c.id : `c-${c.id}-w${s.n}`;
     const backLabel = backTo === 'c-' + c.id ? (c.short || c.name) : 'Week ' + s.n;
@@ -625,6 +650,20 @@
         <div class="planrows">${ps.map((x, i) => `<div class="prow ${res ? (res[i].pct >= .5 ? 'ok' : 'no') : ''}"><label for="pl${i}">Paragraph ${i + 1}</label>
           ${res ? `<div class="pans">${esc(s.plan[i] || '—')}</div><div class="pmodel">${marked(x.title, res[i])}</div>` : `<input id="pl${i}" class="pin" value="${esc((s.plan || [])[i] || '')}" autocomplete="off" autocapitalize="sentences">`}</div>`).join('')}</div>
         <div class="dock">${res ? `<button class="btn" data-act="e-next">Next</button>` : `<button class="btn" data-act="e-plan">Check my plan</button><button class="btn ghost" data-act="e-show">Show me</button>`}</div></div>`;
+    }
+    if (st.t === 'rapid') {
+      const x = secsOf(w)[st.si], t = x.sentences[st.j], res = s.res;
+      const k = x.sentences.indexOf(t) + 1, prev = x.sentences[st.j - 1];
+      return `<div class="screen has-dock drill rapid" style="${cv(c)}">${top}
+        <div class="k">Rapid recall · ${esc(secName(x, w))}</div><h1 class="dq">${esc(x.kind === 'para' ? x.title : w.title)}</h1>
+        ${prev ? `<p class="prevline">${prev.thesis ? '<b>Thesis.</b> ' : ''}${fmt(prev.s, null)}</p>` : ''}
+        <div class="sentno">${t.thesis ? 'The thesis' : `Sentence ${k} of ${x.sentences.length}`} ${tagChips(t.tags)}</div>
+        ${res ? `<div class="verdict ${res.ok ? 'ok' : 'no'}"><b>${res.ok ? 'Got it' : res.shown ? 'Shown' : 'Not that one'}</b><span>${res.shown ? '' : esc(s.answer)}</span></div>
+            <div class="model"><span>The sentence</span>${marked(t.s, res)}</div>
+            <p class="keys">Words that count: ${[...res.K.keys()].map(k => `<b class="${res.hit.has(k) ? 'yes' : ''}">${esc((res.K.disp && res.K.disp.get(k)) || k)}</b>`).join(' ')}</p>`
+          : `<input id="ans" class="ans rapidin" placeholder="One or two words" value="${esc(s.answer)}" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">`}
+        <div class="dock">${res ? `<button class="btn" data-act="e-next">Next</button>` : `<div class="two"><button class="btn ghost" data-act="e-show">Show me</button><button class="btn" data-act="e-check">Check</button></div>`}</div>
+      </div>`;
     }
     const model = stepModel(c, st), res = s.res;
     let head;
@@ -658,11 +697,18 @@
       return;
     }
     const ta = document.getElementById('ans'); if (ta) s.answer = ta.value;
+    if (st.t === 'rapid') {
+      const r = shown ? { ok: false, shown: true, hit: new Set(), K: distinctive(c, st.n, st.si, st.j) } : rapidCheck(c, st, s.answer);
+      s.res = r;
+      if (s.first) { if (r.ok) s.right++; else s.missed.push(st); s.first = false; P.rapid = P.rapid || {}; P.rapid[ekey(c, st.n, `s${st.si}-${st.j}`)] = r.ok ? 'got' : 'again'; save(); }
+      return;
+    }
     const r = shown ? { pct: 0, hit: new Set(), K: keywords(stepModel(c, st)), shown: true } : mark(stepModel(c, st), s.answer);
     r.ok = !shown && r.pct >= PASS; s.res = r;
     if (s.first) { if (r.ok) s.right++; else s.missed.push(st); eSave(c, st.n, stepKey(st), r.ok); s.first = false; }
     else if (r.ok) eSave(c, st.n, stepKey(st), true);
   }
+  const rapidScore = (c, n) => { const ks = []; secsOf(week(c, n)).forEach((x, si) => x.sentences.forEach((t, j) => ks.push((P.rapid || {})[ekey(c, n, `s${si}-${j}`)]))); const tried = ks.filter(Boolean).length; return tried ? ` · last time ${ks.filter(v => v === 'got').length} of ${ks.length}` : ''; };
   function essayWeekPage(c, n) {
     const w = week(c, n);
     if (!P.weeks[wkey(c, n)]) { P.weeks[wkey(c, n)] = Date.now(); save(); }
@@ -677,6 +723,7 @@
       ${src(w.source?.file, w.source?.pages || '')}
       <div class="known"><div class="kbar"><i style="width:${known}%"></i></div><span>${known}% of this essay known</span></div>
       <button class="learn" data-go="c-${c.id}-w${n}-learn"><b>Practise the whole essay</b><span>The thesis, then the plan, then every paragraph, sentence by sentence</span></button>
+      <button class="learn quick" data-go="c-${c.id}-w${n}-rapid"><b>Rapid recall</b><span>One or two key words for each sentence, start to finish${rapidScore(c, n)}</span></button>
       <div class="modes essaymodes">
         <button class="mode" data-go="c-${c.id}-w${n}-thesis"><b>1 · Thesis</b><small>${status(th)}</small></button>
         <button class="mode" data-go="c-${c.id}-w${n}-plan"><b>2 · Plan</b><small>${status(pl)}</small></button>
@@ -942,12 +989,12 @@
     if (rest === 'theses' || rest === 'plans') return { ...r, name: 'drill', what: rest, n: null };
     if (rest.startsWith('case-')) return { ...r, name: 'case', k: rest.slice(5) };
     if (rest === 'all-cards' || rest === 'all-quiz') return { ...r, name: rest.slice(4), n: 'all' };
-    const w = rest.match(/^w(\d+)(?:-(t(\d+)|method|cards|quiz|cases|law|terms|read|learn|thesis|plan|paras|s\d+))?$/);
+    const w = rest.match(/^w(\d+)(?:-(t(\d+)|method|cards|quiz|cases|law|terms|read|learn|thesis|plan|paras|rapid|s\d+|r\d+))?$/);
     if (!w || !week(c, +w[1])) return { ...r, name: 'course' };
     const n = +w[1];
     if (!w[2]) return { ...r, name: 'week', n };
     if (w[2] === 'read') return { ...r, name: 'read', n };
-    if (/^(learn|thesis|plan|paras|s\d+)$/.test(w[2])) return { ...r, name: 'drill', what: w[2], n };
+    if (/^(learn|thesis|plan|paras|rapid|s\d+|r\d+)$/.test(w[2])) return { ...r, name: 'drill', what: w[2], n };
     if (w[3] != null) return { ...r, name: 'topic', n, ti: +w[3] };
     return { ...r, name: w[2] === 'cases' ? 'wcases' : w[2] === 'law' ? 'wlaw' : w[2], n };
   }
@@ -1009,8 +1056,8 @@
       const ta = document.getElementById('ans');
       if (ta) {
         ta.addEventListener('input', () => { session.answer = ta.value; });
-        ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); drillCheck(c, false); render(); } });
-        if (matchMedia('(hover: hover)').matches) ta.focus();
+        ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (ta.value.trim()) { drillCheck(c, false); render(); } } });
+        if (matchMedia('(hover: hover)').matches || ta.classList.contains('rapidin')) ta.focus();
       }
       document.querySelectorAll('.pin').forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const nx = el.closest('.prow').nextElementSibling?.querySelector('.pin'); if (nx) nx.focus(); else { drillCheck(c, false); render(); } } }));
     }
@@ -1018,6 +1065,12 @@
     current = r;
     checkRewards(); setTimeout(showUnlock, 350);
   }
+  // After an answer is marked, Enter goes to the next one, so a whole essay can be done from the keyboard.
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.shiftKey || !session || session.kind !== 'essay' || !session.res || document.querySelector('.unlock')) return;
+    if (e.target.closest && e.target.closest('textarea, input')) return;
+    e.preventDefault(); Object.assign(session, { i: session.i + 1, res: null, answer: '', hint: false, first: true, plan: null }); render(); window.scrollTo(0, 0);
+  });
   addEventListener('hashchange', () => {
     if (session && session.route !== location.hash.slice(1)) session = null;
     if (practise && !location.hash.endsWith('-method')) practise = null;

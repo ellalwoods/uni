@@ -76,7 +76,7 @@ Not every course is a law course. Arts courses (`type: 'arts'` in `content/cours
 
 1. **Thesis.** 2. **Plan:** the theme of each body paragraph, in order. 3. **Paragraphs:** the introduction, each body paragraph and the conclusion, one sentence at a time.
 
-Marking ignores common words, counts names, years and capitalised terms double, and forgives word endings and small typos; 60% of the weighted key words is "substantially right", and the user can mark an answer as right herself. Progress is per sentence in `progress.essay`.
+Marking ignores common words, counts names, years and capitalised terms double, and forgives word endings and small typos; 60% of the weighted key words is "substantially right", and the user can mark an answer as right herself. Progress is per sentence in `progress.essay`. **Rapid recall** is a lighter mode: one or two words per sentence, accepted if they match a word distinctive to that sentence (a name, year or capitalised term, or a word in at most two of the essay's sentences); results go in `progress.rapid` and don't count a sentence as known.
 
 ```js
 UNI.addWeek('genderpoliticalleadership', 1, {

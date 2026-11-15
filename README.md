@@ -36,6 +36,8 @@ Arts courses, like Gender & Political Leadership, don't have cases, legislation 
 
 Answers are marked on key words (names, years and terms count most, and small typos are fine): 60% is substantially right, and **I had it** marks an answer right yourself. **Hint** shows the first few words, and **Show me** reveals the sentence. You can practise the whole essay, one stage, or one paragraph, and the course page has **All theses** and **All plans** across every essay. **Read the essay** shows it in full with its source tags.
 
+**Rapid recall** is the quick version: go through the essay sentence by sentence and type just one or two key words for each. A word counts if it's distinctive to that sentence (a name, a year, or a word used in no more than two sentences of the essay), so a general word like "representation" won't pass. Enter checks your answer and Enter again moves on.
+
 ## Managing courses
 
 - **Add a course** with the **+** button on the Courses screen (or in the sidebar on a computer): give it a name, an optional short name, a colour and the number of weeks.
