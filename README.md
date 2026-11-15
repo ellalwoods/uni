@@ -26,6 +26,16 @@ A study app for my university courses. The name follows Duolingo, Duovino and Du
 
 22 milestones across the semester, each earned by real work: adding a week's notes to every course (week 1, 4, 7, 10 and the full semester), flashcards answered "Got it" (100, 500, 1,000), weeks where every card is known, perfect quizzes, practising problem methods from memory, whole-course revision, and the final bow. Each one unlocks a new disco ball, with a little celebration that never interrupts a flashcard round or quiz. Choose which ball to wear in **the Ballroom** (tap the logo, or Settings): it shows in the header, the sidebar and the Hello screen. Rewards sync with your progress. Resetting progress resets them too.
 
+## Essays (arts courses)
+
+Arts courses, like Gender & Political Leadership, don't have cases, legislation or methods. Each week is an exam essay to memorise:
+
+1. **Thesis:** type it from memory.
+2. **Plan:** type the point of each paragraph, in order.
+3. **Paragraphs:** the introduction, each paragraph and the conclusion, one sentence at a time.
+
+Answers are marked on key words (names, years and terms count most, and small typos are fine): 60% is substantially right, and **I had it** marks an answer right yourself. **Hint** shows the first few words, and **Show me** reveals the sentence. You can practise the whole essay, one stage, or one paragraph, and the course page has **All theses** and **All plans** across every essay. **Read the essay** shows it in full with its source tags.
+
 ## Managing courses
 
 - **Add a course** with the **+** button on the Courses screen (or in the sidebar on a computer): give it a name, an optional short name, a colour and the number of weeks.

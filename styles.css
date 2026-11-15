@@ -415,3 +415,52 @@ blockquote cite { display: block; font-style: normal; font-size: 12.5px; color: 
 @keyframes fall { 100% { transform: translateY(110vh) rotate(540deg); } }
 @media (min-width: 960px) { .ucard { padding-top: 80px; padding-bottom: 60px; } }
 @media (prefers-reduced-motion: reduce) { .drop, .spark, .confetti i, .unlock { animation: none !important; } .confetti { display: none; } }
+
+/* ---------- essays ---------- */
+.part { font-size: 13.5px; color: var(--soft); font-style: italic; margin: 6px 0 0; }
+.known { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: var(--soft); }
+.kbar { flex: 1; height: 6px; border-radius: 3px; background: var(--hair); overflow: hidden; }
+.kbar i { display: block; height: 100%; background: var(--c); border-radius: 3px; }
+.learn { display: flex; flex-direction: column; width: 100%; margin-top: 16px; padding: 16px 18px; border-radius: 18px; background: var(--c); color: #fff; text-align: left; }
+.learn b { font-size: 17px; }
+.learn span { font-size: 13px; opacity: .9; margin-top: 2px; }
+.okdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #00a95c; margin-right: 5px; vertical-align: 1px; }
+.esecs small { font-size: 12px; }
+.stages { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.stages span { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #f4f3ef; color: var(--soft); }
+.stages span.on { background: var(--c); color: #fff; }
+.stages span.done { color: var(--cd); }
+.drill .k { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--cd); margin-top: 18px; }
+.dq { font-family: var(--display); font-weight: 800; font-size: 23px; line-height: 1.15; letter-spacing: -.01em; margin: 6px 0 0; text-wrap: balance; }
+.sofar { margin: 12px 0 0; padding: 10px 12px 10px 30px; border-radius: 12px; background: #f8f8f6; font-size: 13.5px; line-height: 1.45; color: #4a4944; max-height: 132px; overflow-y: auto; overscroll-behavior: contain; -webkit-mask: linear-gradient(transparent, #000 22px); mask: linear-gradient(transparent, #000 22px); }
+.essaymodes .mode b { font-size: 14px; }
+.sofar li { margin: 4px 0; }
+.sofar li.th { color: var(--ink); }
+.sentno { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 16px 0 8px; font-weight: 700; font-size: 14px; }
+.tag { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; font-weight: 800; padding: 2px 6px; border-radius: 4px; color: #fff; vertical-align: 2px; }
+.t-lecture { background: #1f7f8f; } .t-theory { background: #c98a1b; } .t-example { background: #2e8b3e; }
+.t-beyond { background: #7c4bb0; } .t-reading { background: #3a5fae; } .t-counter { background: #c4322d; }
+.ans { width: 100%; font: inherit; font-size: 16px; line-height: 1.5; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--hair); background: #fafaf8; resize: vertical; margin-top: 4px; }
+.ans:focus { outline: none; border-color: var(--c); background: #fff; }
+.hint { font-size: 14px; color: var(--soft); margin: 8px 0 0; }
+.verdict { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 10px; padding: 12px 14px; border-radius: 14px; background: #fdecec; }
+.verdict.ok { background: #e9f8f0; } .verdict.near { background: #fff6dd; }
+.verdict b { font-size: 16px; } .verdict span { font-size: 13px; color: var(--soft); }
+.yours, .model { margin-top: 12px; font-size: 15px; line-height: 1.55; }
+.yours span, .model span { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--soft); margin-bottom: 3px; }
+.yours { color: #4a4944; }
+mark.kh { background: #d6f3e2; color: inherit; border-radius: 3px; padding: 0 2px; }
+mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 3px; padding: 0 2px; }
+.hadit { display: block; margin: 2px auto 0; }
+.planrows { display: grid; gap: 10px; margin-top: 12px; }
+.prow label { display: block; font-size: 12px; font-weight: 700; color: var(--soft); margin-bottom: 4px; }
+.pin { width: 100%; font: inherit; font-size: 16px; padding: 11px 14px; border-radius: 12px; border: 1.5px solid var(--hair); background: #fafaf8; }
+.pin:focus { outline: none; border-color: var(--c); background: #fff; }
+.prow.ok, .prow.no { padding: 10px 12px; border-radius: 12px; background: #e9f8f0; }
+.prow.no { background: #fdecec; }
+.pans { font-size: 14px; color: #4a4944; }
+.pmodel { font-size: 15px; font-weight: 600; margin-top: 3px; }
+.essay ul { list-style: none; padding: 0; }
+.essay li { padding: 7px 0; border-bottom: 1px solid var(--hair); }
+.thesis { margin: 10px 0; padding: 12px 14px; border-left: 4px solid var(--c); background: color-mix(in srgb, var(--c) 8%, #fff); border-radius: 0 12px 12px 0; }
+.thesis b { display: block; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--cd); margin-bottom: 2px; }

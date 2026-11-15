@@ -129,10 +129,11 @@
       if (!UNI.byId[a.id]) UNI.addCourse({ id: a.id, mine: true });
       const c = UNI.byId[a.id];
       if (c.mine) c.orig = { name: a.name, short: a.short, colour: a.colour, weeks: a.weeks };
+      else c.fromApp = { name: a.name, short: a.short, colour: a.colour };
     });
     UNI.courses.forEach(c => {
       if (!c.orig) c.orig = { name: c.name, short: c.short, colour: c.colour, weeks: c.weeks };
-      Object.assign(c, c.orig, CFG.edits[c.id] || {});
+      Object.assign(c, c.orig, c.fromApp || {}, CFG.edits[c.id] || {});
       delete IDX[c.id];
     });
   }
@@ -222,7 +223,9 @@
   const src = (file, extra) => file ? `<div class="src"><span class="doc"></span><span>${esc(file)}${extra ? ' · ' + esc(extra) : ''}</span></div>` : '';
   const prog = (i, n) => { const m = Math.min(n, 40); return `<div class="prog">${Array.from({ length: m }, (_, k) => `<i class="${k < Math.round(i / n * m) ? 'd' : ''}"></i>`).join('')}</div>`; };
   const searchBtn = c => `<button class="iconbtn" data-go="c-${c.id}-search" aria-label="Search ${esc(c.short || c.name)}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>`;
-  const tabs = (c, on) => `<div class="tabs" role="tablist">${[['', 'Weeks'], ['cases', 'Cases'], ['law', 'Legislation'], ['methods', 'Methods']].map(([k, l]) => `<button role="tab" aria-selected="${on === k}" data-go="c-${c.id}${k ? '-' + k : ''}">${l}</button>`).join('')}</div>`;
+  const isArts = c => c.type === 'arts';
+  const isEssay = w => !!(w && w.essay);
+  const tabs = (c, on) => isArts(c) ? '' : `<div class="tabs" role="tablist">${[['', 'Weeks'], ['cases', 'Cases'], ['law', 'Legislation'], ['methods', 'Methods']].map(([k, l]) => `<button role="tab" aria-selected="${on === k}" data-go="c-${c.id}${k ? '-' + k : ''}">${l}</button>`).join('')}</div>`;
   const where = (c, n, ti) => { const w = week(c, n), t = topicsOf(w)[ti]; return `Week ${n}${t ? ' · ' + esc(t.title) : ''}`; };
   let toastTimer;
   function toast(msg) {
@@ -255,7 +258,7 @@
   /* ---------- course: weeks, cases, legislation, methods, search ---------- */
   function courseHead(c, tab) {
     const a = addedWeeks(c).length;
-    return `<div class="bar">${back('home', 'Courses')}<span class="barbtns"><button class="textbtn" data-go="edit-${c.id}">Edit</button>${searchBtn(c)}</span></div>
+    return `<div class="bar">${back('home', 'Courses')}<span class="barbtns"><button class="textbtn" data-go="edit-${c.id}">Edit</button>${isArts(c) ? '' : searchBtn(c)}</span></div>
       <h1 class="ctitle">${esc(c.name)}</h1>
       <div class="meta" style="margin-top:6px">${a} of ${c.weeks} weeks added</div>
       ${tabs(c, tab)}`;
@@ -271,7 +274,8 @@
     return `<div class="screen ${a ? 'has-dock' : ''}" style="${cv(c)}">${courseHead(c, '')}
       <div class="grid">${cells}</div>
       <div class="key"><span><i style="background:var(--c)"></i>Studied</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--c)"></i>New</span><span><i style="background:var(--faint)"></i>Not added yet</span></div>
-      ${a ? `<div class="dock"><div class="two"><button class="btn" data-go="c-${c.id}-all-cards">Flashcards</button><button class="btn ghost" data-go="c-${c.id}-all-quiz">Quiz</button></div><div class="dockcap">From all ${plural(a, 'week')} added</div></div>`
+      ${a && addedWeeks(c).every(n => isEssay(week(c, n))) ? `<div class="dock"><div class="two"><button class="btn" data-go="c-${c.id}-theses">All theses</button><button class="btn ghost" data-go="c-${c.id}-plans">All plans</button></div><div class="dockcap">Recall the thesis or the plan of every essay added</div></div>`
+        : a ? `<div class="dock"><div class="two"><button class="btn" data-go="c-${c.id}-all-cards">Flashcards</button><button class="btn ghost" data-go="c-${c.id}-all-quiz">Quiz</button></div><div class="dockcap">From all ${plural(a, 'week')} added</div></div>`
           : `<p class="note">Nothing to study yet. Weeks show up here once their notes are added.</p>`}
     </div>`;
   }
@@ -522,6 +526,179 @@
   }
   const emptyStudy = (c, backTo, label, msg) => `<div class="screen" style="${cv(c)}"><div class="bar">${back(backTo, label)}<span></span></div><p class="note" style="margin-top:30px">${msg}</p></div>`;
 
+  /* ---------- essays (arts courses): thesis, plan, then each paragraph sentence by sentence ----------
+   * Answers are typed and marked on key words: common words are ignored, names, years and capitalised
+   * terms count double, word endings and small typos are forgiven. 60% of the weighted key words is
+   * "substantially right". */
+  const STOP = new Set(('a an the and or but if of to in on at by for with from as is are was were be been being it its this that these those which who whom whose what when where while there their they them he she his her hers we our you your i not no so than then also can could would should may might must will shall do does did has have had into onto over under about after before between through because only more most less much many some such each other both all any very just own same too up out off once again further how why whether yet still even').split(' '));
+  const PASS = .6, NEAR = .4;
+  const words = t => (String(t).replace(/\*/g, '').replace(/[’‘]/g, "'").replace(/'s\b/gi, '').match(/[A-Za-z0-9]+/g) || []);
+  const stem = w => { w = w.toLowerCase(); if (w.length > 5 && w.endsWith('ies')) return w.slice(0, -3) + 'y'; for (const x of ['ing', 'ed', 'es', 's', 'ly']) if (w.length > x.length + 3 && w.endsWith(x)) return w.slice(0, -x.length); return w; };
+  function keywords(model) {
+    const K = new Map();
+    words(model).forEach((w, i) => {
+      const l = w.toLowerCase(); if (STOP.has(l) || l.length < 2) return;
+      const big = /^\d/.test(w) || (i > 0 && /^[A-Z]/.test(w)), k = stem(w);
+      K.set(k, Math.max(K.get(k) || 0, big ? 2 : 1));
+    });
+    return K;
+  }
+  function lev(a, b) {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+  function mark(model, answer) {
+    const K = keywords(model), A = [...new Set(words(answer).map(stem))];
+    let tot = 0, got = 0; const hit = new Set();
+    K.forEach((wt, k) => {
+      tot += wt;
+      if (A.includes(k) || A.some(a => a.length >= 4 && k.length >= 4 && a.slice(0, 3) === k.slice(0, 3) && lev(a, k) <= (k.length >= 8 ? 2 : 1))) { got += wt; hit.add(k); }
+    });
+    return { pct: tot ? got / tot : 0, hit, K };
+  }
+  // The model text with its key words marked: found in your answer, or missed.
+  function marked(model, res) {
+    return esc(String(model).replace(/\*/g, '')).replace(/[A-Za-z0-9]+/g, w => {
+      const k = stem(w);
+      if (!res.K.has(k) || STOP.has(w.toLowerCase())) return w;
+      return `<mark class="${res.hit.has(k) ? 'kh' : 'km'}">${w}</mark>`;
+    });
+  }
+  const TAGL = { lecture: 'Lecture', theory: 'Theory', example: 'Example', beyond: 'Beyond', reading: 'Reading', counter: 'Counter' };
+  const tagChips = tags => (tags || []).map(t => `<span class="tag t-${t}">${TAGL[t] || esc(t)}</span>`).join('');
+  const secsOf = w => w.essay.sections;
+  const parasOf = w => secsOf(w).filter(x => x.kind === 'para');
+  const thesisOf = w => { for (const x of secsOf(w)) for (const t of x.sentences) if (t.thesis) return t.s; return ''; };
+  const secName = (x, w) => x.kind === 'para' ? `Paragraph ${parasOf(w).indexOf(x) + 1}` : x.title;
+  const ekey = (c, n, k) => `${c.id}:${n}:${k}`;
+  const sentKey = (si, j, t) => t.thesis ? 'thesis' : `s${si}-${j}`;
+  const eRec = (c, n, k) => ((P.essay || {})[ekey(c, n, k)] || {});
+  const eKeys = (c, n) => { const w = week(c, n), ks = ['plan']; secsOf(w).forEach((x, si) => x.sentences.forEach((t, j) => ks.push(sentKey(si, j, t)))); return ks; };
+  const essayKnown = (c, n) => { const ks = eKeys(c, n); return ks.filter(k => eRec(c, n, k).last === 'got').length / ks.length; };
+  function eSave(c, n, k, ok) {
+    P.essay = P.essay || {};
+    const r = P.essay[ekey(c, n, k)] || { got: 0, again: 0 };
+    r[ok ? 'got' : 'again']++; r.last = ok ? 'got' : 'again'; r.at = Date.now(); P.essay[ekey(c, n, k)] = r;
+    if (ok) ST().got = (ST().got || 0) + 1;
+    save();
+  }
+  // Steps: { t: 'thesis' | 'plan' | 'sent', n, si, j }
+  function drillSteps(c, what, n) {
+    const steps = [], thesis = m => steps.push({ t: 'thesis', n: m }), plan = m => steps.push({ t: 'plan', n: m });
+    const sents = (m, only) => secsOf(week(c, m)).forEach((x, si) => { if (only != null && si !== only) return; x.sentences.forEach((t, j) => { if (!t.thesis) steps.push({ t: 'sent', n: m, si, j }); }); });
+    if (what === 'learn') { thesis(n); plan(n); sents(n); }
+    else if (what === 'thesis') thesis(n);
+    else if (what === 'plan') plan(n);
+    else if (what === 'paras') sents(n);
+    else if (what === 'theses') addedWeeks(c).filter(m => isEssay(week(c, m))).forEach(thesis);
+    else if (what === 'plans') addedWeeks(c).filter(m => isEssay(week(c, m))).forEach(plan);
+    else if (/^s\d+$/.test(what)) sents(n, +what.slice(1));
+    return steps;
+  }
+  function startDrill(c, what, n, route) {
+    if (n !== 'all' && n != null && !P.weeks[wkey(c, n)]) { P.weeks[wkey(c, n)] = Date.now(); save(); }
+    session = { route, kind: 'essay', what, n, steps: drillSteps(c, what, n), i: 0, res: null, answer: '', hint: false, first: true, right: 0, missed: [] };
+  }
+  const stepModel = (c, st) => { const w = week(c, st.n); return st.t === 'thesis' ? thesisOf(w) : secsOf(w)[st.si].sentences[st.j].s; };
+  const stepKey = st => st.t === 'thesis' ? 'thesis' : st.t === 'plan' ? 'plan' : `s${st.si}-${st.j}`;
+  function drillPage(c) {
+    const s = session, backTo = s.what === 'theses' || s.what === 'plans' ? 'c-' + c.id : `c-${c.id}-w${s.n}`;
+    const backLabel = backTo === 'c-' + c.id ? (c.short || c.name) : 'Week ' + s.n;
+    if (!s.steps.length) return emptyStudy(c, backTo, backLabel, 'Nothing to practise here yet.');
+    if (s.i >= s.steps.length) {
+      return `<div class="screen result" style="${cv(c)}">
+        <div class="bar">${back(backTo, backLabel)}<span class="meta">Done</span></div>
+        <div class="big">${s.right}/${s.steps.length}</div><p>${s.right === s.steps.length ? 'Every one right first time.' : `You had ${s.right} of ${s.steps.length} right first time.`}</p>
+        <div class="dock">${s.missed.length ? `<button class="btn" data-act="e-missed">Practise the ${plural(s.missed.length, 'one')} you missed</button>` : ''}
+          <button class="btn ${s.missed.length ? 'ghost' : ''}" data-go="${backTo}">Done</button></div></div>`;
+    }
+    const st = s.steps[s.i], w = week(c, st.n), stage = st.t === 'thesis' ? 0 : st.t === 'plan' ? 1 : 2;
+    const top = `<div class="bar">${back(backTo, backLabel)}<span class="meta">${s.i + 1} of ${s.steps.length}</span></div>${prog(s.i, s.steps.length)}
+      ${s.what === 'learn' ? `<div class="stages">${['Thesis', 'Plan', 'Paragraphs'].map((l, k) => `<span class="${k === stage ? 'on' : k < stage ? 'done' : ''}">${k + 1} · ${l}</span>`).join('')}</div>` : ''}`;
+    if (st.t === 'plan') {
+      const ps = parasOf(w), res = s.res;
+      return `<div class="screen has-dock drill" style="${cv(c)}">${top}
+        <div class="k">Week ${st.n} · The plan</div><h1 class="dq">${esc(w.title)}</h1>
+        <p class="note" style="margin-top:6px">Type the point of each paragraph, in order.</p>
+        <div class="planrows">${ps.map((x, i) => `<div class="prow ${res ? (res[i].pct >= .5 ? 'ok' : 'no') : ''}"><label for="pl${i}">Paragraph ${i + 1}</label>
+          ${res ? `<div class="pans">${esc(s.plan[i] || '—')}</div><div class="pmodel">${marked(x.title, res[i])}</div>` : `<input id="pl${i}" class="pin" value="${esc((s.plan || [])[i] || '')}" autocomplete="off" autocapitalize="sentences">`}</div>`).join('')}</div>
+        <div class="dock">${res ? `<button class="btn" data-act="e-next">Next</button>` : `<button class="btn" data-act="e-plan">Check my plan</button><button class="btn ghost" data-act="e-show">Show me</button>`}</div></div>`;
+    }
+    const model = stepModel(c, st), res = s.res;
+    let head;
+    if (st.t === 'thesis') head = `<div class="k">Week ${st.n} · The thesis</div><h1 class="dq">${esc(w.title)}</h1><p class="note" style="margin-top:4px">${esc(w.part || '')}</p>`;
+    else {
+      const x = secsOf(w)[st.si], before = x.sentences.slice(0, st.j);
+      const asked = x.sentences.filter(t => !t.thesis), k = asked.indexOf(x.sentences[st.j]) + 1;
+      head = `<div class="k">Week ${st.n} · ${esc(secName(x, w))}</div><h1 class="dq">${esc(x.kind === 'para' ? x.title : w.title)}</h1>
+        ${before.length ? `<ol class="sofar">${before.map(t => `<li class="${t.thesis ? 'th' : ''}">${t.thesis ? '<b>Thesis.</b> ' : ''}${fmt(t.s, null)}</li>`).join('')}</ol>` : ''}
+        <div class="sentno">Sentence ${k} of ${asked.length} ${tagChips(x.sentences[st.j].tags)}</div>`;
+    }
+    const verdict = res ? (res.ok ? 'ok' : res.pct >= NEAR ? 'near' : 'no') : '';
+    return `<div class="screen has-dock drill" style="${cv(c)}">${top}${head}
+      ${res ? `<div class="verdict ${verdict}"><b>${res.ok ? (res.had ? 'Marked as right' : 'Substantially right') : res.pct >= NEAR ? 'Nearly' : 'Not yet'}</b><span>${res.shown ? 'Shown' : Math.round(res.pct * 100) + '% of the key words'}</span></div>
+        ${res.shown ? '' : `<div class="yours"><span>You wrote</span>${esc(s.answer) || '—'}</div>`}
+        <div class="model"><span>The essay says</span>${marked(model, res)}</div>`
+        : `<textarea id="ans" class="ans" rows="5" placeholder="${st.t === 'thesis' ? 'Type the thesis' : 'Type the sentence'}" autocapitalize="sentences" spellcheck="true">${esc(s.answer)}</textarea>
+           ${s.hint ? `<p class="hint">Starts: “${esc(words(model).slice(0, 3).join(' '))}…”</p>` : ''}`}
+      <div class="dock">${res ? (res.ok ? `<button class="btn" data-act="e-next">Next</button>`
+          : `<div class="two"><button class="btn ghost" data-act="e-retry">Try again</button><button class="btn" data-act="e-next">Next</button></div>${res.shown ? '' : `<button class="textbtn hadit" data-act="e-had">I had it: mark as right</button>`}`)
+        : `<button class="btn" data-act="e-check">Check</button><div class="two"><button class="btn ghost" data-act="e-hint" ${s.hint ? 'disabled' : ''}>Hint</button><button class="btn ghost" data-act="e-show">Show me</button></div>`}</div>
+    </div>`;
+  }
+  function drillCheck(c, shown) {
+    const s = session, st = s.steps[s.i], w = week(c, st.n);
+    if (st.t === 'plan') {
+      s.plan = parasOf(w).map((_, i) => (document.getElementById('pl' + i) || {}).value || '');
+      s.res = parasOf(w).map((x, i) => shown ? { pct: 0, hit: new Set(), K: keywords(x.title) } : mark(x.title, s.plan[i]));
+      const ok = !shown && s.res.every(r => r.pct >= .5);
+      if (s.first) { if (ok) s.right++; else s.missed.push(st); eSave(c, st.n, 'plan', ok); s.first = false; }
+      return;
+    }
+    const ta = document.getElementById('ans'); if (ta) s.answer = ta.value;
+    const r = shown ? { pct: 0, hit: new Set(), K: keywords(stepModel(c, st)), shown: true } : mark(stepModel(c, st), s.answer);
+    r.ok = !shown && r.pct >= PASS; s.res = r;
+    if (s.first) { if (r.ok) s.right++; else s.missed.push(st); eSave(c, st.n, stepKey(st), r.ok); s.first = false; }
+    else if (r.ok) eSave(c, st.n, stepKey(st), true);
+  }
+  function essayWeekPage(c, n) {
+    const w = week(c, n);
+    if (!P.weeks[wkey(c, n)]) { P.weeks[wkey(c, n)] = Date.now(); save(); }
+    const known = Math.round(essayKnown(c, n) * 100), th = eRec(c, n, 'thesis').last, pl = eRec(c, n, 'plan').last;
+    const secs = secsOf(w);
+    const status = l => l === 'got' ? '<i class="okdot"></i>Known' : l === 'again' ? 'Keep going' : 'Not tried yet';
+    return `<div class="screen" style="${cv(c)}">
+      <div class="bar">${back('c-' + c.id, c.short || c.name)}<span class="meta">Week ${n} of ${c.weeks}</span></div>
+      <div class="wnum">${pad(n)}</div>
+      <h1 class="wtitle">${esc(w.title)}</h1>
+      ${w.part ? `<p class="part">${esc(w.part)}</p>` : ''}
+      ${src(w.source?.file, w.source?.pages || '')}
+      <div class="known"><div class="kbar"><i style="width:${known}%"></i></div><span>${known}% of this essay known</span></div>
+      <button class="learn" data-go="c-${c.id}-w${n}-learn"><b>Practise the whole essay</b><span>The thesis, then the plan, then every paragraph, sentence by sentence</span></button>
+      <div class="modes essaymodes">
+        <button class="mode" data-go="c-${c.id}-w${n}-thesis"><b>1 · Thesis</b><small>${status(th)}</small></button>
+        <button class="mode" data-go="c-${c.id}-w${n}-plan"><b>2 · Plan</b><small>${status(pl)}</small></button>
+        <button class="mode" data-go="c-${c.id}-w${n}-paras"><b>3 · Paragraphs</b><small>All ${secs.length}, in order</small></button>
+      </div>
+      <div class="sub">Paragraph by paragraph</div>
+      <ol class="topics esecs">${secs.map((x, si) => { const ks = x.sentences.map((t, j) => sentKey(si, j, t)), k = ks.filter(q => eRec(c, n, q).last === 'got').length;
+        return `<li><button data-go="c-${c.id}-w${n}-s${si}"><span>${esc(secName(x, w))}${x.kind === 'para' ? ' · ' + esc(x.title) : ''}</span><small>${k} of ${ks.length} sentences known</small></button></li>`; }).join('')}</ol>
+      <button class="btn ghost" style="margin-top:18px" data-go="c-${c.id}-w${n}-read">Read the essay</button>
+    </div>`;
+  }
+  function readPage(c, n) {
+    const w = week(c, n);
+    return `<div class="screen" style="${cv(c)}">
+      <div class="bar">${back(`c-${c.id}-w${n}`, 'Week ' + n)}<span class="meta">The essay</span></div>
+      <h1 class="wtitle" style="margin-top:14px">${esc(w.title)}</h1>
+      ${w.part ? `<p class="part">${esc(w.part)}</p>` : ''}${src(w.source?.file, w.source?.pages || '')}
+      <div class="prose essay">${secsOf(w).map(x => `<h3 class="bh">${esc(secName(x, w))}${x.kind === 'para' ? ' · ' + esc(x.title) : ''}</h3>
+        <ul>${x.sentences.map(t => t.thesis ? `</ul><div class="thesis"><b>Thesis</b>${fmt(t.s, null)}</div><ul>` : `<li>${fmt(t.s, null)} ${tagChips(t.tags)}</li>`).join('')}</ul>`).join('')}</div>
+    </div>`;
+  }
+
   /* ---------- settings ---------- */
   function settingsPage() {
     const data = JSON.stringify({ app: 'uni', v: 2, progress: P, courses: CFG });
@@ -614,9 +791,16 @@
   // Every course has week n added (n can depend on the course's length).
   const allHave = f => { const cs = courses(); return cs.length > 0 && cs.every(c => week(c, Math.min(c.weeks, f(c)))); };
   const allCards = () => courses().flatMap(c => addedWeeks(c).flatMap(n => (week(c, n).cards || []).map(card => [c, n, card])));
-  const weekSwept = (c, n) => { const cs = week(c, n).cards || []; return cs.length > 0 && cs.every(card => known(c, n, card)); };
+  const weekSwept = (c, n) => { if (isEssay(week(c, n))) return essayKnown(c, n) === 1; const cs = week(c, n).cards || []; return cs.length > 0 && cs.every(card => known(c, n, card)); };
   const sweptWeeks = () => courses().reduce((t, c) => t + addedWeeks(c).filter(n => weekSwept(c, n)).length, 0);
-  const courseKnown = c => { const cs = addedWeeks(c).flatMap(n => (week(c, n).cards || []).map(card => known(c, n, card))); return cs.length ? cs.filter(Boolean).length / cs.length : 0; };
+  const courseKnown = c => {
+    const ks = addedWeeks(c).flatMap(n => isEssay(week(c, n)) ? eKeys(c, n).map(k => eRec(c, n, k).last === 'got') : (week(c, n).cards || []).map(card => known(c, n, card)));
+    return ks.length ? ks.filter(Boolean).length / ks.length : 0;
+  };
+  const hasQuiz = c => addedWeeks(c).some(n => (week(c, n).quiz || []).length);
+  const quizCourses = () => courses().filter(hasQuiz);
+  const essayCourses = () => courses().filter(c => addedWeeks(c).some(n => isEssay(week(c, n))));
+  const thesesKnown = c => addedWeeks(c).filter(n => isEssay(week(c, n))).every(n => eRec(c, n, 'thesis').last === 'got');
   const full = c => addedWeeks(c).length === c.weeks;
   const perfectWeek = c => addedWeeks(c).some(n => { const q = P.quiz[wkey(c, n)]; return q && q.best === q.of && q.of > 0; });
   const methodsOf = c => addedWeeks(c).filter(n => week(c, n).method);
@@ -625,24 +809,24 @@
   const MILESTONES = [
     ['opening', 'Opening night', 'The first week of notes added to any course', () => totalAdded() > 0],
     ['week1', 'Week one, all in', 'Week 1 added for every course (two or more)', () => courses().length >= 2 && allHave(() => 1)],
-    ['got100', 'First 100', '100 flashcards answered “Got it”', () => got() >= 100],
-    ['fullmarks', 'Full marks', 'A perfect score on a week’s quiz', () => courses().some(perfectWeek)],
+    ['got100', 'First 100', '100 flashcards or essay sentences right', () => got() >= 100],
+    ['fullmarks', 'Full marks', 'A perfect score on a week’s quiz, or a whole essay recalled', () => courses().some(perfectWeek) || essayCourses().some(c => addedWeeks(c).some(n => isEssay(week(c, n)) && essayKnown(c, n) === 1))],
     ['method', 'Method actor', 'A problem-question method practised from memory, all the way through', () => Object.keys(P.methods || {}).length > 0],
     ['month', 'A month in', 'Week 4 added for every course', () => allHave(() => 4)],
     ['sweep', 'Clean sweep', 'Every flashcard in a week known', () => sweptWeeks() >= 1],
     ['caughtup', 'Caught up', 'At least 6 weeks added, and every one of them opened', () => totalAdded() >= 6 && courses().every(c => newCount(c) === 0)],
     ['halfway', 'Halfway', 'Week 7 added for every course', () => allHave(c => Math.ceil(c.weeks / 2))],
-    ['got500', '500 cards', '500 flashcards answered “Got it”', () => got() >= 500],
+    ['got500', '500 cards', '500 flashcards or essay sentences right', () => got() >= 500],
     ['comeback', 'Comeback', 'Full marks on a quiz you once scored under half on', () => !!(P.stats || {}).comeback],
     ['sweep5', 'Five sweeps', 'Five weeks with every flashcard known', () => sweptWeeks() >= 5],
     ['homestretch', 'Home stretch', 'Week 10 added for every course', () => allHave(c => Math.ceil(c.weeks * 10 / 13))],
     ['mixtape', 'Mixtape', 'A round of flashcards from all weeks finished', () => Object.keys(P.mix || {}).length > 0],
-    ['got1000', '1,000 cards', '1,000 flashcards answered “Got it”', () => got() >= 1000],
+    ['got1000', '1,000 cards', '1,000 flashcards or essay sentences right', () => got() >= 1000],
     ['encore', 'Encore', 'Every card right first time in a week you opened over 3 weeks ago', () => !!(P.stats || {}).encore],
     ['methodsall', 'Method in the madness', 'Every problem method in a course practised (at least 3)', () => courses().some(c => { const ms = methodsOf(c); return ms.length >= 3 && ms.every(n => (P.methods || {})[wkey(c, n)]); })],
-    ['marksall', 'Full marks everywhere', 'A perfect week’s quiz in every course (two or more)', () => courses().length >= 2 && courses().every(perfectWeek)],
+    ['marksall', 'Full marks everywhere', 'A perfect week’s quiz in every course that has quizzes (two or more)', () => quizCourses().length >= 2 && quizCourses().every(perfectWeek)],
     ['fullsem', 'Full semester', 'Every week added for every course', () => courses().length > 0 && courses().every(full)],
-    ['examready', 'Exam ready', '80% or more on a whole-course quiz, in every course', () => courses().length > 0 && courses().every(c => ((P.exam || {})[c.id] || 0) >= .8)],
+    ['examready', 'Exam ready', '80% or more on a whole-course quiz in every course, and every essay’s thesis known', () => courses().length > 0 && quizCourses().every(c => ((P.exam || {})[c.id] || 0) >= .8) && essayCourses().every(thesesKnown)],
     ['mastered', 'Mastered', 'Every flashcard in a whole course known, with all its weeks added', () => courses().some(c => full(c) && courseKnown(c) === 1)],
     ['finalbow', 'Final bow', 'Every course fully added, with 80% of its flashcards known', () => courses().length > 0 && courses().every(c => full(c) && courseKnown(c) >= .8)],
   ];
@@ -657,7 +841,7 @@
     save();
   }
   // Don't interrupt a flashcard or quiz in progress; show unlocks between things.
-  const busy = () => session && ((session.kind === 'cards' && session.started && session.queue.length) || (session.kind === 'quiz' && session.i < session.items.length));
+  const busy = () => session && ((session.kind === 'cards' && session.started && session.queue.length) || (session.kind === 'quiz' && session.i < session.items.length) || (session.kind === 'essay' && session.i < session.steps.length));
   function showUnlock() {
     if (!unlockQueue.length || busy() || document.querySelector('.unlock')) return;
     const id = unlockQueue.shift(), i = MILESTONES.findIndex(m => m[0] === id), m = MILESTONES[i], look = lookFor(i);
@@ -755,12 +939,15 @@
     const r = { c, raw: h };
     if (!rest) return { ...r, name: 'course' };
     if (['cases', 'law', 'methods', 'search'].includes(rest)) return { ...r, name: rest };
+    if (rest === 'theses' || rest === 'plans') return { ...r, name: 'drill', what: rest, n: null };
     if (rest.startsWith('case-')) return { ...r, name: 'case', k: rest.slice(5) };
     if (rest === 'all-cards' || rest === 'all-quiz') return { ...r, name: rest.slice(4), n: 'all' };
-    const w = rest.match(/^w(\d+)(?:-(t(\d+)|method|cards|quiz|cases|law|terms))?$/);
+    const w = rest.match(/^w(\d+)(?:-(t(\d+)|method|cards|quiz|cases|law|terms|read|learn|thesis|plan|paras|s\d+))?$/);
     if (!w || !week(c, +w[1])) return { ...r, name: 'course' };
     const n = +w[1];
     if (!w[2]) return { ...r, name: 'week', n };
+    if (w[2] === 'read') return { ...r, name: 'read', n };
+    if (/^(learn|thesis|plan|paras|s\d+)$/.test(w[2])) return { ...r, name: 'drill', what: w[2], n };
     if (w[3] != null) return { ...r, name: 'topic', n, ti: +w[3] };
     return { ...r, name: w[2] === 'cases' ? 'wcases' : w[2] === 'law' ? 'wlaw' : w[2], n };
   }
@@ -777,7 +964,7 @@
       ${cur ? `<div class="slbl">${esc(cur.short || cur.name)}</div>
         <div style="${cv(cur)}">${weeksOf(cur).map(n => { const w = week(cur, n), s = state(cur, n);
           return `<button class="sw ${s} ${r.n === n ? 'on' : ''}" ${w ? `data-go="c-${cur.id}-w${n}"` : `data-none="${n}"`}><b>${pad(n)}</b><span>${w ? esc(w.title) : 'Not added yet'}</span></button>`; }).join('')}
-        <div class="slinks">${link('cases', 'Cases')}${link('law', 'Legislation')}${link('methods', 'Methods')}${link('search', 'Search')}</div></div>` : ''}
+        ${isArts(cur) ? '' : `<div class="slinks">${link('cases', 'Cases')}${link('law', 'Legislation')}${link('methods', 'Methods')}${link('search', 'Search')}</div>`}</div>` : ''}
       <button class="sset sball" data-go="ballroom">${myBall(18)}The Ballroom <span class="ct">${earnedCount()}/${MILESTONES.length}</span></button>
       <button class="sset" data-go="settings">Settings</button>
     </aside>`;
@@ -800,7 +987,9 @@
       case 'methods': html = methodsPage(c); break;
       case 'search': html = searchPage(c); break;
       case 'case': html = casePage(c, r.k); break;
-      case 'week': html = weekPage(c, r.n); break;
+      case 'week': html = isEssay(week(c, r.n)) ? essayWeekPage(c, r.n) : weekPage(c, r.n); break;
+      case 'read': html = readPage(c, r.n); break;
+      case 'drill': if (!session || session.route !== r.raw) startDrill(c, r.what, r.n, r.raw); html = drillPage(c); break;
       case 'topic': html = topicPage(c, r.n, r.ti); break;
       case 'method': html = methodPage(c, r.n); break;
       case 'wcases': html = casesPage(c, r.n); break;
@@ -815,6 +1004,16 @@
     document.title = c ? `${c.short || c.name} · DuoDisco` : 'DuoDisco';
     if (r.name === 'form') document.getElementById('cform').addEventListener('submit', e => { e.preventDefault(); saveCourse(r.c); });
     if (r.name === 'settings') document.getElementById('rsfile')?.addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(restore); });
+    if (r.name === 'drill') {
+      const sf = document.querySelector('.sofar'); if (sf) sf.scrollTop = sf.scrollHeight;
+      const ta = document.getElementById('ans');
+      if (ta) {
+        ta.addEventListener('input', () => { session.answer = ta.value; });
+        ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); drillCheck(c, false); render(); } });
+        if (matchMedia('(hover: hover)').matches) ta.focus();
+      }
+      document.querySelectorAll('.pin').forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const nx = el.closest('.prow').nextElementSibling?.querySelector('.pin'); if (nx) nx.focus(); else { drillCheck(c, false); render(); } } }));
+    }
     if (r.name === 'search') { const q = document.getElementById('q'), out = document.getElementById('results'); q.addEventListener('input', () => { out.innerHTML = searchResults(c, q.value); }); q.focus(); }
     current = r;
     checkRewards(); setTimeout(showUnlock, 350);
@@ -841,6 +1040,13 @@
     }
     switch (t.dataset.act) {
       case 'start': startCards(c, current.n); render(); window.scrollTo(0, 0); break;
+      case 'e-check': case 'e-plan': drillCheck(c, false); render(); break;
+      case 'e-show': drillCheck(c, true); render(); break;
+      case 'e-hint': session.hint = true; render(); break;
+      case 'e-retry': session.res = null; render(); break;
+      case 'e-had': { const st = session.steps[session.i]; session.res.ok = true; session.res.had = true; session.right++; session.missed = session.missed.filter(x => x !== st); eSave(c, st.n, stepKey(st), true); render(); break; }
+      case 'e-next': Object.assign(session, { i: session.i + 1, res: null, answer: '', hint: false, first: true, plan: null }); render(); window.scrollTo(0, 0); break;
+      case 'e-missed': Object.assign(session, { steps: session.missed, missed: [], i: 0, right: 0, res: null, answer: '', hint: false, first: true }); render(); window.scrollTo(0, 0); break;
       case 'show': session.open = true; render(); break;
       case 'got': answerCard(c, true); render(); window.scrollTo(0, 0); break;
       case 'again': answerCard(c, false); render(); window.scrollTo(0, 0); break;

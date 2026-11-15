@@ -10,7 +10,7 @@ window.UNI = {
   },
   addWeek(courseId, n, week) {
     const c = this.byId[courseId];
-    if (!c) throw new Error('Unknown course: ' + courseId);
+    if (!c) { console.warn('DuoDisco: no course with id ' + courseId + ', so week ' + n + ' was skipped'); return; }
     c.content[n] = week;
   },
 };

@@ -68,6 +68,34 @@ Inside text: `**bold**`, `*italic*`, and `***Case name***` for case names (as th
 - **Quiz:** around 8 to 15 questions a week, four options each, spread across the topics. Wrong options should be plausible and drawn from the same notes, never jokes. Vary which position holds the right answer.
 - **Language:** plain, clear, academic English. Use the notes' terminology. No themed or playful wording anywhere: just courses, weeks, topics, notes, flashcards, quiz, cases and legislation.
 
+## Arts courses and essays
+
+Not every course is a law course. Arts courses (`type: 'arts'` in `content/courses.js`) have no Cases, Legislation, Methods or Search, because their notes aren't built that way. Ask the user how each new arts course is assessed before choosing a format.
+
+**Essays to memorise** (Gender & Political Leadership, `content/genderpoliticalleadership.js`): each week is one exam essay. The user learns it in three stages, typing from memory and marked on key words:
+
+1. **Thesis.** 2. **Plan:** the theme of each body paragraph, in order. 3. **Paragraphs:** the introduction, each body paragraph and the conclusion, one sentence at a time.
+
+Marking ignores common words, counts names, years and capitalised terms double, and forgives word endings and small typos; 60% of the weighted key words is "substantially right", and the user can mark an answer as right herself. Progress is per sentence in `progress.essay`.
+
+```js
+UNI.addWeek('genderpoliticalleadership', 1, {
+  title: 'Descriptive and Substantive Representation',
+  part: 'Part A2 · Descriptive and substantive representation and political leadership',
+  source: { file: 'Exam Prep.pdf', pages: 'pp.1–3' },
+  essay: { sections: [
+    { kind: 'intro', title: 'Introduction', sentences: [
+      { s: 'One sentence, exactly as written.', tags: ['lecture'] },
+      { s: 'The thesis.', tags: [], thesis: true },          // exactly one sentence has thesis: true
+    ] },
+    { kind: 'para', title: 'Descriptive representation has value in itself', sentences: [ … ] },
+    { kind: 'conclusion', title: 'Conclusion', sentences: [ … ] },
+  ] },
+});
+```
+
+Carry every sentence across word for word (the user is memorising them): don't merge, split or reword. `tags` are the notes' own source labels: `lecture`, `theory`, `example`, `beyond`, `reading`, `counter`. Paragraph titles are the plan, so keep them exactly as headed. The PDF text can be extracted with `pdftotext`; check for words joined where a hyphen fell at a line break.
+
 ## Publishing
 
 `.github/workflows/publish.yml` merges any push to a `claude/` branch into `main`, then deploys `main` to GitHub Pages (https://ellalwoods.github.io/uni/). The user never merges anything. Check the Publish run succeeded after pushing. If the merge into `main` conflicts, the run fails: rebase the branch onto `origin/main` and push again.
@@ -103,6 +131,7 @@ The user can add, rename, recolour, change the weeks of, and remove courses in t
 | `uni.js` | Content registry (`UNI.addCourse`, `UNI.addWeek`) |
 | `content/courses.js` | The list of courses |
 | `content/<id>.js` | One course's weeks |
+| `content/genderpoliticalleadership.js` | Gender & Political Leadership: four essays to memorise (an arts course) |
 | `app.js` | Screens, notes reader, indexes, search, flashcards, quiz, progress, backup, milestones (`MILESTONES`) |
 | `rewards.js` | The Ballroom's disco balls: one look per milestone, in the same order as `MILESTONES` (plus Classic first) |
 | `sw.js`, `manifest.webmanifest` | Offline support and home-screen install |
