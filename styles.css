@@ -483,3 +483,6 @@ mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 
 .dues { display: grid; grid-template-columns: repeat(var(--n, 13), 1fr); gap: 3px; margin-top: 10px; align-items: end; height: 20px; }
 .dues span { display: flex; justify-content: center; align-items: flex-end; }
 .dues svg { display: block; }
+.esecs li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.esecs li > button:first-of-type { width: 100%; min-width: 0; }
+.rq { flex: none; font-size: 12.5px; font-weight: 700; color: var(--cd); padding: 8px 2px 8px 10px; white-space: nowrap; }

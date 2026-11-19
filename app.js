@@ -737,7 +737,7 @@
       </div>
       <div class="sub">Paragraph by paragraph</div>
       <ol class="topics esecs">${secs.map((x, si) => { const ks = x.sentences.map((t, j) => sentKey(si, j, t)), k = ks.filter(q => eRec(c, n, q).last === 'got').length;
-        return `<li><button data-go="c-${c.id}-w${n}-s${si}"><span>${esc(secName(x, w))}${x.kind === 'para' ? ' · ' + esc(x.title) : ''}</span><small>${k} of ${ks.length} sentences known</small></button></li>`; }).join('')}</ol>
+        return `<li><button data-go="c-${c.id}-w${n}-s${si}"><span>${esc(secName(x, w))}${x.kind === 'para' ? ' · ' + esc(x.title) : ''}</span><small>${k} of ${ks.length} sentences known</small></button><button class="rq" data-go="c-${c.id}-w${n}-r${si}" aria-label="Rapid recall: ${esc(secName(x, w))}">Rapid</button></li>`; }).join('')}</ol>
       <button class="btn ghost" style="margin-top:18px" data-go="c-${c.id}-w${n}-read">Read the essay</button>
     </div>`;
   }
