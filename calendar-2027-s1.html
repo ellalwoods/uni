@@ -3,89 +3,47 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Semester 1, 2027 · UQ · DuoDisco</title>
 <style>
-:root{--ink:#1a1a1a;--soft:#5c5a55;--hair:#ebebeb;--teach:#ffe6f3;--teachInk:#c83f78;--rev:#fff7d1;--revInk:#6b5800;--exam:#3255a4;--mark:#00838a}
 *{box-sizing:border-box}
-body{margin:0;background:#f4f3ef;color:var(--ink);font:16px/1.45 -apple-system,system-ui,"Hanken Grotesk",sans-serif}
-main{max-width:520px;margin:0 auto;background:#fff;min-height:100vh;padding:22px 14px 40px}
-h1{font-size:30px;line-height:1.05;margin:6px 0 4px;letter-spacing:-.02em;font-weight:800}
-.lede{font-size:13.5px;color:var(--soft);margin:0 0 14px}
-.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12.5px;color:var(--soft);margin:0 0 6px}
+body{margin:0;background:#f4f3ef;color:#1a1a1a;font:16px/1.4 -apple-system,system-ui,"Hanken Grotesk",sans-serif}
+main{max-width:600px;margin:0 auto;background:#fff;min-height:100vh;padding:22px 10px 40px}
+h1{font-size:30px;line-height:1.05;margin:6px 0 4px;letter-spacing:-.02em;font-weight:800;padding:0 4px}
+.lede{font-size:13.5px;color:#5c5a55;margin:0 0 12px;padding:0 4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:#5c5a55;margin:0 0 10px;padding:0 4px}
 .legend span{display:flex;align-items:center;gap:6px}
 .legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
-.note{font-size:12.5px;color:var(--soft);background:#f8f8f6;border-radius:10px;padding:9px 11px;margin:12px 0 18px}
-.month{margin:0 0 26px}
-.month h2{font-size:20px;font-weight:800;margin:0 0 8px;letter-spacing:-.01em}
-.grid{display:grid;grid-template-columns:34px repeat(7,1fr);gap:3px}
-.wh{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);font-weight:700;text-align:center;padding:2px 0}
-.wk{font-size:11px;color:var(--soft);font-weight:700;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
-.day{min-height:50px;border-radius:7px;padding:4px 5px;display:flex;flex-direction:column;background:#fafaf8;font-size:12px}
-.day b{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
-.day i{font-style:normal;font-size:9.5px;line-height:1.1;font-weight:700;margin-top:auto;word-break:break-word}
-.day.teach{background:var(--teach);color:var(--teachInk)}
-.day.rev{background:var(--rev);color:var(--revInk)}
-.day.exam{background:var(--exam);color:#fff}
-.day.census i,.day.mark i{color:var(--mark)}
-.day.exam i,.day.exam b{color:#fff}
-.day.census{box-shadow:inset 0 0 0 2px var(--mark)}
-.day.out{background:transparent;color:#d6d6d2}
-.day.out b{color:#d6d6d2}
+.note{font-size:12.5px;color:#5c5a55;background:#f8f8f6;border-radius:10px;padding:9px 11px;margin:0 0 14px}
+.head,.row{display:grid;grid-template-columns:84px repeat(7,1fr);gap:3px}
+.head{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#5c5a55;font-weight:700;text-align:center;margin-bottom:4px}
+.row{margin-bottom:4px;align-items:stretch}
+.rl{display:flex;flex-direction:column;justify-content:center;padding-right:4px}
+.rl b{font-size:13px;font-weight:800;line-height:1.2}
+.rl span{font-size:10.5px;color:#5c5a55;line-height:1.25}
+.d{min-height:50px;border-radius:7px;padding:4px 4px;display:flex;flex-direction:column;font-size:12px;background:#fafaf8;overflow:hidden}
+.d b{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.d b small{font-size:8.5px;font-weight:700;color:inherit;opacity:.8}
+.d i{font-style:normal;font-size:8.5px;line-height:1.1;font-weight:700;margin-top:auto;word-break:normal;overflow-wrap:normal;hyphens:none}
+.d.teach{background:#ffe6f3;color:#c83f78}
+.d.brk{background:#fff7d1;color:#6b5800}
+.d.rev{background:#fff7d1;color:#6b5800}
+.d.orient{background:#e6f5f6;color:#00838a}
+.d.exam{background:#3255a4;color:#fff}
+.d.supp{background:#c9d4ee;color:#1f3a7a}
+.d.sat{background:#fff;color:#3255a4;box-shadow:inset 0 0 0 2px #3255a4}
+.d.res{background:#e6f5f6;color:#00838a}
+.d.off{background:transparent;color:#cfcfca;padding:4px}
+.d.off b{color:#cfcfca}
+.d.teach i,.d.brk i{color:inherit}
 </style></head><body><main>
 <h1>Semester 1, 2027</h1>
-<p class="lede">University of Queensland · whole semester, February to July</p>
+<p class="lede">University of Queensland · orientation, teaching weeks, break and exams</p>
 <div class="legend">
-<span><i style="background:var(--teach)"></i>Classes</span>
-<span><i style="background:var(--rev)"></i>Revision</span>
-<span><i style="background:var(--exam)"></i>Exams</span>
-<span><i style="box-shadow:inset 0 0 0 2px var(--mark);background:#fff"></i>Key date</span>
-<span><b style="color:var(--soft)">Wk</b>Teaching week</span>
+<span><i style="background:#ffe6f3"></i>Classes</span>
+<span><i style="background:#fff7d1"></i>Break &amp; revision</span>
+<span><i style="background:#3255a4"></i>Exams</span>
+<span><i style="background:#fff;box-shadow:inset 0 0 0 2px #3255a4"></i>Saturday exam</span>
+<span><i style="background:#e6f5f6"></i>Orientation &amp; results</span>
 </div>
-<div class="note">Dates are from UQ's published calendar but haven't been checked against my.UQ yet. Confirm before relying on them. Classes start Mon 22 Feb; census 31 Mar; classes end Fri 28 May; revision 31 May to 4 Jun; exams 5 to 19 Jun.</div>
-<section class="month"><h2>February 2027</h2><div class="grid">
-<div class="wh">Wk</div><div class="wh">Mon</div><div class="wh">Tue</div><div class="wh">Wed</div><div class="wh">Thu</div><div class="wh">Fri</div><div class="wh">Sat</div><div class="wh">Sun</div>
-<div class="wk"></div><div class="day "><b>1</b></div><div class="day "><b>2</b></div><div class="day "><b>3</b></div><div class="day "><b>4</b></div><div class="day "><b>5</b></div><div class="day "><b>6</b></div><div class="day "><b>7</b></div>
-<div class="wk"></div><div class="day "><b>8</b></div><div class="day "><b>9</b></div><div class="day "><b>10</b></div><div class="day "><b>11</b></div><div class="day "><b>12</b></div><div class="day "><b>13</b></div><div class="day "><b>14</b></div>
-<div class="wk"></div><div class="day "><b>15</b></div><div class="day "><b>16</b></div><div class="day "><b>17</b></div><div class="day "><b>18</b></div><div class="day "><b>19</b></div><div class="day "><b>20</b></div><div class="day "><b>21</b></div>
-<div class="wk">1</div><div class="day teach"><b>22</b></div><div class="day teach"><b>23</b></div><div class="day teach"><b>24</b></div><div class="day teach"><b>25</b></div><div class="day teach"><b>26</b></div><div class="day teach"><b>27</b></div><div class="day teach"><b>28</b></div>
-</div></section>
-<section class="month"><h2>March 2027</h2><div class="grid">
-<div class="wh">Wk</div><div class="wh">Mon</div><div class="wh">Tue</div><div class="wh">Wed</div><div class="wh">Thu</div><div class="wh">Fri</div><div class="wh">Sat</div><div class="wh">Sun</div>
-<div class="wk">2</div><div class="day teach"><b>1</b></div><div class="day teach"><b>2</b></div><div class="day teach"><b>3</b></div><div class="day teach"><b>4</b></div><div class="day teach"><b>5</b></div><div class="day teach"><b>6</b></div><div class="day teach"><b>7</b></div>
-<div class="wk">3</div><div class="day teach"><b>8</b></div><div class="day teach"><b>9</b></div><div class="day teach"><b>10</b></div><div class="day teach"><b>11</b></div><div class="day teach"><b>12</b></div><div class="day teach"><b>13</b></div><div class="day teach"><b>14</b></div>
-<div class="wk">4</div><div class="day teach"><b>15</b></div><div class="day teach"><b>16</b></div><div class="day teach"><b>17</b></div><div class="day teach"><b>18</b></div><div class="day teach"><b>19</b></div><div class="day teach"><b>20</b></div><div class="day teach"><b>21</b></div>
-<div class="wk">5</div><div class="day teach"><b>22</b></div><div class="day teach"><b>23</b></div><div class="day teach"><b>24</b></div><div class="day teach"><b>25</b></div><div class="day teach"><b>26</b></div><div class="day teach"><b>27</b></div><div class="day teach"><b>28</b></div>
-<div class="wk">6</div><div class="day teach"><b>29</b></div><div class="day teach"><b>30</b></div><div class="day census"><b>31</b><i>Census</i></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div>
-</div></section>
-<section class="month"><h2>April 2027</h2><div class="grid">
-<div class="wh">Wk</div><div class="wh">Mon</div><div class="wh">Tue</div><div class="wh">Wed</div><div class="wh">Thu</div><div class="wh">Fri</div><div class="wh">Sat</div><div class="wh">Sun</div>
-<div class="wk">6</div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day teach"><b>1</b></div><div class="day teach"><b>2</b></div><div class="day teach"><b>3</b></div><div class="day teach"><b>4</b></div>
-<div class="wk">7</div><div class="day teach"><b>5</b></div><div class="day teach"><b>6</b></div><div class="day teach"><b>7</b></div><div class="day teach"><b>8</b></div><div class="day teach"><b>9</b></div><div class="day teach"><b>10</b></div><div class="day teach"><b>11</b></div>
-<div class="wk">8</div><div class="day teach"><b>12</b></div><div class="day teach"><b>13</b></div><div class="day teach"><b>14</b></div><div class="day teach"><b>15</b></div><div class="day teach"><b>16</b></div><div class="day teach"><b>17</b></div><div class="day teach"><b>18</b></div>
-<div class="wk">9</div><div class="day teach"><b>19</b></div><div class="day teach"><b>20</b></div><div class="day teach"><b>21</b></div><div class="day teach"><b>22</b></div><div class="day teach"><b>23</b></div><div class="day teach"><b>24</b></div><div class="day teach"><b>25</b></div>
-<div class="wk">10</div><div class="day teach"><b>26</b></div><div class="day teach"><b>27</b></div><div class="day teach"><b>28</b></div><div class="day teach"><b>29</b></div><div class="day teach"><b>30</b></div><div class="day out"><b></b></div><div class="day out"><b></b></div>
-</div></section>
-<section class="month"><h2>May 2027</h2><div class="grid">
-<div class="wh">Wk</div><div class="wh">Mon</div><div class="wh">Tue</div><div class="wh">Wed</div><div class="wh">Thu</div><div class="wh">Fri</div><div class="wh">Sat</div><div class="wh">Sun</div>
-<div class="wk">10</div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day teach"><b>1</b></div><div class="day teach"><b>2</b></div>
-<div class="wk">11</div><div class="day teach"><b>3</b></div><div class="day teach"><b>4</b></div><div class="day teach"><b>5</b></div><div class="day teach"><b>6</b></div><div class="day teach"><b>7</b></div><div class="day teach"><b>8</b></div><div class="day teach"><b>9</b></div>
-<div class="wk">12</div><div class="day teach"><b>10</b></div><div class="day teach"><b>11</b></div><div class="day teach"><b>12</b></div><div class="day teach"><b>13</b></div><div class="day teach"><b>14</b></div><div class="day teach"><b>15</b></div><div class="day teach"><b>16</b></div>
-<div class="wk">13</div><div class="day teach"><b>17</b></div><div class="day teach"><b>18</b></div><div class="day teach"><b>19</b></div><div class="day teach"><b>20</b></div><div class="day teach"><b>21</b></div><div class="day teach"><b>22</b></div><div class="day teach"><b>23</b></div>
-<div class="wk">14</div><div class="day teach"><b>24</b></div><div class="day teach"><b>25</b></div><div class="day teach"><b>26</b></div><div class="day teach"><b>27</b></div><div class="day teach"><b>28</b></div><div class="day "><b>29</b></div><div class="day "><b>30</b></div>
-<div class="wk"></div><div class="day rev"><b>31</b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div>
-</div></section>
-<section class="month"><h2>June 2027</h2><div class="grid">
-<div class="wh">Wk</div><div class="wh">Mon</div><div class="wh">Tue</div><div class="wh">Wed</div><div class="wh">Thu</div><div class="wh">Fri</div><div class="wh">Sat</div><div class="wh">Sun</div>
-<div class="wk"></div><div class="day out"><b></b></div><div class="day rev"><b>1</b></div><div class="day rev"><b>2</b></div><div class="day rev"><b>3</b></div><div class="day rev"><b>4</b></div><div class="day exam"><b>5</b></div><div class="day exam"><b>6</b></div>
-<div class="wk"></div><div class="day exam"><b>7</b></div><div class="day exam"><b>8</b></div><div class="day exam"><b>9</b></div><div class="day exam"><b>10</b></div><div class="day exam"><b>11</b></div><div class="day exam"><b>12</b></div><div class="day exam"><b>13</b></div>
-<div class="wk"></div><div class="day exam"><b>14</b></div><div class="day exam"><b>15</b></div><div class="day exam"><b>16</b></div><div class="day exam"><b>17</b></div><div class="day exam"><b>18</b></div><div class="day exam"><b>19</b></div><div class="day "><b>20</b></div>
-<div class="wk"></div><div class="day "><b>21</b></div><div class="day "><b>22</b></div><div class="day "><b>23</b></div><div class="day "><b>24</b></div><div class="day "><b>25</b></div><div class="day "><b>26</b></div><div class="day "><b>27</b></div>
-<div class="wk"></div><div class="day "><b>28</b></div><div class="day "><b>29</b></div><div class="day mark"><b>30</b><i>Grades</i></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div>
-</div></section>
-<section class="month"><h2>July 2027</h2><div class="grid">
-<div class="wh">Wk</div><div class="wh">Mon</div><div class="wh">Tue</div><div class="wh">Wed</div><div class="wh">Thu</div><div class="wh">Fri</div><div class="wh">Sat</div><div class="wh">Sun</div>
-<div class="wk"></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day out"><b></b></div><div class="day "><b>1</b></div><div class="day "><b>2</b></div><div class="day "><b>3</b></div><div class="day mark"><b>4</b><i>Supp. request</i></div>
-<div class="wk"></div><div class="day "><b>5</b></div><div class="day "><b>6</b></div><div class="day "><b>7</b></div><div class="day "><b>8</b></div><div class="day "><b>9</b></div><div class="day "><b>10</b></div><div class="day "><b>11</b></div>
-<div class="wk"></div><div class="day "><b>12</b></div><div class="day "><b>13</b></div><div class="day "><b>14</b></div><div class="day "><b>15</b></div><div class="day "><b>16</b></div><div class="day "><b>17</b></div><div class="day "><b>18</b></div>
-<div class="wk"></div><div class="day "><b>19</b></div><div class="day "><b>20</b></div><div class="day "><b>21</b></div><div class="day "><b>22</b></div><div class="day "><b>23</b></div><div class="day "><b>24</b></div><div class="day "><b>25</b></div>
-<div class="wk"></div><div class="day "><b>26</b></div><div class="day "><b>27</b></div><div class="day "><b>28</b></div><div class="day "><b>29</b></div><div class="day "><b>30</b></div><div class="day "><b>31</b></div><div class="day out"><b></b></div>
-</div></section>
+<div class="note">From UQ's academic calendar (about.uq.edu.au). Key dates are labelled in their day. Mid-semester break: Fri 26 Mar to Sun 4 Apr; classes resume Mon 5 Apr.</div>
+<div class="head"><div></div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+<div class="row"><div class="rl"><b>Orientation</b><span>15 Feb – 21 Feb</span></div><div class="d orient"><b>15 <small>Feb</small></b><i>O-week</i></div><div class="d orient"><b>16</b></div><div class="d orient"><b>17</b></div><div class="d orient"><b>18</b></div><div class="d orient"><b>19</b></div><div class="d orient"><b>20</b></div><div class="d orient"><b>21</b></div></div><div class="row"><div class="rl"><b>Week 1</b><span>22 Feb – 28 Feb</span></div><div class="d teach"><b>22 <small>Feb</small></b><i>Start</i></div><div class="d teach"><b>23</b></div><div class="d teach"><b>24</b></div><div class="d teach"><b>25</b></div><div class="d teach"><b>26</b></div><div class="d teach"><b>27</b></div><div class="d teach"><b>28</b></div></div><div class="row"><div class="rl"><b>Week 2</b><span>1 Mar – 7 Mar</span></div><div class="d teach"><b>1 <small>Mar</small></b></div><div class="d teach"><b>2</b></div><div class="d teach"><b>3</b></div><div class="d teach"><b>4</b></div><div class="d teach"><b>5</b></div><div class="d teach"><b>6</b></div><div class="d teach"><b>7</b><i>Add by</i></div></div><div class="row"><div class="rl"><b>Week 3</b><span>8 Mar – 14 Mar</span></div><div class="d teach"><b>8 <small>Mar</small></b></div><div class="d teach"><b>9</b></div><div class="d teach"><b>10</b></div><div class="d teach"><b>11</b></div><div class="d teach"><b>12</b></div><div class="d teach"><b>13</b></div><div class="d teach"><b>14</b></div></div><div class="row"><div class="rl"><b>Week 4</b><span>15 Mar – 21 Mar</span></div><div class="d teach"><b>15 <small>Mar</small></b></div><div class="d teach"><b>16</b></div><div class="d teach"><b>17</b></div><div class="d teach"><b>18</b></div><div class="d teach"><b>19</b></div><div class="d teach"><b>20</b></div><div class="d teach"><b>21</b></div></div><div class="row"><div class="rl"><b>Week 5</b><span>22 Mar – 28 Mar</span></div><div class="d teach"><b>22 <small>Mar</small></b></div><div class="d teach"><b>23</b></div><div class="d teach"><b>24</b></div><div class="d teach"><b>25</b></div><div class="d brk"><b>26</b><i>Break</i></div><div class="d brk"><b>27</b></div><div class="d brk"><b>28</b></div></div><div class="row"><div class="rl"><b>Mid-sem break</b><span>29 Mar – 4 Apr</span></div><div class="d brk"><b>29 <small>Mar</small></b></div><div class="d brk"><b>30</b></div><div class="d brk"><b>31</b><i>Census</i></div><div class="d brk"><b>1 <small>Apr</small></b></div><div class="d brk"><b>2</b></div><div class="d sat"><b>3</b><i>Exam</i></div><div class="d brk"><b>4</b></div></div><div class="row"><div class="rl"><b>Week 6</b><span>5 Apr – 11 Apr</span></div><div class="d teach"><b>5 <small>Apr</small></b><i>Resume</i></div><div class="d teach"><b>6</b></div><div class="d teach"><b>7</b></div><div class="d teach"><b>8</b></div><div class="d teach"><b>9</b></div><div class="d sat"><b>10</b><i>Exam</i></div><div class="d teach"><b>11</b></div></div><div class="row"><div class="rl"><b>Week 7</b><span>12 Apr – 18 Apr</span></div><div class="d teach"><b>12 <small>Apr</small></b></div><div class="d teach"><b>13</b></div><div class="d teach"><b>14</b></div><div class="d teach"><b>15</b></div><div class="d teach"><b>16</b></div><div class="d sat"><b>17</b><i>Exam</i></div><div class="d teach"><b>18</b></div></div><div class="row"><div class="rl"><b>Week 8</b><span>19 Apr – 25 Apr</span></div><div class="d teach"><b>19 <small>Apr</small></b></div><div class="d teach"><b>20</b></div><div class="d teach"><b>21</b></div><div class="d teach"><b>22</b></div><div class="d teach"><b>23</b></div><div class="d sat"><b>24</b><i>Exam</i></div><div class="d teach"><b>25</b></div></div><div class="row"><div class="rl"><b>Week 9</b><span>26 Apr – 2 May</span></div><div class="d teach"><b>26 <small>Apr</small></b><i>Anzac</i></div><div class="d teach"><b>27</b></div><div class="d teach"><b>28</b></div><div class="d teach"><b>29</b></div><div class="d teach"><b>30</b><i>Drop</i></div><div class="d teach"><b>1 <small>May</small></b></div><div class="d teach"><b>2</b></div></div><div class="row"><div class="rl"><b>Week 10</b><span>3 May – 9 May</span></div><div class="d teach"><b>3 <small>May</small></b><i>Labour</i></div><div class="d teach"><b>4</b></div><div class="d teach"><b>5</b></div><div class="d teach"><b>6</b></div><div class="d teach"><b>7</b></div><div class="d sat"><b>8</b><i>Exam</i></div><div class="d teach"><b>9</b></div></div><div class="row"><div class="rl"><b>Week 11</b><span>10 May – 16 May</span></div><div class="d teach"><b>10 <small>May</small></b></div><div class="d teach"><b>11</b></div><div class="d teach"><b>12</b></div><div class="d teach"><b>13</b></div><div class="d teach"><b>14</b></div><div class="d sat"><b>15</b><i>Exam</i></div><div class="d teach"><b>16</b></div></div><div class="row"><div class="rl"><b>Week 12</b><span>17 May – 23 May</span></div><div class="d teach"><b>17 <small>May</small></b></div><div class="d teach"><b>18</b></div><div class="d teach"><b>19</b></div><div class="d teach"><b>20</b></div><div class="d teach"><b>21</b></div><div class="d teach"><b>22</b></div><div class="d teach"><b>23</b></div></div><div class="row"><div class="rl"><b>Week 13</b><span>24 May – 30 May</span></div><div class="d teach"><b>24 <small>May</small></b></div><div class="d teach"><b>25</b></div><div class="d teach"><b>26</b></div><div class="d teach"><b>27</b></div><div class="d teach"><b>28</b><i>Ends</i></div><div class="d off"><b>29</b></div><div class="d off"><b>30</b></div></div><div class="row"><div class="rl"><b>Revision &amp; exams</b><span>31 May – 6 Jun</span></div><div class="d rev"><b>31 <small>May</small></b></div><div class="d rev"><b>1 <small>Jun</small></b></div><div class="d rev"><b>2</b></div><div class="d rev"><b>3</b></div><div class="d rev"><b>4</b><i>Drop</i></div><div class="d off"><b>5</b></div><div class="d off"><b>6</b></div></div><div class="row"><div class="rl"><b>Exams</b><span>7 Jun – 13 Jun</span></div><div class="d exam"><b>7 <small>Jun</small></b></div><div class="d exam"><b>8</b></div><div class="d exam"><b>9</b></div><div class="d exam"><b>10</b></div><div class="d exam"><b>11</b></div><div class="d exam"><b>12</b></div><div class="d exam"><b>13</b></div></div><div class="row"><div class="rl"><b>Exams</b><span>14 Jun – 20 Jun</span></div><div class="d exam"><b>14 <small>Jun</small></b></div><div class="d exam"><b>15</b></div><div class="d exam"><b>16</b></div><div class="d exam"><b>17</b></div><div class="d exam"><b>18</b></div><div class="d exam"><b>19</b><i>Ends</i></div><div class="d off"><b>20</b></div></div><div class="row"><div class="rl"><b>Results &amp; winter</b><span>21 Jun – 27 Jun</span></div><div class="d off"><b>21 <small>Jun</small></b><i>Winter</i></div><div class="d off"><b>22</b></div><div class="d off"><b>23</b></div><div class="d off"><b>24</b></div><div class="d off"><b>25</b></div><div class="d off"><b>26</b></div><div class="d off"><b>27</b></div></div><div class="row"><div class="rl"><b>Supp. exams</b><span>19 Jul – 25 Jul</span></div><div class="d supp"><b>19 <small>Jul</small></b><i>Supp</i></div><div class="d supp"><b>20</b></div><div class="d supp"><b>21</b></div><div class="d supp"><b>22</b></div><div class="d supp"><b>23</b></div><div class="d off"><b>24</b></div><div class="d off"><b>25</b></div></div>
 </main></body></html>
