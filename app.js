@@ -25,7 +25,7 @@
   /* Courses you add, edit or remove in the app. Saved on this device and in backups.
    * added: courses created in the app; edits: changes to any course; removed: hidden course ids. */
   const CKEY = 'uni.courses';
-  const blankCfg = () => ({ added: [], edits: {}, removed: [] });
+  const blankCfg = () => ({ added: [], edits: {}, removed: [], assess: {} });
   let CFG = Object.assign(blankCfg(), store.get(CKEY, {}));
   const saveCfg = () => { CFG._at = Date.now(); store.set(CKEY, CFG); applyCfg(); cloudPush(); };
   /* ---------- sync between devices (Supabase) ----------
@@ -84,6 +84,7 @@
     rc.added.forEach(a => { if (!CFG.added.some(x => x.id === a.id)) CFG.added.push(a); });
     CFG.edits = Object.assign({}, rc.edits, CFG.edits);
     CFG.removed = [...new Set([...CFG.removed, ...rc.removed])];
+    CFG.assess = Object.assign({}, rc.assess, CFG.assess);
     P._at = CFG._at = Date.now();
     store.set(PKEY, P); store.set(CKEY, CFG); applyCfg();
   }
@@ -268,8 +269,9 @@
     const cells = weeksOf(c).map(n => {
       const s = state(c, n), w = week(c, n);
       const label = s === 'none' ? '' : s === 'new' ? `<b>New</b> · ${esc(w.title)}` : esc(w.title);
-      return `<button class="cell ${s}" ${s === 'none' ? `data-none="${n}"` : `data-go="c-${c.id}-w${n}"`} aria-label="Week ${n}${w ? ': ' + esc(w.title) : ', not added yet'}">
-        <div class="n">${pad(n)}</div><div class="t">${label}</div></button>`;
+      const due = dueOf(c, n);
+      return `<button class="cell ${s}" ${s === 'none' ? `data-none="${n}"` : `data-go="c-${c.id}-w${n}"`} aria-label="Week ${n}${w ? ': ' + esc(w.title) : ', not added yet'}${due ? ', assessment: ' + esc(due) : ''}">
+        ${due ? `<span class="due">${esc(due)}</span>` : ''}<div class="n">${pad(n)}</div><div class="t">${label}</div></button>`;
     }).join('');
     return `<div class="screen ${a ? 'has-dock' : ''}" style="${cv(c)}">${courseHead(c, '')}
       <div class="grid">${cells}</div>
@@ -359,6 +361,7 @@
       <div class="bar">${back('c-' + c.id, c.short || c.name)}<span class="meta">Week ${n} of ${c.weeks}</span></div>
       <div class="wnum">${pad(n)}</div>
       <h1 class="wtitle">${esc(w.title)}</h1>
+      ${dueOf(c, n) ? `<p class="dueline"><b>Assessment</b> ${esc(dueOf(c, n))}</p>` : ''}
       ${src(w.source?.file, w.source?.pages || '')}
       <div class="modes">
         <button class="mode main" data-go="c-${c.id}-w${n}-cards"><b>Flashcards</b><small>${plural(cards.length, 'card')}${k ? ` · ${k} known` : ''}</small></button>
@@ -720,6 +723,7 @@
       <div class="bar">${back('c-' + c.id, c.short || c.name)}<span class="meta">Week ${n} of ${c.weeks}</span></div>
       <div class="wnum">${pad(n)}</div>
       <h1 class="wtitle">${esc(w.title)}</h1>
+      ${dueOf(c, n) ? `<p class="dueline"><b>Assessment</b> ${esc(dueOf(c, n))}</p>` : ''}
       ${w.part ? `<p class="part">${esc(w.part)}</p>` : ''}
       ${src(w.source?.file, w.source?.pages || '')}
       <div class="known"><div class="kbar"><i style="width:${known}%"></i></div><span>${known}% of this essay known</span></div>
@@ -932,6 +936,17 @@
   }
 
   /* ---------- adding and editing courses ---------- */
+  /* Assessments: which weeks have one, and what it is called. Stored in CFG.assess (synced with the courses). */
+  const dueOf = (c, n) => ((CFG.assess || {})[c.id] || {})[n] || '';
+  const assessText = c => c ? Object.entries((CFG.assess || {})[c.id] || {}).sort((a, b) => a[0] - b[0]).map(([n, l]) => `${n} ${l}`).join(', ') : '';
+  function parseAssess(text, weeks) {
+    const out = {}, bad = [];
+    text.split(/[,;\n]+/).map(x => x.trim()).filter(Boolean).forEach(part => {
+      const m = part.match(/^(\d+)\s*[:\-–.]?\s*(.*)$/), n = m && +m[1];
+      if (!m || n < 1 || n > weeks) bad.push(part); else out[n] = m[2].trim().slice(0, 40) || 'Assessment';
+    });
+    return { out, bad };
+  }
   function courseForm(c) {
     const isNew = !c, colour = c ? c.colour : (INKS.find(([h]) => !courses().some(x => x.colour === h)) || INKS[0])[0];
     const minWeeks = c ? Math.max(1, ...Object.keys(c.content).map(Number)) : 1;
@@ -948,6 +963,8 @@
         <label for="f-weeks">Number of weeks</label>
         <input id="f-weeks" name="weeks" type="number" inputmode="numeric" min="${minWeeks}" max="26" value="${c ? c.weeks : 13}">
         ${hasContent ? `<small class="hint">At least ${minWeeks}, because week ${minWeeks} has been added.</small>` : ''}
+        <label for="f-assess">Assessments <small>week and name, separated by commas (optional)</small></label>
+        <input id="f-assess" name="assess" maxlength="160" value="${esc(assessText(c))}" placeholder="e.g. 7 Essay, 13 Exam" autocomplete="off">
         <p class="formerr" id="ferr" role="alert"></p>
         <button class="btn" type="submit">${isNew ? 'Add course' : 'Save changes'}</button>
       </form>
@@ -962,14 +979,16 @@
     const min = c ? Math.max(1, ...Object.keys(c.content).map(Number)) : 1;
     if (!name) { err.textContent = 'Give the course a name.'; f.elements['name'].focus(); return; }
     if (!(weeks >= min && weeks <= 26)) { err.textContent = `Weeks must be between ${min} and 26.`; f.elements['weeks'].focus(); return; }
+    const { out, bad } = parseAssess(f.elements['assess'].value, weeks);
+    if (bad.length) { err.textContent = `Check the assessments: “${bad[0]}”. Start each with a week number from 1 to ${weeks}, for example 7 Essay.`; f.elements['assess'].focus(); return; }
     const vals = { name, short: short || name, colour, weeks };
     if (!c) {
       let id = name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 24) || 'course', base = id, k = 2;
       while (UNI.byId[id]) id = base + k++;
-      CFG.added.push({ id, ...vals }); saveCfg(); toast('Course added'); go('c-' + id);
+      CFG.added.push({ id, ...vals }); CFG.assess[id] = out; saveCfg(); toast('Course added'); go('c-' + id);
     } else {
       if (c.mine) Object.assign(CFG.added.find(a => a.id === c.id), vals); else CFG.edits[c.id] = vals;
-      saveCfg(); toast('Saved'); go('c-' + c.id);
+      CFG.assess[c.id] = out; saveCfg(); toast('Saved'); go('c-' + c.id);
     }
   }
 

@@ -41,6 +41,7 @@ Answers are marked on key words (names, years and terms count most, and small ty
 ## Managing courses
 
 - **Add a course** with the **+** button on the Courses screen (or in the sidebar on a computer): give it a name, an optional short name, a colour and the number of weeks.
+- **Mark assessments** in **Edit** on a course, in the Assessments box, for example `7 Essay, 13 Exam`. Each one shows as a badge above that week on the course page, and under the week's title. A week can be marked before its notes are added.
 - **Edit or remove a course** from **Edit** on the course, or **Settings → Courses**. Removing a course hides it but keeps its weeks and progress; bring it back from Settings.
 - These changes are saved on the device you make them on (and in backups). When I ask Claude to add notes to a new course, Claude adds the course to the app for every device.
 

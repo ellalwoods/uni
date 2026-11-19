@@ -474,3 +474,9 @@ mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 
 .keys b { font-weight: 600; padding: 1px 6px; border-radius: 4px; background: #f1f0ec; color: var(--ink); }
 .keys b.yes { background: #d6f3e2; }
 .rapidin.done { background: #f8f8f6; color: var(--soft); caret-color: transparent; }
+
+/* assessments */
+.cell { position: relative; }
+.due { align-self: flex-start; margin: 0 0 7px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; line-height: 1; font-weight: 700; letter-spacing: .02em; padding: 4px 7px; border-radius: 999px; background: var(--c); color: #fff; }
+.dueline { margin: 8px 0 0; font-size: 14px; color: var(--cd); }
+.dueline b { font-weight: 700; margin-right: 4px; }
