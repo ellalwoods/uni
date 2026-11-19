@@ -38,6 +38,10 @@ Answers are marked on key words (names, years and terms count most, and small ty
 
 **Rapid recall** is the quick version: go through the essay sentence by sentence and type just one or two key words for each. A word counts if it's distinctive to that sentence (a name, a year, or a word used in no more than two sentences of the essay), so a general word like "representation" won't pass. Enter checks your answer and Enter again moves on. Each paragraph on the essay page also has its own **Rapid** button, so you can do one paragraph at a time.
 
+## The calendar
+
+The calendar (the calendar icon at the top of the courses screen) shows the semester week by week. Tap a day, or use **Add to the calendar**, to add your own classes, assessments or exams. Your dates sync with your courses. Tap **Remove** under **Your dates** to delete one.
+
 ## Managing courses
 
 - **Add a course** with the **+** button on the Courses screen (or in the sidebar on a computer): give it a name, an optional short name, a colour and the number of weeks.

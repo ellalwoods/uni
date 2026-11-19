@@ -518,3 +518,13 @@ mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 
 /* assessment: mark an item done */
 .assessbtn { display: inline-flex; align-items: center; margin: 4px 0 6px; padding: 8px 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--c); color: var(--cd); font-size: 13.5px; font-weight: 700; }
 .assessbtn.done { background: var(--c); color: #fff; }
+
+/* your own dates on the calendar */
+.cev { font-style: normal; font-size: 10px; line-height: 1.2; font-weight: 700; margin-top: 3px; color: var(--soft); word-break: break-word; }
+.cev.assess { color: #c83f78; }
+.cev.exam { color: #3255a4; }
+.cev.class { color: var(--ink); }
+.calitem { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--hair); }
+.calitem b { display: block; font-size: 15px; }
+.calitem span { font-size: 12.5px; color: var(--soft); }
+.form select { font: inherit; color: var(--ink); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--faint); background: #fff; }

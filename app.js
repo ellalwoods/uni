@@ -25,7 +25,7 @@
   /* Courses you add, edit or remove in the app. Saved on this device and in backups.
    * added: courses created in the app; edits: changes to any course; removed: hidden course ids. */
   const CKEY = 'uni.courses';
-  const blankCfg = () => ({ added: [], edits: {}, removed: [], assess: {} });
+  const blankCfg = () => ({ added: [], edits: {}, removed: [], assess: {}, events: [] });
   let CFG = Object.assign(blankCfg(), store.get(CKEY, {}));
   const saveCfg = () => { CFG._at = Date.now(); store.set(CKEY, CFG); applyCfg(); cloudPush(); };
   /* ---------- sync between devices (Supabase) ----------
@@ -85,6 +85,7 @@
     CFG.edits = Object.assign({}, rc.edits, CFG.edits);
     CFG.removed = [...new Set([...CFG.removed, ...rc.removed])];
     CFG.assess = Object.assign({}, rc.assess, CFG.assess);
+    CFG.events = [...(CFG.events || []), ...(rc.events || []).filter(e => !(CFG.events || []).some(x => x.id === e.id))];
     P._at = CFG._at = Date.now();
     store.set(PKEY, P); store.set(CKEY, CFG); applyCfg();
   }
@@ -265,23 +266,48 @@
     const cal = window.UNI_CALENDAR;
     if (!cal) return `<div class="screen">${back('home', 'Courses')}<p class="note">The calendar isn’t available.</p></div>`;
     const tone = iso => { const p = cal.periods.find(x => iso >= x.from && iso <= x.to); return p ? p.kind : ''; };
+    const evOn = {};
+    (CFG.events || []).forEach(e => { for (let iso = e.from; iso <= e.to && iso < isoAdd(e.from, 120); iso = isoAdd(iso, 1)) (evOn[iso] = evOn[iso] || []).push(e); });
+    const mine = (CFG.events || []).slice().sort((a, b) => a.from < b.from ? -1 : 1);
     const rows = cal.rows.map(r => {
       const end = isoAdd(r.start, 6);
       const days = Array.from({ length: 7 }, (_, k) => {
         const iso = isoAdd(r.start, k), d = +iso.slice(8);
-        return `<div class="cday ${tone(iso)}"><b>${d}</b></div>`;
+        const evs = evOn[iso] || [];
+        return `<div class="cday ${tone(iso)}" data-act="cal-add" data-d="${iso}" role="button" tabindex="0" aria-label="Add to ${isoDate(iso)}"><b>${d}</b>${evs.map(e => `<i class="cev ${e.kind}">${esc(e.label)}</i>`).join('')}</div>`;
       }).join('');
       const label = r.week ? `<b class="cwn">${pad(r.week)}</b><span>Week · ${isoDate(r.start)}</span>` : `<b>${esc(r.name)}</b><span>${isoDate(r.start)} – ${isoDate(end)}</span>`;
       return `<div class="crow2"><div class="crl">${label}</div>${days}</div>`;
     }).join('');
     return `<div class="screen calscreen">${back('home', 'Courses')}
-      <p class="meta" style="margin-top:10px">Calendar · University of Queensland</p>
       <h1 class="title">${esc(cal.name)}</h1>
-      <p class="note" style="margin-top:0">${esc(cal.note)} Dates from ${esc(cal.source)}.</p>
       <div class="cal">
         <div class="chead"><div></div>${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(x => `<div>${x}</div>`).join('')}</div>
         ${rows}
       </div>
+      <button class="addrow" data-act="cal-add" data-d="2027-02-22"><span>+</span>Add to the calendar</button>
+      ${mine.length ? `<div class="sub" style="margin-top:22px">Your dates</div>${mine.map(e => `<div class="calitem"><div><b>${esc(e.label)}</b><span>${isoDate(e.from)}${e.to !== e.from ? ' – ' + isoDate(e.to) : ''} · ${esc((CAL_KINDS.find(k => k[0] === e.kind) || [0, 'Other'])[1])}</span></div><button class="textbtn" data-act="cal-del" data-id="${e.id}">Remove</button></div>`).join('')}` : ''}
+    </div>`;
+  }
+
+  const CAL_KINDS = [['assess', 'Assessment'], ['exam', 'Exam'], ['class', 'Class'], ['other', 'Other']];
+  let calDraft = null;
+  function calendarAddPage() {
+    const d = calDraft || { from: '2027-02-22', to: '2027-02-22' };
+    return `<div class="screen">${back('calendar', 'Calendar')}
+      <h1 class="title" style="margin-top:14px">Add to the calendar</h1>
+      <form class="form" id="calform" novalidate>
+        <label for="cal-label">What is it</label>
+        <input id="cal-label" maxlength="60" placeholder="e.g. Essay 1, Tutorial, Exam" autocomplete="off">
+        <label for="cal-kind">Type</label>
+        <select id="cal-kind">${CAL_KINDS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select>
+        <label for="cal-from">From</label>
+        <input id="cal-from" type="date" value="${d.from}">
+        <label for="cal-to">To <small>leave as the same day for one day</small></label>
+        <input id="cal-to" type="date" value="${d.to}">
+        <p class="formerr" id="cerr" role="alert"></p>
+      </form>
+      <button class="btn" data-act="cal-save">Add to calendar</button>
     </div>`;
   }
 
@@ -1044,7 +1070,7 @@
     const h = location.hash.slice(1) || 'home';
     if (cloudOn && !SYNC && !store.get('uni.skip', false) && h !== 'welcome') return { name: 'welcome', raw: h };
     if (h === 'welcome') return SYNC ? { name: 'home', raw: 'home' } : { name: 'welcome', raw: h };
-    if (h === 'home' || h === 'settings' || h === 'ballroom' || h === 'calendar') return { name: h, raw: h };
+    if (h === 'home' || h === 'settings' || h === 'ballroom' || h === 'calendar' || h === 'calendar-add') return { name: h, raw: h };
     if (h === 'new-course') return { name: 'form', raw: h };
     if (h.startsWith('edit-')) { const c = course(h.slice(5)); return c ? { name: 'form', c, raw: h } : { name: 'home', raw: 'home' }; }
     const m = h.match(/^c-([a-z0-9]+)(?:-(.*))?$/);
@@ -1095,6 +1121,7 @@
       case 'settings': html = settingsPage(); break;
       case 'ballroom': html = ballroomPage(); break;
       case 'calendar': html = calendarPage(); break;
+      case 'calendar-add': html = calendarAddPage(); break;
       case 'form': html = courseForm(c); break;
       case 'course': html = coursePage(c); break;
       case 'cases': html = casesPage(c); break;
@@ -1166,6 +1193,20 @@
       session.picked = +t.dataset.pick; if (session.picked === session.items[session.i].item.answer) session.score++; render(); return;
     }
     switch (t.dataset.act) {
+      case 'cal-add': calDraft = { from: t.dataset.d, to: t.dataset.d }; go('calendar-add'); break;
+      case 'cal-save': {
+        const val = id => document.getElementById(id).value, err = document.getElementById('cerr');
+        const label = val('cal-label').trim(), kind = val('cal-kind'), from = val('cal-from'), to = val('cal-to') || from;
+        if (!label) { err.textContent = 'Give it a name, like Essay 1 or Tutorial.'; document.getElementById('cal-label').focus(); break; }
+        if (!from) { err.textContent = 'Pick a start date.'; break; }
+        if (to < from) { err.textContent = 'The end date is before the start date.'; break; }
+        CFG.events = [...(CFG.events || []), { id: Date.now().toString(36), from, to, label, kind }];
+        saveCfg(); toast('Added to the calendar'); calDraft = null; go('calendar'); break;
+      }
+      case 'cal-del': {
+        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to remove'; break; }
+        CFG.events = (CFG.events || []).filter(e => e.id !== t.dataset.id); saveCfg(); toast('Removed'); render(); break;
+      }
       case 'start': startCards(c, current.n); render(); window.scrollTo(0, 0); break;
       case 'e-check': case 'e-plan': drillCheck(c, false); render(); break;
       case 'e-show': drillCheck(c, true); render(); break;
