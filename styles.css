@@ -485,3 +485,33 @@ mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 
 .dues { position: absolute; left: 0; right: 0; bottom: 100%; height: 22px; display: grid; grid-template-columns: repeat(var(--n, 13), 1fr); gap: 3px; align-items: end; pointer-events: none; }
 .dues span { display: flex; align-items: flex-end; justify-content: center; }
 .dues svg { display: block; }
+
+/* semester calendar: one row per week, Monday to Sunday */
+.calscreen .title { margin-top: 6px; }
+.cal { margin-top: 14px; }
+.chead, .crow2 { display: grid; grid-template-columns: 112px repeat(7, minmax(0, 1fr)); gap: 4px; }
+.chead { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); font-weight: 700; padding: 0 0 8px; border-bottom: 1px solid var(--hair); margin-bottom: 6px; }
+.chead div:not(:first-child) { padding-left: 6px; }
+.crow2 { padding: 6px 0; border-bottom: 1px solid var(--hair); align-items: stretch; }
+.crl { display: flex; flex-direction: column; justify-content: center; padding-right: 6px; }
+.crl b { font-family: var(--display); font-size: 16px; font-weight: 800; line-height: 1.1; letter-spacing: -.01em; }
+.crl b.cwn { font-size: 38px; line-height: .95; letter-spacing: -.04em; color: var(--c-pink, #ff48b0); font-variant-numeric: tabular-nums; }
+.crl span { font-size: 11.5px; color: var(--soft); line-height: 1.35; margin-top: 2px; }
+.cday { min-height: 62px; border-radius: 10px; padding: 6px 7px; display: flex; flex-direction: column; background: #fff; box-shadow: inset 0 0 0 1px var(--hair); }
+.cday b { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.cday b small { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--soft); margin-left: 2px; }
+.cday i { font-style: normal; font-size: 10px; line-height: 1.15; font-weight: 700; letter-spacing: .02em; margin-top: auto; color: var(--soft); text-transform: uppercase; }
+.cday.break { background: #fffbe6; box-shadow: none; }
+.cday.swot { background: #eef7fa; box-shadow: none; }
+.cday.exam { background: #f5f1fc; box-shadow: none; }
+@media (max-width: 640px) {
+  .chead, .crow2 { grid-template-columns: 74px repeat(7, minmax(0, 1fr)); gap: 3px; }
+  .crl b { font-size: 13px; }
+  .crl b.cwn { font-size: 28px; }
+  .crl span { font-size: 10px; }
+  .cday { min-height: 54px; padding: 4px; border-radius: 8px; }
+  .cday b { font-size: 13px; }
+  .cday i { font-size: 8px; letter-spacing: 0; }
+  .chead div:not(:first-child) { padding-left: 0; text-align: center; }
+}
+@media (min-width: 960px) { .screen.calscreen { max-width: none; padding-left: 40px; padding-right: 40px; } }

@@ -252,7 +252,36 @@
         <button class="iconbtn" data-go="settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></span></div>
       <h1 class="title">Courses</h1>
       ${rows ? rows + `<button class="addrow" data-go="new-course"><span>+</span>Add a course</button>` : `<div class="empty"><p>No courses yet. Add each course you’re taking this semester, then upload a week’s notes to Claude to fill it in.</p><button class="btn" style="--c:#ff48b0" data-go="new-course">Add your first course</button></div>`}
+      <button class="addrow" data-go="calendar"><span>▦</span>Semester calendar</button>
       <p class="note">New weeks appear here once their notes have been added.</p>
+    </div>`;
+  }
+
+  /* ---------- semester calendar: one row per week, Monday to Sunday (content/calendar.js) ---------- */
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const isoAdd = (iso, k) => { const x = new Date(iso + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
+  const isoDate = iso => `${+iso.slice(8)} ${MONTHS[+iso.slice(5, 7) - 1]}`;
+  function calendarPage() {
+    const cal = window.UNI_CALENDAR;
+    if (!cal) return `<div class="screen">${back('home', 'Courses')}<p class="note">The calendar isn’t available.</p></div>`;
+    const tone = iso => { const p = cal.periods.find(x => iso >= x.from && iso <= x.to); return p ? p.kind : ''; };
+    const rows = cal.rows.map(r => {
+      const end = isoAdd(r.start, 6);
+      const days = Array.from({ length: 7 }, (_, k) => {
+        const iso = isoAdd(r.start, k), key = cal.keys[iso] || '', d = +iso.slice(8);
+        return `<div class="cday ${tone(iso)}"><b>${d}${d === 1 || k === 0 ? ` <small>${MONTHS[+iso.slice(5, 7) - 1]}</small>` : ''}</b>${key ? `<i>${esc(key)}</i>` : ''}</div>`;
+      }).join('');
+      const label = r.week ? `<b class="cwn">${pad(r.week)}</b><span>Week · ${isoDate(r.start)}</span>` : `<b>${esc(r.name)}</b><span>${isoDate(r.start)} – ${isoDate(end)}</span>`;
+      return `<div class="crow2"><div class="crl">${label}</div>${days}</div>`;
+    }).join('');
+    return `<div class="screen calscreen">${back('home', 'Courses')}
+      <p class="meta" style="margin-top:10px">Calendar · University of Queensland</p>
+      <h1 class="title">${esc(cal.name)}</h1>
+      <p class="note" style="margin-top:0">${esc(cal.note)} Dates from ${esc(cal.source)}.</p>
+      <div class="cal">
+        <div class="chead"><div></div>${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(x => `<div>${x}</div>`).join('')}</div>
+        ${rows}
+      </div>
     </div>`;
   }
 
@@ -1006,7 +1035,7 @@
     const h = location.hash.slice(1) || 'home';
     if (cloudOn && !SYNC && !store.get('uni.skip', false) && h !== 'welcome') return { name: 'welcome', raw: h };
     if (h === 'welcome') return SYNC ? { name: 'home', raw: 'home' } : { name: 'welcome', raw: h };
-    if (h === 'home' || h === 'settings' || h === 'ballroom') return { name: h, raw: h };
+    if (h === 'home' || h === 'settings' || h === 'ballroom' || h === 'calendar') return { name: h, raw: h };
     if (h === 'new-course') return { name: 'form', raw: h };
     if (h.startsWith('edit-')) { const c = course(h.slice(5)); return c ? { name: 'form', c, raw: h } : { name: 'home', raw: 'home' }; }
     const m = h.match(/^c-([a-z0-9]+)(?:-(.*))?$/);
@@ -1037,6 +1066,7 @@
       <div class="slbl">Courses</div>
       ${courses().map(c => `<button class="sc ${cur && cur.id === c.id ? 'on' : ''}" style="${cv(c)}" data-go="c-${c.id}"><span class="dot"></span><span class="nm">${esc(c.short || c.name)}</span><span class="ct">${addedWeeks(c).length}/${c.weeks}</span></button>`).join('')}
       <button class="sc sadd" data-go="new-course"><span class="dot">+</span><span class="nm">Add a course</span></button>
+      <button class="sc ${r.name === 'calendar' ? 'on' : ''}" data-go="calendar"><span class="dot">▦</span><span class="nm">Calendar</span></button>
       ${cur ? `<div class="slbl">${esc(cur.short || cur.name)}</div>
         <div style="${cv(cur)}">${weeksOf(cur).map(n => { const w = week(cur, n), s = state(cur, n);
           return `<button class="sw ${s} ${r.n === n ? 'on' : ''}" ${w ? `data-go="c-${cur.id}-w${n}"` : `data-none="${n}"`}><b>${pad(n)}</b><span>${w ? esc(w.title) : 'Not added yet'}</span></button>`; }).join('')}
@@ -1056,6 +1086,7 @@
         return;
       case 'settings': html = settingsPage(); break;
       case 'ballroom': html = ballroomPage(); break;
+      case 'calendar': html = calendarPage(); break;
       case 'form': html = courseForm(c); break;
       case 'course': html = coursePage(c); break;
       case 'cases': html = casesPage(c); break;

@@ -131,6 +131,7 @@ The user can add, rename, recolour, change the weeks of, and remove courses in t
 | `uni.js` | Content registry (`UNI.addCourse`, `UNI.addWeek`) |
 | `content/courses.js` | The list of courses |
 | `content/<id>.js` | One course's weeks |
+| `content/calendar.js` | The university's semester calendar, shown under Calendar (weeks as rows, Monday to Sunday). Edit it when the dates change |
 | `content/genderpoliticalleadership.js` | Gender & Political Leadership: four essays to memorise (an arts course) |
 | `app.js` | Screens, notes reader, indexes, search, flashcards, quiz, progress, backup, milestones (`MILESTONES`) |
 | `rewards.js` | The Ballroom's disco balls: one look per milestone, in the same order as `MILESTONES` (plus Classic first) |
