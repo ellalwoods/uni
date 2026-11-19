@@ -249,10 +249,10 @@
     return `<div class="screen">
       <div class="bar"><button class="logo" data-go="ballroom" aria-label="DuoDisco: open the Ballroom">${myBall(30)}DuoDisco</button>
         <span class="barbtns"><button class="iconbtn" data-go="new-course" aria-label="Add a course"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="iconbtn" data-go="calendar" aria-label="Calendar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
         <button class="iconbtn" data-go="settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button></span></div>
       <h1 class="title">Courses</h1>
       ${rows ? rows + `<button class="addrow" data-go="new-course"><span>+</span>Add a course</button>` : `<div class="empty"><p>No courses yet. Add each course you’re taking this semester, then upload a week’s notes to Claude to fill it in.</p><button class="btn" style="--c:#ff48b0" data-go="new-course">Add your first course</button></div>`}
-      <button class="addrow" data-go="calendar"><span>▦</span>Semester calendar</button>
       <p class="note">New weeks appear here once their notes have been added.</p>
     </div>`;
   }
