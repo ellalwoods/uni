@@ -1066,7 +1066,6 @@
       <div class="slbl">Courses</div>
       ${courses().map(c => `<button class="sc ${cur && cur.id === c.id ? 'on' : ''}" style="${cv(c)}" data-go="c-${c.id}"><span class="dot"></span><span class="nm">${esc(c.short || c.name)}</span><span class="ct">${addedWeeks(c).length}/${c.weeks}</span></button>`).join('')}
       <button class="sc sadd" data-go="new-course"><span class="dot">+</span><span class="nm">Add a course</span></button>
-      <button class="sc ${r.name === 'calendar' ? 'on' : ''}" data-go="calendar"><span class="dot">▦</span><span class="nm">Calendar</span></button>
       ${cur ? `<div class="slbl">${esc(cur.short || cur.name)}</div>
         <div style="${cv(cur)}">${weeksOf(cur).map(n => { const w = week(cur, n), s = state(cur, n);
           return `<button class="sw ${s} ${r.n === n ? 'on' : ''}" ${w ? `data-go="c-${cur.id}-w${n}"` : `data-none="${n}"`}><b>${pad(n)}</b><span>${w ? esc(w.title) : 'Not added yet'}</span></button>`; }).join('')}
