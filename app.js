@@ -268,8 +268,8 @@
     const rows = cal.rows.map(r => {
       const end = isoAdd(r.start, 6);
       const days = Array.from({ length: 7 }, (_, k) => {
-        const iso = isoAdd(r.start, k), key = cal.keys[iso] || '', d = +iso.slice(8);
-        return `<div class="cday ${tone(iso)}"><b>${d}${d === 1 || k === 0 ? ` <small>${MONTHS[+iso.slice(5, 7) - 1]}</small>` : ''}</b>${key ? `<i>${esc(key)}</i>` : ''}</div>`;
+        const iso = isoAdd(r.start, k), d = +iso.slice(8);
+        return `<div class="cday ${tone(iso)}"><b>${d}</b></div>`;
       }).join('');
       const label = r.week ? `<b class="cwn">${pad(r.week)}</b><span>Week · ${isoDate(r.start)}</span>` : `<b>${esc(r.name)}</b><span>${isoDate(r.start)} – ${isoDate(end)}</span>`;
       return `<div class="crow2"><div class="crl">${label}</div>${days}</div>`;

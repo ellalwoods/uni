@@ -4,7 +4,7 @@
 window.UNI_CALENDAR = {
   name: 'Semester 1, 2027',
   source: 'University of Queensland · academic calendar (about.uq.edu.au)',
-  note: 'Mid-semester break: Fri 26 Mar to Sun 4 Apr. Classes resume Mon 5 Apr.',
+  note: 'Mid-semester break: Mon 29 Mar to Sun 4 Apr. Classes resume Mon 5 Apr.',
   rows: [
     { name: 'Orientation', start: '2027-02-15' },
     { week: 1, start: '2027-02-22' }, { week: 2, start: '2027-03-01' }, { week: 3, start: '2027-03-08' },
@@ -19,15 +19,10 @@ window.UNI_CALENDAR = {
   ],
   // Shaded periods: break (light yellow), SWOTVAC (light blue), exams (light lilac)
   periods: [
-    { from: '2027-03-26', to: '2027-04-04', kind: 'break' },
+    { from: '2027-03-29', to: '2027-04-04', kind: 'break' },
     { from: '2027-05-31', to: '2027-06-04', kind: 'swot' },
     { from: '2027-06-05', to: '2027-06-19', kind: 'exam' },
   ],
-  // Key dates, written in their day
-  keys: {
-    '2027-02-15': 'O-week', '2027-02-22': 'Start', '2027-03-07': 'Add by',
-    '2027-03-26': 'Break', '2027-03-31': 'Census', '2027-04-05': 'Resume',
-    '2027-04-26': 'Anzac', '2027-04-30': 'Drop', '2027-05-03': 'Labour',
-    '2027-05-28': 'Ends', '2027-06-04': 'Drop', '2027-06-19': 'Ends',
-  },
+  // Key dates are not shown in the calendar. Add them here as { 'YYYY-MM-DD': 'Label' } if needed.
+  keys: {},
 };
