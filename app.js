@@ -243,8 +243,7 @@
       const a = addedWeeks(c).length, nw = newCount(c);
       return `<button class="crow" style="${cv(c)}" data-go="c-${c.id}">
         <div class="nm">${esc(c.name)}</div>
-        ${dueRow(c)}
-        <div class="segs" style="--n:${c.weeks}${dueRow(c) ? ';margin-top:4px' : ''}">${weeksOf(c).map(n => `<i class="${state(c, n)}"></i>`).join('')}</div>
+        <div class="segwrap">${dueRow(c)}<div class="segs" style="--n:${c.weeks}">${weeksOf(c).map(n => `<i class="${state(c, n)}"></i>`).join('')}</div></div>
         <div class="st"><span>${a} of ${c.weeks} weeks added</span>${nw ? `<b>${nw} new</b>` : '<span></span>'}</div></button>`;
     }).join('');
     return `<div class="screen">
@@ -939,11 +938,14 @@
   /* ---------- adding and editing courses ---------- */
   /* Assessments: which weeks have one, and what it is called. Stored in CFG.assess (synced with the courses). */
   const dueOf = (c, n) => ((CFG.assess || {})[c.id] || {})[n] || '';
-  // A small disco ball above each assessment week on the courses screen, in the course's colour.
+  // A disco ball, drawn exactly like the logo, above each assessment week on the courses screen.
+  // Its middle tone is the course colour; the light and dark tones are tints and shades of it.
+  const mixHex = (a, b, t) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
   const dueRow = c => {
     if (!weeksOf(c).some(n => dueOf(c, n))) return '';
-    const ball = `<svg width="22" height="24" viewBox="0 0 22 24" aria-hidden="true" focusable="false"><line x1="11" y1="0" x2="11" y2="5" stroke="${c.colour}" stroke-width="1.6" stroke-linecap="round"/><circle cx="11" cy="14" r="9" fill="${c.colour}"/><g fill="#fff" opacity=".9"><rect x="6.5" y="9.5" width="3" height="3" rx=".7"/><rect x="11.5" y="8.5" width="3" height="3" rx=".7"/><rect x="8" y="14.5" width="3" height="3" rx=".7"/><rect x="13.5" y="14" width="3" height="3" rx=".7"/></g></svg>`;
-    return `<div class="dues" style="--n:${c.weeks}">${weeksOf(c).map(n => dueOf(c, n) ? `<span title="${esc(dueOf(c, n))}">${ball}</span>` : '<span></span>').join('')}</div>`;
+    const light = mixHex(c.colour, '#ffffff', .6), dark = mixHex(c.colour, '#000000', .2);
+    const ball = BALLROOM.ball({ f: (i, j, d) => d < 6 ? light : d < 12 ? c.colour : dark }, 22);
+    return `<div class="dues" style="--n:${c.weeks}" aria-hidden="true">${weeksOf(c).map(n => dueOf(c, n) ? `<span title="${esc(dueOf(c, n))}">${ball}</span>` : '<span></span>').join('')}</div>`;
   };
   const assessText = c => c ? Object.entries((CFG.assess || {})[c.id] || {}).sort((a, b) => a[0] - b[0]).map(([n, l]) => `${n} ${l}`).join(', ') : '';
   function parseAssess(text, weeks) {
