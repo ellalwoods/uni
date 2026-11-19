@@ -40,7 +40,9 @@ Answers are marked on key words (names, years and terms count most, and small ty
 
 ## The calendar
 
-The calendar (the calendar icon at the top of the courses screen) shows the semester week by week. Tap a day, or use **Add to the calendar**, to add your own classes, assessments or exams. Your dates sync with your courses. Tap **Remove** under **Your dates** to delete one.
+The calendar (the calendar icon at the top of the courses screen) shows the semester week by week. Tap a day, or the **+** at the top right, to add a class, assessment, exam or other date. Tap **Edit** under **Your dates** to change one. Each date can have a **Subject** (one of your courses) and any **Tags** you've made under **Tags**, for example Work.
+
+Assessments are calendar dates with a subject, so they appear in both places: on the calendar, and on the course (in its week, and in the Assessments box on the course's Edit screen). Your dates sync with your courses.
 
 ## Managing courses
 
