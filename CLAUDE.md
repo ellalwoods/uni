@@ -108,7 +108,7 @@ Don't commit the user's original notes files: they asked for them not to be kept
 
 ## The Ballroom
 
-`MILESTONES` in `app.js` lists 22 milestones, each earned by real study (notes added for every course, cards known, quizzes, methods practised, revision), never by setting things up or daily streaks. Milestone *i* unlocks look *i + 1* in `rewards.js`; keep the two lists the same length and order. Earned milestones are stored in `progress.rewards` and the chosen look in `progress.look`, so they sync. If you add or reorder milestones, don't change existing ids.
+`MILESTONES` in `app.js` lists 22 milestones, each earned by real study (notes added for every course, assessment items marked done, quizzes, methods practised, revision), never by setting things up or daily streaks. Milestone *i* unlocks look *i + 1* in `rewards.js`; keep the two lists the same length and order. Earned milestones are stored in `progress.rewards` and the chosen look in `progress.look`, so they sync. If you add or reorder milestones, don't change existing ids.
 
 ## Adding a course
 

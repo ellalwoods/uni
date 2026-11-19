@@ -390,7 +390,7 @@
       <div class="bar">${back('c-' + c.id, c.short || c.name)}<span class="meta">Week ${n} of ${c.weeks}</span></div>
       <div class="wnum">${pad(n)}</div>
       <h1 class="wtitle">${esc(w.title)}</h1>
-      ${dueOf(c, n) ? `<p class="dueline"><b>Assessment</b> ${esc(dueOf(c, n))}</p>` : ''}
+      ${assessLine(c, n)}
       ${src(w.source?.file, w.source?.pages || '')}
       <div class="modes">
         <button class="mode main" data-go="c-${c.id}-w${n}-cards"><b>Flashcards</b><small>${plural(cards.length, 'card')}${k ? ` · ${k} known` : ''}</small></button>
@@ -752,7 +752,7 @@
       <div class="bar">${back('c-' + c.id, c.short || c.name)}<span class="meta">Week ${n} of ${c.weeks}</span></div>
       <div class="wnum">${pad(n)}</div>
       <h1 class="wtitle">${esc(w.title)}</h1>
-      ${dueOf(c, n) ? `<p class="dueline"><b>Assessment</b> ${esc(dueOf(c, n))}</p>` : ''}
+      ${assessLine(c, n)}
       ${w.part ? `<p class="part">${esc(w.part)}</p>` : ''}
       ${src(w.source?.file, w.source?.pages || '')}
       <div class="known"><div class="kbar"><i style="width:${known}%"></i></div><span>${known}% of this essay known</span></div>
@@ -872,8 +872,6 @@
   // Every course has week n added (n can depend on the course's length).
   const allHave = f => { const cs = courses(); return cs.length > 0 && cs.every(c => week(c, Math.min(c.weeks, f(c)))); };
   const allCards = () => courses().flatMap(c => addedWeeks(c).flatMap(n => (week(c, n).cards || []).map(card => [c, n, card])));
-  const weekSwept = (c, n) => { if (isEssay(week(c, n))) return essayKnown(c, n) === 1; const cs = week(c, n).cards || []; return cs.length > 0 && cs.every(card => known(c, n, card)); };
-  const sweptWeeks = () => courses().reduce((t, c) => t + addedWeeks(c).filter(n => weekSwept(c, n)).length, 0);
   const courseKnown = c => {
     const ks = addedWeeks(c).flatMap(n => isEssay(week(c, n)) ? eKeys(c, n).map(k => eRec(c, n, k).last === 'got') : (week(c, n).cards || []).map(card => known(c, n, card)));
     return ks.length ? ks.filter(Boolean).length / ks.length : 0;
@@ -886,32 +884,31 @@
   const perfectWeek = c => addedWeeks(c).some(n => { const q = P.quiz[wkey(c, n)]; return q && q.best === q.of && q.of > 0; });
   const methodsOf = c => addedWeeks(c).filter(n => week(c, n).method);
   const totalAdded = () => courses().reduce((t, c) => t + addedWeeks(c).length, 0);
-  const got = () => (P.stats || {}).got || 0;
   const MILESTONES = [
     ['opening', 'Opening night', 'The first week of notes added to any course', () => totalAdded() > 0],
     ['week1', 'Week one, all in', 'Week 1 added for every course (two or more)', () => courses().length >= 2 && allHave(() => 1)],
-    ['got100', 'First 100', '100 flashcards or essay sentences right', () => got() >= 100],
+    ['firstdone', 'First one done', 'Finish your first assessment item', () => assessCount() >= 1],
     ['fullmarks', 'Full marks', 'A perfect score on a week’s quiz, or a whole essay recalled', () => courses().some(perfectWeek) || essayCourses().some(c => addedWeeks(c).some(n => isEssay(week(c, n)) && essayKnown(c, n) === 1))],
     ['method', 'Method actor', 'A problem-question method practised from memory, all the way through', () => Object.keys(P.methods || {}).length > 0],
     ['month', 'A month in', 'Week 4 added for every course', () => allHave(() => 4)],
-    ['sweep', 'Clean sweep', 'Every flashcard in a week known', () => sweptWeeks() >= 1],
+    ['threedone', 'Three down', 'Finish three assessment items', () => assessCount() >= 3],
     ['caughtup', 'Caught up', 'At least 6 weeks added, and every one of them opened', () => totalAdded() >= 6 && courses().every(c => newCount(c) === 0)],
     ['halfway', 'Halfway', 'Week 7 added for every course', () => allHave(c => Math.ceil(c.weeks / 2))],
-    ['got500', '500 cards', '500 flashcards or essay sentences right', () => got() >= 500],
+    ['coursedone', 'Course complete', 'Finish every assessment item in one course (two or more)', () => courses().some(c => assessItems(c).length >= 2 && courseAssessed(c))],
     ['comeback', 'Comeback', 'Full marks on a quiz you once scored under half on', () => !!(P.stats || {}).comeback],
-    ['sweep5', 'Five sweeps', 'Five weeks with every flashcard known', () => sweptWeeks() >= 5],
+    ['fivedone', 'Five down', 'Finish five assessment items', () => assessCount() >= 5],
     ['homestretch', 'Home stretch', 'Week 10 added for every course', () => allHave(c => Math.ceil(c.weeks * 10 / 13))],
-    ['mixtape', 'Mixtape', 'A round of flashcards from all weeks finished', () => Object.keys(P.mix || {}).length > 0],
-    ['got1000', '1,000 cards', '1,000 flashcards or essay sentences right', () => got() >= 1000],
-    ['encore', 'Encore', 'Every card right first time in a week you opened over 3 weeks ago', () => !!(P.stats || {}).encore],
+    ['everycourse', 'Across the board', 'Finish at least one assessment item in every course that has one (two or more)', () => assessCourses().length >= 2 && assessCourses().every(c => assessItems(c).some(x => assessDone(c, x.n)))],
+    ['tendone', 'Ten down', 'Finish ten assessment items', () => assessCount() >= 10],
+    ['alldone', 'Every item in', 'Finish every assessment item across all courses (at least two)', () => assessCount() >= 2 && assessCourses().every(courseAssessed)],
     ['methodsall', 'Method in the madness', 'Every problem method in a course practised (at least 3)', () => courses().some(c => { const ms = methodsOf(c); return ms.length >= 3 && ms.every(n => (P.methods || {})[wkey(c, n)]); })],
     ['marksall', 'Full marks everywhere', 'A perfect week’s quiz in every course that has quizzes (two or more)', () => quizCourses().length >= 2 && quizCourses().every(perfectWeek)],
     ['fullsem', 'Full semester', 'Every week added for every course', () => courses().length > 0 && courses().every(full)],
     ['examready', 'Exam ready', '80% or more on a whole-course quiz in every course, and every essay’s thesis known', () => courses().length > 0 && quizCourses().every(c => ((P.exam || {})[c.id] || 0) >= .8) && essayCourses().every(thesesKnown)],
-    ['mastered', 'Mastered', 'Every flashcard in a whole course known, with all its weeks added', () => courses().some(c => full(c) && courseKnown(c) === 1)],
-    ['finalbow', 'Final bow', 'Every course fully added, with 80% of its flashcards known', () => courses().length > 0 && courses().every(c => full(c) && courseKnown(c) >= .8)],
+    ['twocourses', 'Two courses clear', 'Finish every assessment item in two courses', () => assessCourses().filter(courseAssessed).length >= 2],
+    ['finalbow', 'Final bow', 'Every course fully added, with every assessment item finished', () => courses().length > 0 && courses().every(c => full(c) && assessItems(c).length > 0 && courseAssessed(c))],
   ];
-  const earnedCount = () => Object.keys(P.rewards || {}).length;
+  const earnedCount = () => MILESTONES.filter(m => (P.rewards || {})[m[0]]).length;
   const lookFor = i => LOOKS[i + 1];          // milestone i unlocks look i + 1; Classic is yours from the start
   let unlockQueue = [];
   function checkRewards() {
@@ -967,6 +964,18 @@
   /* ---------- adding and editing courses ---------- */
   /* Assessments: which weeks have one, and what it is called. Stored in CFG.assess (synced with the courses). */
   const dueOf = (c, n) => ((CFG.assess || {})[c.id] || {})[n] || '';
+  // An assessment item is done once you mark it. P.assessDone = { courseId: { week: time } }.
+  const assessDone = (c, n) => !!((P.assessDone || {})[c.id] || {})[n];
+  const assessLine = (c, n) => {
+    const d = dueOf(c, n);
+    if (!d) return '';
+    return `<p class="dueline"><b>Assessment</b> ${esc(d)}</p>
+      <button class="assessbtn ${assessDone(c, n) ? 'done' : ''}" data-act="assess-toggle" data-c="${c.id}" data-n="${n}">${assessDone(c, n) ? 'Done ✓ · tap to undo' : 'Mark as done'}</button>`;
+  };
+  const assessItems = c => weeksOf(c).filter(n => dueOf(c, n)).map(n => ({ c, n }));
+  const assessCount = () => courses().reduce((t, c) => t + assessItems(c).filter(x => assessDone(c, x.n)).length, 0);
+  const assessCourses = () => courses().filter(c => assessItems(c).length > 0);
+  const courseAssessed = c => assessItems(c).length > 0 && assessItems(c).every(x => assessDone(c, x.n));
   // A disco ball, drawn exactly like the logo, above each assessment week on the courses screen.
   // Its middle tone is the course colour; the light and dark tones are tints and shades of it.
   const mixHex = (a, b, t) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
@@ -1179,6 +1188,12 @@
         if (practise.shown >= week(c, current.n).method.steps.length) { P.methods = P.methods || {}; P.methods[wkey(c, current.n)] = Date.now(); save(); }
         render(); break;
       case 'practise-stop': practise = null; render(); break;
+      case 'assess-toggle': {
+        const id = t.dataset.c, n = +t.dataset.n;
+        P.assessDone = P.assessDone || {}; P.assessDone[id] = P.assessDone[id] || {};
+        if (P.assessDone[id][n]) delete P.assessDone[id][n]; else P.assessDone[id][n] = Date.now();
+        save(); render(); break;
+      }
       case 'remove-course': {
         if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to remove'; break; }
         const id = t.dataset.id, mine = CFG.added.find(a => a.id === id), empty = !Object.keys(UNI.byId[id].content).length;

@@ -515,3 +515,6 @@ mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 
   .chead div:not(:first-child) { padding-left: 0; text-align: center; }
 }
 @media (min-width: 960px) { .screen.calscreen { max-width: none; padding-left: 40px; padding-right: 40px; } }
+/* assessment: mark an item done */
+.assessbtn { display: inline-flex; align-items: center; margin: 4px 0 6px; padding: 8px 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--c); color: var(--cd); font-size: 13.5px; font-weight: 700; }
+.assessbtn.done { background: var(--c); color: #fff; }
