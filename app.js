@@ -85,7 +85,7 @@
     CFG.edits = Object.assign({}, rc.edits, CFG.edits);
     CFG.removed = [...new Set([...CFG.removed, ...rc.removed])];
     CFG.assess = Object.assign({}, rc.assess, CFG.assess);
-    CFG.tags = [...new Set([...(CFG.tags || []), ...(rc.tags || [])])];
+    { const have = new Set((CFG.tags || []).map(t => typeof t === 'string' ? t : t.name)); CFG.tags = [...(CFG.tags || []), ...(rc.tags || []).filter(t => !have.has(typeof t === 'string' ? t : t.name))]; }
     CFG.events = [...(CFG.events || []), ...(rc.events || []).filter(e => !(CFG.events || []).some(x => x.id === e.id))];
     P._at = CFG._at = Date.now();
     store.set(PKEY, P); store.set(CKEY, CFG); applyCfg();
@@ -260,33 +260,35 @@
   }
 
   /* ---------- semester calendar: one row per week, Monday to Sunday (content/calendar.js) ----------
-   * Your own dates are CFG.events: { id, from, to, label, kind, course, tags }.
-   * Assessments are events of kind 'assess' with a subject (course), so they show on the calendar and on the course. */
+   * Dates you add: CFG.events = [{ id, from, to, label, kind, course, tags: [tagName] }].
+   * Tags you make: CFG.tags = [{ name, colour }]. A date is coloured by its first tag, else its subject.
+   * Assessments are dates of kind 'assess' with a subject; the course shows them in their week. */
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const isoAdd = (iso, k) => { const x = new Date(iso + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
   const isoDate = iso => `${+iso.slice(8)} ${MONTHS[+iso.slice(5, 7) - 1]}`;
   const CAL_KINDS = [['assess', 'Assessment'], ['exam', 'Exam'], ['class', 'Class'], ['other', 'Other']];
   const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const eventsOf = () => CFG.events || [];
+  const tagsOf = () => (CFG.tags || []).map(t => typeof t === 'string' ? { name: t, colour: '#5c5a55' } : t);
+  const tagOf = name => tagsOf().find(t => t.name === name);
+  const evColour = e => (e.tags || []).map(n => (tagOf(n) || {}).colour).find(Boolean) || ((e.course && course(e.course)) || {}).colour || '#5c5a55';
   let calDraft = null;
   const calRows = () => (window.UNI_CALENDAR && window.UNI_CALENDAR.rows) || [];
   // Monday of course week n, from the calendar; and the course week a date falls in (null in breaks)
   const weekMonday = n => { const r = calRows().find(x => x.week === n); return r ? r.start : ''; };
   const weekOfDate = iso => { const r = calRows().find(x => x.week && iso >= x.start && iso <= isoAdd(x.start, 6)); return r ? r.week : null; };
-  const evColour = e => { const c = e.course && course(e.course); return c ? c.colour : '#5c5a55'; };
-  const subjectName = e => { const c = e.course && course(e.course); return c ? (c.short || c.name) : ''; };
+
   function calendarPage() {
     const cal = window.UNI_CALENDAR;
     if (!cal) return `<div class="screen">${back('home', 'Courses')}<p class="note">The calendar isn’t available.</p></div>`;
     const tone = iso => { const p = cal.periods.find(x => iso >= x.from && iso <= x.to); return p ? p.kind : ''; };
     const evOn = {};
     eventsOf().forEach(e => { for (let iso = e.from; iso <= e.to && iso < isoAdd(e.from, 120); iso = isoAdd(iso, 1)) (evOn[iso] = evOn[iso] || []).push(e); });
-    const mine = eventsOf().slice().sort((a, b) => a.from < b.from ? -1 : 1);
     const rows = cal.rows.map(r => {
       const end = isoAdd(r.start, 6);
       const days = Array.from({ length: 7 }, (_, k) => {
         const iso = isoAdd(r.start, k), d = +iso.slice(8), evs = evOn[iso] || [];
-        return `<div class="cday ${tone(iso)}" data-act="cal-add" data-d="${iso}" role="button" tabindex="0" aria-label="Add to ${isoDate(iso)}"><b>${d}</b>${evs.map(e => `<i class="cev" style="color:${evColour(e)}">${esc(e.label)}</i>`).join('')}</div>`;
+        return `<div class="cday ${tone(iso)}" data-act="cal-add" data-d="${iso}" role="button" tabindex="0" aria-label="Add to ${isoDate(iso)}"><b>${d}</b>${evs.map(e => `<button class="cev" data-act="cal-edit" data-id="${e.id}" style="--t:${evColour(e)}">${esc(e.label)}</button>`).join('')}</div>`;
       }).join('');
       const label = r.week ? `<b class="cwn">${pad(r.week)}</b><span>Week · ${isoDate(r.start)}</span>` : `<b>${esc(r.name)}</b><span>${isoDate(r.start)} – ${isoDate(end)}</span>`;
       return `<div class="crow2"><div class="crl">${label}</div>${days}</div>`;
@@ -298,39 +300,35 @@
         <div class="chead"><div></div>${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(x => `<div>${x}</div>`).join('')}</div>
         ${rows}
       </div>
-      ${mine.length ? `<div class="sub" style="margin-top:22px">Your dates</div>${mine.map(e => {
-        const tags = [subjectName(e), ...(e.tags || [])].filter(Boolean);
-        return `<div class="calitem"><div><b>${esc(e.label)}</b><span>${isoDate(e.from)}${e.to !== e.from ? ' – ' + isoDate(e.to) : ''} · ${esc((CAL_KINDS.find(k => k[0] === e.kind) || [0, 'Other'])[1])}${tags.length ? ' · ' + tags.map(esc).join(', ') : ''}</span></div><button class="textbtn" data-act="cal-edit" data-id="${e.id}">Edit</button></div>`;
-      }).join('')}` : ''}
-      <div class="sub" style="margin-top:22px">Tags</div>
-      <p class="note" style="margin:0 0 6px">Your own labels for things that aren’t a subject, like Work or Personal.</p>
-      ${(CFG.tags || []).map(t => `<div class="calitem"><b>${esc(t)}</b><button class="textbtn" data-act="cal-tag-del" data-tag="${esc(t)}">Remove</button></div>`).join('')}
-      <div class="tagadd"><input id="tagname" maxlength="24" placeholder="New tag" autocomplete="off"><button class="btn small" data-act="cal-tag-add">Add tag</button></div>
     </div>`;
   }
+
+  // Read what's typed into the form back into the draft, so toggling a chip doesn't lose it.
+  const calCapture = () => {
+    const v = id => document.getElementById(id);
+    if (!calDraft || !v('cal-label')) return;
+    calDraft.label = v('cal-label').value; calDraft.from = v('cal-from').value; calDraft.to = v('cal-to').value;
+    calDraft.newName = v('tag-new') ? v('tag-new').value : (calDraft.newName || '');
+  };
+  const chip = (on, attrs, text, colour) => `<button type="button" class="chip ${on ? 'on' : ''}" ${attrs} style="${colour ? `--t:${colour}` : ''}">${esc(text)}</button>`;
   function calendarAddPage() {
     const ed = calDraft && calDraft.id ? calDraft : null;
     const d = calDraft || { from: '2027-02-22', to: '2027-02-22' };
-    const tags = CFG.tags || [], picked = d.tags || [];
-    return `<div class="screen">${back('calendar', 'Calendar')}
-      <h1 class="title" style="margin-top:14px">${ed ? 'Edit date' : 'Add to the calendar'}</h1>
-      <form class="form" id="calform" novalidate>
-        <label for="cal-label">What is it</label>
-        <input id="cal-label" maxlength="60" value="${esc(d.label || '')}" placeholder="e.g. Essay 1, Tutorial, Exam" autocomplete="off">
-        <label for="cal-kind">Type</label>
-        <select id="cal-kind">${CAL_KINDS.map(([k, n]) => `<option value="${k}" ${k === (d.kind || 'assess') ? 'selected' : ''}>${n}</option>`).join('')}</select>
-        <label for="cal-course">Subject</label>
-        <select id="cal-course"><option value="">None</option>${courses().map(c => `<option value="${c.id}" ${c.id === d.course ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
-        <label>Tags</label>
-        <div class="tagpick">${tags.length ? tags.map(t => `<label class="tagchip"><input type="checkbox" name="tag" value="${esc(t)}" ${picked.includes(t) ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('') : '<span class="note">No tags yet. Add some under Tags on the calendar.</span>'}</div>
-        <label for="cal-from">From</label>
-        <input id="cal-from" type="date" value="${d.from}">
-        <label for="cal-to">To <small>leave as the same day for one day</small></label>
-        <input id="cal-to" type="date" value="${d.to}">
-        <p class="formerr" id="cerr" role="alert"></p>
-      </form>
+    const kind = d.kind || 'assess', tags = d.tags || [];
+    const newColour = d.newColour || INKS[0][0];
+    return `<div class="screen calform">${back('calendar', 'Calendar')}
+      <h1 class="title" style="margin-top:12px">${ed ? 'Edit' : 'Add to the calendar'}</h1>
+      <input id="cal-label" class="calname" maxlength="60" value="${esc(d.label || '')}" placeholder="What is it? e.g. Essay 1" autocomplete="off">
+      <div class="calgroup"><span class="calk">Type</span><div class="chips">${CAL_KINDS.map(([k, n]) => chip(k === kind, `data-act="cal-kind" data-k="${k}"`, n)).join('')}</div></div>
+      <div class="calgroup"><span class="calk">Subject</span><div class="chips">${courses().map(c => chip(d.course === c.id, `data-act="cal-subject" data-k="${c.id}"`, c.short || c.name, c.colour)).join('')}</div></div>
+      <div class="calgroup"><span class="calk">Tags</span><div class="chips">${tagsOf().map(t => `<span class="tagwrap">${chip(tags.includes(t.name), `data-act="cal-tag" data-k="${esc(t.name)}"`, t.name, t.colour)}<button type="button" class="tagx" data-act="cal-tag-del" data-k="${esc(t.name)}" aria-label="Delete tag ${esc(t.name)}">×</button></span>`).join('')}</div>
+        <div class="newtag"><input id="tag-new" maxlength="24" value="${esc(d.newName || '')}" placeholder="New tag, e.g. Work" autocomplete="off">
+        <div class="swatches">${INKS.map(([h, n]) => `<button type="button" class="sw2 ${h === newColour ? 'on' : ''}" style="--k:${h}" data-act="cal-colour" data-k="${h}" aria-label="${n}"></button>`).join('')}</div>
+        <button type="button" class="btn small ghost" data-act="cal-tag-add">Add tag</button></div></div>
+      <div class="calgroup calwhen"><label class="calk" for="cal-from">From</label><label class="calk" for="cal-to">To</label><input id="cal-from" type="date" value="${d.from}"><input id="cal-to" type="date" value="${d.to}"></div>
+      <p class="formerr" id="cerr" role="alert"></p>
       <button class="btn" data-act="cal-save">${ed ? 'Save changes' : 'Add to calendar'}</button>
-      ${ed ? `<div class="set danger"><button class="btn small ghost" data-act="cal-del" data-id="${ed.id}">Remove this date</button></div>` : ''}
+      ${ed ? `<div class="set danger"><button class="btn small ghost" data-act="cal-del" data-id="${ed.id}">Delete this date</button></div>` : ''}
     </div>`;
   }
 
@@ -1248,38 +1246,53 @@
       session.picked = +t.dataset.pick; if (session.picked === session.items[session.i].item.answer) session.score++; render(); return;
     }
     switch (t.dataset.act) {
-      case 'cal-add': calDraft = { from: t.dataset.d, to: t.dataset.d }; go('calendar-add'); break;
-      case 'cal-edit': { const ev = eventsOf().find(e => e.id === t.dataset.id); if (ev) { calDraft = { ...ev }; go('calendar-edit-' + ev.id); } break; }
+      case 'cal-add': calCapture(); calDraft = { from: t.dataset.d, to: t.dataset.d, kind: 'assess', tags: [] }; go('calendar-add'); break;
+      case 'cal-edit': {
+        const ev = eventsOf().find(e => e.id === t.dataset.id);
+        if (ev) { calDraft = { ...ev }; go('calendar-edit-' + ev.id); }
+        break;
+      }
+      case 'cal-kind': calCapture(); calDraft.kind = t.dataset.k; render(); break;
+      case 'cal-subject': calCapture(); calDraft.course = calDraft.course === t.dataset.k ? '' : t.dataset.k; render(); break;
+      case 'cal-tag': {
+        calCapture(); const n = t.dataset.k; calDraft.tags = calDraft.tags || [];
+        calDraft.tags = calDraft.tags.includes(n) ? calDraft.tags.filter(x => x !== n) : [...calDraft.tags, n];
+        render(); break;
+      }
+      case 'cal-colour': calCapture(); calDraft.newColour = t.dataset.k; render(); break;
       case 'cal-tag-add': {
-        const name = document.getElementById('tagname').value.trim();
-        if (!name) { toast('Type a tag first'); break; }
-        if (!(CFG.tags || []).includes(name)) CFG.tags = [...(CFG.tags || []), name];
+        calCapture();
+        const name = (calDraft.newName || '').trim();
+        if (!name) { toast('Type a tag name first'); break; }
+        if (!tagOf(name)) CFG.tags = [...tagsOf(), { name, colour: calDraft.newColour || INKS[0][0] }];
+        calDraft.tags = [...new Set([...(calDraft.tags || []), name])]; calDraft.newName = '';
         saveCfg(); render(); break;
       }
       case 'cal-tag-del': {
-        CFG.tags = (CFG.tags || []).filter(x => x !== t.dataset.tag);
-        CFG.events = eventsOf().map(e => ({ ...e, tags: (e.tags || []).filter(x => x !== t.dataset.tag) }));
+        calCapture();
+        const n = t.dataset.k;
+        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Sure?'; break; }
+        CFG.tags = tagsOf().filter(x => x.name !== n);
+        CFG.events = eventsOf().map(e => ({ ...e, tags: (e.tags || []).filter(x => x !== n) }));
+        calDraft.tags = (calDraft.tags || []).filter(x => x !== n);
         saveCfg(); render(); break;
       }
       case 'cal-save': {
-        const val = id => document.getElementById(id).value, err = document.getElementById('cerr');
-        const label = val('cal-label').trim(), kind = val('cal-kind'), course = val('cal-course'), from = val('cal-from'), to = val('cal-to') || from;
-        const tags = [...document.querySelectorAll('input[name="tag"]:checked')].map(x => x.value);
+        calCapture();
+        const err = document.getElementById('cerr'), label = calDraft.label.trim(), from = calDraft.from, to = calDraft.to || from;
         if (!label) { err.textContent = 'Give it a name, like Essay 1 or Tutorial.'; document.getElementById('cal-label').focus(); break; }
         if (!from) { err.textContent = 'Pick a start date.'; break; }
         if (to < from) { err.textContent = 'The end date is before the start date.'; break; }
-        if (calDraft && calDraft.id) {
-          CFG.events = eventsOf().map(e => e.id === calDraft.id ? { ...e, label, kind, course, from, to, tags } : e);
-          saveCfg(); toast('Saved');
-        } else {
-          CFG.events = [...eventsOf(), { id: newId(), from, to, label, kind, course, tags }];
-          saveCfg(); toast('Added to the calendar');
-        }
+        const fields = { label, from, to, kind: calDraft.kind || 'assess', course: calDraft.course || '', tags: calDraft.tags || [] };
+        if (calDraft.id) { CFG.events = eventsOf().map(e => e.id === calDraft.id ? { ...e, ...fields } : e); saveCfg(); toast('Saved'); }
+        else { CFG.events = [...eventsOf(), { id: newId(), ...fields }]; saveCfg(); toast('Added to the calendar'); }
         calDraft = null; go('calendar'); break;
       }
       case 'cal-del': {
-        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to remove'; break; }
-        CFG.events = eventsOf().filter(e => e.id !== t.dataset.id); if (P.assessDone) delete P.assessDone[t.dataset.id]; save(); saveCfg(); toast('Removed'); calDraft = null; go('calendar'); break;
+        if (!t.dataset.sure) { t.dataset.sure = '1'; t.textContent = 'Tap again to delete'; break; }
+        CFG.events = eventsOf().filter(e => e.id !== t.dataset.id);
+        if (P.assessDone) delete P.assessDone[t.dataset.id];
+        save(); saveCfg(); toast('Deleted'); calDraft = null; go('calendar'); break;
       }
       case 'start': startCards(c, current.n); render(); window.scrollTo(0, 0); break;
       case 'e-check': case 'e-plan': drillCheck(c, false); render(); break;

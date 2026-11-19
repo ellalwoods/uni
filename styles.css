@@ -519,19 +519,23 @@ mark.km { background: #ffe0ee; color: #9e1f5c; font-weight: 700; border-radius: 
 .assessbtn { display: inline-flex; align-items: center; margin: 4px 0 6px; padding: 8px 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--c); color: var(--cd); font-size: 13.5px; font-weight: 700; }
 .assessbtn.done { background: var(--c); color: #fff; }
 
-/* your own dates on the calendar */
-.cev { font-style: normal; font-size: 10px; line-height: 1.2; font-weight: 700; margin-top: 3px; color: var(--soft); word-break: break-word; }
-.cev.assess { color: #c83f78; }
-.cev.exam { color: #3255a4; }
-.cev.class { color: var(--ink); }
-.calitem { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--hair); }
-.calitem b { display: block; font-size: 15px; }
-.calitem span { font-size: 12.5px; color: var(--soft); }
-.form select { font: inherit; color: var(--ink); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--faint); background: #fff; }
-/* calendar: tags and editing */
-.tagadd { display: flex; gap: 8px; margin-top: 8px; }
-.tagadd input { flex: 1; min-width: 0; font: inherit; color: var(--ink); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--faint); background: #fff; }
-.tagpick { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
-.tagchip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--faint); font-size: 14px; cursor: pointer; }
-.tagchip input { margin: 0; }
-.tagchip:has(input:checked) { background: var(--ink); color: #fff; }
+/* calendar: dates as coloured chips; the add form uses chip groups */
+.cev { display: block; width: 100%; text-align: left; margin-top: 3px; padding: 3px 3px; border-radius: 6px; font-size: 9.5px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; color: var(--t, #5c5a55); background: color-mix(in srgb, var(--t, #5c5a55) 16%, #fff); overflow: hidden; max-height: 3.6em; white-space: normal; overflow-wrap: anywhere; hyphens: none; }
+.calform .calname { width: 100%; font: inherit; font-size: 18px; font-weight: 700; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--faint); margin: 6px 0 14px; }
+.calgroup { margin: 0 0 16px; }
+.calgroup > .calk, .calwhen .calk { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--soft); margin: 0 0 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; padding: 7px 13px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--faint); background: #fff; }
+.chip[style*="--t"] { box-shadow: inset 0 0 0 1.5px var(--t); color: var(--t); }
+.chip.on { background: var(--t, var(--ink)); color: #fff; box-shadow: none; }
+.tagwrap { display: inline-flex; align-items: center; gap: 2px; }
+.tagx { width: 26px; height: 26px; border-radius: 50%; color: var(--soft); font-size: 16px; line-height: 1; }
+.tagx:hover { background: #f1f0ec; }
+.newtag { margin-top: 12px; display: grid; gap: 10px; }
+.newtag input { font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--faint); }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.sw2 { width: 26px; height: 26px; border-radius: 50%; background: var(--k); box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px var(--faint); }
+.sw2.on { box-shadow: inset 0 0 0 2px #fff, 0 0 0 2.5px var(--ink); }
+.calwhen { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.calwhen input { font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--faint); min-width: 0; width: 100%; }
+.calwhen .calk { margin: 0 0 6px; }
